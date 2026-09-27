@@ -76,6 +76,36 @@ The September 16 acceptance record points to
 present in this checkout. The historical pass is therefore a recorded result,
 not independently re-read artifact evidence in this session.
 
+## 2026-09-27 historical-workspace reconstruction
+
+An independent detached clone was created at workspace commit `0a77bd26` and
+all submodules were initialised at that commit's recorded gitlinks:
+
+- `fujinet-nio-driver`: `d7d65934cf0dec1f1610f9b37c245ea0df3f4abb`
+- `nio-core-apps`: `cdb026d28f53254459824591ec6439db108804e6`
+
+It built a fresh `wb32/a1200-030` base HDF from the locally configured,
+licensed Workbench 3.2 media and ran the exact historical test node:
+
+```sh
+scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030 \
+  test_diskdevice_fmount.py::test_fmount_fumount_standard_adf -vv
+```
+
+The old source requires three **disposable reconstruction-only** includes of
+`<dos/dos.h>` (in `fujinet_serial_device.c`, `fujinet-nio-baud.c`, and
+`fujinet-nio-serial.c`) to compile with the current NDK headers. They provide
+the missing `BPTR` and `RETURN_*` declarations only; no disk-device,
+`FMOUNT`, or `FUMOUNT` source was changed.
+
+The guest booted and loaded both resident devices, but stopped before the
+mount/unmount sequence with `Unsupported candidate media`. Its completion
+monitor found no test completion marker. Therefore this run is neither a
+historical passing proof nor a reproduction of the current final-`DN0:`
+failure: the regenerated present-day test-media/environment does not satisfy
+the historical disk-media contract. Its artifacts are intentionally isolated
+under `/tmp/nio-fumount-20260916-Bdmn72/`, not in the workspace evidence tree.
+
 ## What changed after the recorded pass?
 
 No change found that should alter this WB3.2 path:
@@ -112,11 +142,9 @@ current generated HDF before changing production behaviour.
 1. Recover and inspect `amiberry-20260916-233252` if available outside this
    checkout. Confirm the actual `fumount-eject.result` and exact binaries in
    the HDF.
-2. If it cannot be recovered, rebuild the September 16 workspace and its two
-   gitlink revisions in isolated worktrees, then run the focused serial case.
-   This will distinguish an environmental/harness difference from a source
-   regression.
-3. If both old and current revisions reproduce the failure, treat it as a
+2. Recover the exact September media fixture/configuration too, then rerun the
+   already reconstructed workspace rather than substituting regenerated media.
+3. If both old and current revisions reproduce the failure with equivalent
+   media, treat it as a
    previously unobserved FFS multi-DosNode limitation. Choose a new explicit
    FUMOUNT contract before implementation; do not silently force eject.
-
