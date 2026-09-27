@@ -1,0 +1,40 @@
+; Run from the versioned NIO: share:
+;   Execute NIO:Install-FujiNet-WB13
+;
+; This installs the WB1.3/nix13 FujiNet artifacts. It is safe to run again;
+; the MountList block is written only on the first successful installation.
+
+If EXISTS S:FujiNet-WB13-Installed
+  Echo "FujiNet WB1.3 files are already installed."
+Else
+  Copy NIO:fujinet-nio.device TO DEVS:
+  Copy NIO:fujinet-disk.device TO DEVS:
+  Copy NIO:fujinet-load-resident TO C:
+  Copy NIO:fujinet-mount TO C:
+  Copy NIO:fujinet-nio-exchange TO C:
+
+  ; Mount uses the shared DEVS:MountList on Workbench 1.3. Preserve its
+  ; system entries (NEWCON:, AUX:, PIPE:) and add DN0 as a complete entry.
+  Echo >>DEVS:MountList ""
+  Echo >>DEVS:MountList "DN0:"
+  Echo >>DEVS:MountList "    Device = fujinet-disk.device"
+  Echo >>DEVS:MountList "    Unit = 0"
+  Echo >>DEVS:MountList "    Flags = 0"
+  Echo >>DEVS:MountList "    Surfaces = 2"
+  Echo >>DEVS:MountList "    BlocksPerTrack = 11"
+  Echo >>DEVS:MountList "    Reserved = 2"
+  Echo >>DEVS:MountList "    Interleave = 0"
+  Echo >>DEVS:MountList "    LowCyl = 0"
+  Echo >>DEVS:MountList "    HighCyl = 79"
+  Echo >>DEVS:MountList "    Buffers = 5"
+  Echo >>DEVS:MountList "    BufMemType = 1"
+  Echo >>DEVS:MountList "    DosType = 0x444F5300"
+  Echo >>DEVS:MountList "    StackSize = 32768"
+  Echo >>DEVS:MountList "    Priority = 5"
+  Echo >>DEVS:MountList "#"
+
+  Echo >S:FujiNet-WB13-Installed "Installed FujiNet WB1.3 files"
+  Echo "Installed. Add the following two lines before Break 1 C in S:StartupII:"
+  Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
+  Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
+EndIf

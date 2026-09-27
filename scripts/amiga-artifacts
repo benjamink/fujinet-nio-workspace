@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Build self-contained Amiga artifact profiles.  Profiles never share object
+# or executable directories, so a release cannot accidentally use whichever
+# CRT was built most recently.
+set -euo pipefail
+
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+PROFILE="${1:-}"
+
+case "$PROFILE" in
+  wb13) CRT=nix13 ;;
+  wb31|wb32) CRT=clib2 ;;
+  *)
+    echo "Usage: scripts/amiga-artifacts wb13|wb31|wb32" >&2
+    exit 2
+    ;;
+esac
+
+source "$ROOT/scripts/env.sh"
+
+DRIVER_BUILD="$ROOT/repos/fujinet-nio-driver/build/amiga/$PROFILE"
+CORE_BUILD="$ROOT/repos/nio-core-apps/build/amiga/$PROFILE"
+APPS_BUILD="$ROOT/repos/nio-apps/build/amiga/$PROFILE"
+STAGE="$ROOT/build/amiga-artifacts/$PROFILE/NIO"
+
+make -C "$ROOT/repos/fujinet-nio-driver/amiga" \
+  "$DRIVER_BUILD/fujinet-nio.device" \
+  "$DRIVER_BUILD/fujinet-disk.device" \
+  "$DRIVER_BUILD/fujinet-serial.device" \
+  "$DRIVER_BUILD/fujinet-load-resident" \
+  "$DRIVER_BUILD/fujinet-mount" \
+  "$DRIVER_BUILD/fujinet-nio-exchange" \
+  sdk resident-artifacts "BUILD_DIR=../build/amiga/$PROFILE"
+make -C "$ROOT/repos/nio-core-apps" TARGET=amiga \
+  "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+  "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
+make -C "$ROOT/repos/nio-apps" TARGET=amiga \
+  "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+  "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
+
+mkdir -p "$STAGE"
+for name in fujinet-nio.device fujinet-disk.device fujinet-serial.device \
+            fujinet-load-resident fujinet-mount fujinet-nio-exchange; do
+  install -m 0644 "$DRIVER_BUILD/$name" "$STAGE/$name"
+done
+
+if [[ "$PROFILE" != wb13 ]]; then
+  for name in fujinet-unload-resident fujinet-td-probe fujinet-nio-baud \
+              fujinet-nio-serial; do
+    install -m 0644 "$DRIVER_BUILD/$name" "$STAGE/$name"
+  done
+fi
+
+for bin_dir in "$CORE_BUILD/bin" "$APPS_BUILD/bin"; do
+  for artifact in "$bin_dir"/*; do
+    [[ -f "$artifact" ]] || continue
+    install -m 0644 "$artifact" "$STAGE/$(basename "$artifact")"
+  done
+done
+
+if [[ "$PROFILE" == wb13 ]]; then
+  install -m 0644 "$ROOT/configs/amiga/install/Install-FujiNet-WB13" \
+    "$STAGE/Install-FujiNet-WB13"
+  install -m 0644 "$ROOT/repos/fujinet-nio-driver/amiga/config/DN0" \
+    "$STAGE/DN0-MountList"
+fi
+
+printf 'Amiga %s artifacts: %s\n' "$PROFILE" "$STAGE"
