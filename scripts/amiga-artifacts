@@ -50,7 +50,8 @@ if [[ "$PROFILE" == wb13 ]]; then
     build/amiga/$PROFILE/bin/fapp build/amiga/$PROFILE/bin/fboot \
     build/amiga/$PROFILE/bin/fdrive build/amiga/$PROFILE/bin/fhost \
     build/amiga/$PROFILE/bin/fin build/amiga/$PROFILE/bin/fls \
-    build/amiga/$PROFILE/bin/fmount build/amiga/$PROFILE/bin/fout
+    build/amiga/$PROFILE/bin/fmount build/amiga/$PROFILE/bin/fout \
+    build/amiga/$PROFILE/bin/fumount
 else
   make -C "$ROOT/repos/nio-core-apps" TARGET=amiga \
     "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \

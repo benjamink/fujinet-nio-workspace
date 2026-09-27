@@ -17,5 +17,6 @@ files:
   - build/amiga-artifacts/wb13/NIO/fin
   - build/amiga-artifacts/wb13/NIO/fls
   - build/amiga-artifacts/wb13/NIO/fmount
+  - build/amiga-artifacts/wb13/NIO/fumount
   - build/amiga-artifacts/wb13/NIO/fout
   - configs/amiga/install/Install-FujiNet-WB13

@@ -51,6 +51,26 @@ rolled back; a later `FUMOUNT` of an inactive node skips handler retirement
 and retries eject before completing the mapping and DOS-entry removal.
 `FMOUNTRESTORE` replays all valid saved mappings; it takes no arguments.
 
+### Workbench 1.3 static-unit workflow
+
+Workbench 1.3 uses a permanent `DEVS:MountList` entry for each installed
+FujiNet unit. It has the same commands, but a deliberately different handler
+lifecycle:
+
+```text
+FMOUNT 11 DN0: RO
+Dir DN0:
+FUMOUNT DN0:
+FMOUNT 11 DN0: RO
+Type DN0:KNOWN.TXT
+```
+
+On WB1.3, `FUMOUNT DN0:` ejects the FujiNet media through `TD_EJECT`; it does
+not remove `DN0:` or retire its OFS handler. Leaving that static handler and
+MountList entry in place is intentional: the final `FMOUNT` supplies new
+media to the same unit. Do not use WB2+ descriptions of `ACTION_DIE`, dynamic
+DOS-node removal, or `FMOUNTRESTORE` as WB1.3 instructions.
+
 ### Mounting two images at once
 
 Before mounting images on different `DNx:` units at the same time, make sure

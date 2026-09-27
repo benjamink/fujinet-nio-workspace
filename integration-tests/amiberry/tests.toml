@@ -146,7 +146,7 @@ app = "wifitest"
 driver = true
 driver_tools = ["fujinet-nio-exchange"]
 amiga_artifact_profile = "wb13"
-core_tools = ["fmount"]
+core_tools = ["fmount", "fumount"]
 wb13_mountlist = true
 environments = ["wb13"]
 timeout = 75
@@ -156,7 +156,14 @@ startup = "startup/diskdevice-wb13-ofs.sequence"
 startup_target = "S/StartupII"
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-ofs"
-results = []
+results = [
+  "wb13-load.result",
+  "wb13-fmount-first.result",
+  "wb13-type-first.result",
+  "wb13-fumount.result",
+  "wb13-fmount-second.result",
+  "wb13-type-second.result",
+]
 
 [[test]]
 name = "diskdevice-hd-adf"
