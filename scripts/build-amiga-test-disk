@@ -197,6 +197,11 @@ def main() -> int:
             startup.write_text(startup_text, encoding="latin-1")
             run_xdf(args.output, "delete", startup_target)
             run_xdf(args.output, "write", str(startup), startup_target)
+            # Workbench 1.3 only executes Startup-Sequence files carrying the
+            # script protection bit.  xdftool writes new files with its normal
+            # data-file protection mask, so restore the standard executable
+            # script attributes after replacing a startup file.
+            run_xdf(args.output, "protect", startup_target, "s+rwed")
 
     print(f"Built Amiga test HDF: {args.output}")
     return 0
