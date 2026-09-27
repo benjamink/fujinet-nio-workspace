@@ -16,11 +16,13 @@ __pycache__/
 __init__.py
 __main__.py
 
-/scratch
 /repos/PDCurses/
 /repos/bounce-world/
 /repos/8n1
 /repos/core2350-test
+/repos/DIEGO-500
+
+/scratch
 /images/
 
 # causal output we don't want to track
