@@ -106,12 +106,11 @@ such as `NEWCON:`, and prints the two resident-loader lines to add before
 
 ```text
 FMOUNT 11 DN0: RO
-Mount DN0:
 Dir DN0:
 ```
 
 Workbench 1.3 has no supported public dynamic DOS-node API: `FMOUNT` therefore
-selects media in the static unit and `Mount` starts its OFS handler. WB1.3
+selects media in the static unit and starts its OFS handler itself. WB1.3
 does not yet package `FUMOUNT`: safely retiring a live handler requires the
 classic raw DOS-packet path, which is separate work. The WB2+ dynamic-node
 behaviour remains in the separate `wb31`/`wb32` builds.

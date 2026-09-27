@@ -38,5 +38,5 @@ Else
   Echo "Installed. Add the following two lines before Break 1 C in S:StartupII:"
   Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
   Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
-  Echo "Then, after the next boot: FMOUNT 11 DN0: RO ; Mount DN0:"
+  Echo "Then, after the next boot: FMOUNT 11 DN0: RO"
 EndIf
