@@ -73,18 +73,21 @@ AMIGA_WB32_ADF_MODULES_A500=/path/to/ModulesA500_3.2.adf
 # add AMIGA_WB32_ADF_MODULES_A2000 etc. when needed
 ```
 
-**WB1.3 interactive Workbench (Amiga Forever or original media):**
+**WB1.3 A500 Workbench and E2E base (Amiga Forever or original media):**
 
 ```bash
 AMIGA_WB13_KICKSTART=/path/to/kick13.rom
 AMIGA_WB13_ROM_KEY=/path/to/rom.key          # omit only for an unencrypted ROM
 AMIGA_WB13_ADF_WORKBENCH=/path/to/workbench13.adf
+AMIGA_WB13_HDF=/path/to/clean-workbench13.hdf
 ```
 
-`wb1.3` is an interactive direct-floppy profile, not an assembled automated
-environment. Keep these licensed paths solely in ignored `local/amiga.env`.
-The launcher has no fallback media paths: a missing or unreadable ROM, key, or
-ADF is reported as a profile launch error.
+`AMIGA_WB13_HDF` is a clean, manually installed and bootable WB1.3 HDF. The
+`wb13` environment builder copies it to `build/amiga-envs/wb13/a500-000/` and
+never writes to the source. Each E2E case then copies that generated base again
+before injecting its payload. Keep these licensed paths solely in ignored
+`local/amiga.env`. The launcher has no fallback media paths: a missing or
+unreadable ROM, key, ADF, or HDF is reported as a profile launch error.
 
 The Modules ADF is machine-specific because it contains chipset drivers. The generic
 Workbench and Extras ADFs are shared; only the Modules ADF differs per machine family.
@@ -116,6 +119,20 @@ scripts/amiga-env build wb32 --machine a500-030
 ```
 
 Build output: `build/amiga-envs/wb32/a1200-030/base.hdf`, etc.
+
+### Machine-keyed prebuilt environments (WB1.3)
+
+WB1.3 uses a prepared local HDF rather than automating an OS installation from
+licensed floppy media. Build the disposable base for the real 68000 A500
+profile with:
+
+```bash
+scripts/amiga-env build wb13 --machine a500-000
+```
+
+This creates `build/amiga-envs/wb13/a500-000/base.hdf` and its manifest. It
+does not alter `AMIGA_WB13_HDF`; rebuilding is safe after updating the local
+source image.
 
 ---
 
@@ -181,6 +198,9 @@ scripts/amiga-env build wb31
 scripts/amiga-env build wb32 --machine a1200-030
 scripts/amiga-env build wb32 --machine a500-030
 
+# Prepared local WB1.3 HDF, keyed to the 68000 A500 profile
+scripts/amiga-env build wb13 --machine a500-000
+
 # Force rebuild even if inputs are unchanged
 scripts/amiga-env build wb32 --machine a1200-030 --force
 ```
@@ -234,6 +254,10 @@ scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030 --run-amiga
 # Run a focused test
 scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030 \
   --run-amiga -k test_fmount_fumount_standard_adf
+
+# Focused cold-start broker regression on a fresh copy of the WB1.3 base
+scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000 \
+  --run-amiga -k test_wb13_cold_stock_serial_worker -v
 
 # Verbose output
 scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030 --run-amiga -v

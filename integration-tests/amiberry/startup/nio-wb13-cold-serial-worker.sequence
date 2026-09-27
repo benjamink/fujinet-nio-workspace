@@ -1,0 +1,5 @@
+C:Assign T: RAM:
+C:Failat 100
+C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device
+C:fujinet-nio-exchange --type clock --backend cold --baud 38400 --trials 1
+C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --trials 1 --size 256 --uri host:/amiga-e2e-complete/nio-wb13-cold-serial-worker

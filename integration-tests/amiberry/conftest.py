@@ -837,6 +837,21 @@ def run_amiga_case(amiga_environment: dict[str, str],
                    amiga_evidence_root: Path) -> Any:
     def run(name: str, *, installation: str | None = None) -> dict[str, str]:
         case = dict(amiga_cases[name])
+        supported_environments = case.get("environments")
+        active_environment = amiga_environment.get("AMIGA_ENV_ID")
+        if supported_environments is not None:
+            if (not isinstance(supported_environments, list)
+                    or not all(isinstance(item, str) for item in supported_environments)):
+                raise AssertionError(
+                    f"Amiberry case '{name}' has invalid environments: "
+                    f"{supported_environments!r}"
+                )
+            if active_environment not in supported_environments:
+                pytest.skip(
+                    f"Amiberry case '{name}' supports only "
+                    f"{', '.join(supported_environments)}; active environment is "
+                    f"{active_environment or 'unknown'}"
+                )
         if installation not in {None, "serial", "native"}:
             raise ValueError(f"Unknown installation: {installation}")
         if installation == "native":
@@ -996,6 +1011,8 @@ def run_amiga_case(amiga_environment: dict[str, str],
             "--no-workbench",
             "--output", image,
         ]
+        if case.get("startup_target"):
+            build_cmd.extend(["--startup-target", case["startup_target"]])
         if not case.get("nio_broker"):
             build_cmd.extend([
                 "--extra-app-dir", ROOT / "repos/nio-apps/build/amiga/bin",

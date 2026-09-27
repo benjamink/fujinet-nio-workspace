@@ -5,10 +5,8 @@ kickstart_var: AMIGA_WB13_KICKSTART
 rom_key_var: AMIGA_WB13_ROM_KEY
 
 assembly:
-  # TBD: assembly method to be determined after auditing actual licensed 1.3
-  # media. Do not assume any particular disk count or filesystem layout.
-  method: TBD
-
-hdf:
-  size: 64M
-  volume_label: Workbench13
+  # The source is a manually installed, bootable, licensed HDF. The builder
+  # copies it into a disposable machine-keyed E2E base; it never edits source.
+  method: prebuilt_hdf
+  machine: required
+  source_hdf_var: AMIGA_WB13_HDF

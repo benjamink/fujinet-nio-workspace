@@ -56,6 +56,8 @@ def main() -> int:
                         help="startup command; defaults to the installed app name")
     parser.add_argument("--startup-script", type=Path,
                         help="complete Startup-Sequence to install instead of generating one")
+    parser.add_argument("--startup-target", default="S/Startup-Sequence",
+                        help="guest startup file to replace (default: S/Startup-Sequence)")
     parser.add_argument("--interactive", action="store_true",
                         help="preserve the OS startup sequence for interactive use")
     parser.add_argument("--no-workbench", action="store_true",
@@ -101,19 +103,17 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="amiga-test-disk-") as temp:
         shutil.copy2(args.base_hdf, args.output)
 
-        # Read the Startup-Sequence from the copied image so we can splice
-        # test commands into it at the LoadWB marker.
-        ss_local = Path(temp) / "Startup-Sequence"
-        extracted = False
-        for ss_name in ("S/Startup-Sequence", "S/Startup-sequence"):
-            try:
-                run_xdf(args.output, "read", ss_name, str(ss_local))
-                extracted = True
-                break
-            except SystemExit:
-                pass
-        if not extracted:
-            raise SystemExit("Could not read S/Startup-Sequence from base HDF")
+        # Read the requested startup file. Most environments use the primary
+        # Startup-Sequence; WB1.3 media may delegate its early boot work to a
+        # second sequence which must run before Workbench.
+        startup_target = args.startup_target.strip()
+        if not startup_target or startup_target.startswith("/") or ".." in startup_target.split("/"):
+            raise SystemExit(f"Invalid startup target: {args.startup_target!r}")
+        ss_local = Path(temp) / "startup-target"
+        try:
+            run_xdf(args.output, "read", startup_target, str(ss_local))
+        except SystemExit as exc:
+            raise SystemExit(f"Could not read {startup_target} from base HDF") from exc
         staged_startup = ss_local.read_text(encoding="latin-1")
 
         # Install test payload: app, driver, extra apps, archives.
@@ -168,18 +168,35 @@ def main() -> int:
                 load_nio=args.load_nio,
             )
 
-            marker_at = startup_command_offset(staged_startup, "LoadWB")
-            if marker_at is None:
-                raise SystemExit("licensed Startup-Sequence has no LoadWB command line")
-            startup_text = staged_startup[:marker_at] + test_commands.rstrip() + "\n"
-            if args.no_workbench:
-                startup_text += "C:Wait 1\nC:EndCLI\n"
+            if startup_target.lower() == "s/startup-sequence":
+                marker_at = startup_command_offset(staged_startup, "LoadWB")
+                if marker_at is None:
+                    raise SystemExit("licensed Startup-Sequence has no LoadWB command line")
+                startup_text = staged_startup[:marker_at] + test_commands.rstrip() + "\n"
+                if args.no_workbench:
+                    startup_text += "C:Wait 1\nC:EndCLI\n"
+                else:
+                    startup_text += staged_startup[marker_at:]
             else:
-                startup_text += staged_startup[marker_at:]
-            startup = Path(temp) / "Startup-Sequence-patched"
+                # A delegated startup such as WB1.3's S:StartupII has no
+                # LoadWB marker. Preserve its setup (notably ENV: assigns),
+                # then insert the test immediately before its existing Break
+                # wakes the primary Startup-Sequence.
+                marker_at = startup_command_offset(staged_startup, "Break")
+                if marker_at is None:
+                    raise SystemExit(
+                        f"delegated startup {startup_target} has no Break command line"
+                    )
+                startup_text = (
+                    staged_startup[:marker_at]
+                    + test_commands.rstrip()
+                    + "\n"
+                    + staged_startup[marker_at:]
+                )
+            startup = Path(temp) / "startup-target-patched"
             startup.write_text(startup_text, encoding="latin-1")
-            run_xdf(args.output, "delete", "S/Startup-Sequence")
-            run_xdf(args.output, "write", str(startup), "S/Startup-Sequence")
+            run_xdf(args.output, "delete", startup_target)
+            run_xdf(args.output, "write", str(startup), startup_target)
 
     print(f"Built Amiga test HDF: {args.output}")
     return 0

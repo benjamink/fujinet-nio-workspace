@@ -83,12 +83,13 @@ Other useful profile options:
 
 #### Workbench 1.3 cold broker validation
 
-`wb1.3` remains an A500/68000 direct-floppy session (512 KiB chip RAM). Set
-`AMIGA_WB13_KICKSTART`, `AMIGA_WB13_ROM_KEY` when the ROM is encrypted, and
-`AMIGA_WB13_ADF_WORKBENCH` in ignored `local/amiga.env`; the profile will name
-missing or unreadable licensed media rather than selecting a fallback. Its
-read-only `NIO:` share is refreshed at launch and contains the resident loader,
-`fujinet-nio.device`, and `fujinet-nio-exchange`.
+`wb13-adf` remains an A500/68000 direct-floppy session. `wb13-a500` is the
+persistent HDF profile. Set `AMIGA_WB13_KICKSTART`, `AMIGA_WB13_ROM_KEY` when
+the ROM is encrypted, `AMIGA_WB13_ADF_WORKBENCH`, and the clean source
+`AMIGA_WB13_HDF` in ignored `local/amiga.env`; profiles and the environment
+builder name missing or unreadable licensed media rather than selecting a
+fallback. The read-only `NIO:` share is refreshed at launch and contains the
+resident loader, `fujinet-nio.device`, and `fujinet-nio-exchange`.
 
 To demonstrate that the broker, rather than an earlier open, loads stock
 `serial.device` from the Workbench disk:

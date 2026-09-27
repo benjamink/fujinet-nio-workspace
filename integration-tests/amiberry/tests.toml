@@ -885,6 +885,20 @@ results = [
 ]
 
 [[test]]
+name = "nio-wb13-cold-serial-worker"
+project = "driver"
+app = "fujinet-nio-exchange"
+nio_broker = true
+environments = ["wb13"]
+timeout = 75
+activity_timeout = 60
+no_activity_timeout = 30
+startup = "startup/nio-wb13-cold-serial-worker.sequence"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/nio-wb13-cold-serial-worker"
+results = []
+
+[[test]]
 name = "nio-native-test"
 project = "driver"
 app = "fujinet-nio-native-test-probe"

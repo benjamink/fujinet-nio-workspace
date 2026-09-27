@@ -37,7 +37,7 @@ class DevelopmentShareTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[3]
         profile = load_profile(
             root / "configs" / "amiga" / "workbenches.yaml",
-            "wb1.3",
+            "wb13-adf",
             root,
             {
                 "AMIGA_WB13_ADF_WORKBENCH": "/media/workbench13.adf",

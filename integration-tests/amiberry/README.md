@@ -45,6 +45,7 @@ If you haven't built the environment yet:
 ```sh
 scripts/amiga-env build wb32 --machine a1200-030
 scripts/amiga-env build wb31
+scripts/amiga-env build wb13 --machine a500-000
 scripts/amiga-env status
 ```
 

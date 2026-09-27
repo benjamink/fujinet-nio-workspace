@@ -144,7 +144,7 @@ def compute_input_hash(recipe_path: Path, media_paths: list[Path]) -> str:
     h = hashlib.sha256()
     h.update(recipe_path.read_bytes())
     # Include builder version as a string so recipe-logic changes invalidate the stamp.
-    h.update(b"amiga-env-builder-v1\n")
+    h.update(b"amiga-env-builder-v2\n")
     for p in sorted(media_paths):
         h.update(p.name.encode())
         hash_file(p, h)
@@ -436,6 +436,23 @@ def assemble_preexpanded(recipe: dict, local_env: dict[str, str], out_dir: Path)
     return tree, Path(boot_adf_val)
 
 
+def resolve_prebuilt_hdf(recipe: dict, local_env: dict[str, str]) -> Path:
+    """Return the local prepared base HDF for a prebuilt recipe.
+
+    The source is deliberately copy-only: the builder and E2E test cases must
+    never mutate the developer's original licensed Workbench installation.
+    """
+    source_var = recipe.get("assembly", {}).get("source_hdf_var", "")
+    source_value = local_env.get(source_var, "")
+    source_hdf = Path(source_value) if source_value else None
+    if not source_hdf or not source_hdf.is_file():
+        raise SystemExit(
+            f"{source_var} must point to a bootable prepared HDF. "
+            "Set it in local/amiga.env."
+        )
+    return source_hdf
+
+
 # ---------------------------------------------------------------------------
 # build
 # ---------------------------------------------------------------------------
@@ -453,17 +470,25 @@ def cmd_build(env_id: str, force: bool, machine_id: str | None) -> None:
 
     assembly = recipe.get("assembly", {})
     machine_modules_required = assembly.get("machine_modules") == "required"
+    machine_required = assembly.get("machine") == "required"
+    machine_keyed = machine_modules_required or machine_required
 
     # Resolve machine profile and modules ADF if needed.
     machine_profile: dict = {}
     machine_modules_adf: Path | None = None
+    if machine_required and not machine_id:
+        raise SystemExit(
+            f"Environment '{env_id}' requires a machine. "
+            f"Specify one with --machine, e.g.: scripts/amiga-env build {env_id} --machine a500-000"
+        )
+    if machine_keyed and machine_id:
+        machine_profile = load_machine_profile(machine_id)
     if machine_modules_required:
         if not machine_id:
             raise SystemExit(
                 f"Environment '{env_id}' requires a machine (machine_modules: required).\n"
                 f"Specify one with --machine, e.g.: scripts/amiga-env build {env_id} --machine a1200-030"
             )
-        machine_profile = load_machine_profile(machine_id)
         os_modules = machine_profile.get("os_modules", {})
         modules_var = os_modules.get(env_id)
         if not modules_var:
@@ -480,7 +505,7 @@ def cmd_build(env_id: str, force: bool, machine_id: str | None) -> None:
                 f"Set it in local/amiga.env."
             )
         machine_modules_adf = Path(modules_val)
-    elif machine_id:
+    elif machine_id and not machine_keyed:
         print(f"Note: --machine {machine_id!r} ignored (environment '{env_id}' is machine-agnostic).")
 
     local_env = load_local_env()
@@ -508,7 +533,7 @@ def cmd_build(env_id: str, force: bool, machine_id: str | None) -> None:
             rom_key = Path(rom_key_val)
 
     # Output path: <env_id>/ for machine-agnostic, <env_id>/<machine_id>/ when machine required.
-    if machine_modules_required and machine_id:
+    if machine_keyed and machine_id:
         out_dir = ENVS_DIR / env_id / machine_id
     else:
         out_dir = ENVS_DIR / env_id
@@ -524,6 +549,7 @@ def cmd_build(env_id: str, force: bool, machine_id: str | None) -> None:
     if machine_modules_adf and machine_modules_adf.is_file():
         media_files.append(machine_modules_adf)
 
+    prebuilt_hdf: Path | None = None
     if method in ("six_disk", "wb32_adf"):
         disks_spec = assembly.get("disks", {})
         for var in disks_spec.values():
@@ -534,65 +560,77 @@ def cmd_build(env_id: str, force: bool, machine_id: str | None) -> None:
         boot_adf_val = local_env.get(assembly.get("boot_adf_var", ""), "")
         if boot_adf_val and Path(boot_adf_val).is_file():
             media_files.append(Path(boot_adf_val))
+    elif method == "prebuilt_hdf":
+        prebuilt_hdf = resolve_prebuilt_hdf(recipe, local_env)
+        media_files.append(prebuilt_hdf)
 
     input_hash = compute_input_hash(recipe_path, media_files)
 
-    build_label = f"{env_id}/{machine_id}" if machine_id and machine_modules_required else env_id
+    build_label = f"{env_id}/{machine_id}" if machine_id and machine_keyed else env_id
     if not force and stamp_path.is_file() and stamp_path.read_text().strip() == input_hash:
         print(f"Environment '{build_label}' is up to date (stamp matches). Use --force to rebuild.")
         return
 
     print(f"Building environment: {build_label}")
 
-    with tempfile.TemporaryDirectory(prefix=f"amiga-env-{env_id}-") as tmp:
-        work = Path(tmp)
+    ffs_out: Path | None = None
+    if method == "prebuilt_hdf":
+        assert prebuilt_hdf is not None
+        print("  Copying prepared base HDF (source is not modified) ...")
+        temporary_hdf = base_hdf.with_suffix(base_hdf.suffix + ".tmp")
+        temporary_hdf.unlink(missing_ok=True)
+        shutil.copy2(prebuilt_hdf, temporary_hdf)
+        temporary_hdf.replace(base_hdf)
+    else:
+        with tempfile.TemporaryDirectory(prefix=f"amiga-env-{env_id}-") as tmp:
+            work = Path(tmp)
 
-        if method == "six_disk":
-            os_tree, boot_adf = assemble_six_disk(recipe, local_env, work)
-        elif method == "wb32_adf":
-            assert machine_modules_adf is not None
-            os_tree, boot_adf = assemble_wb32_adf(recipe, local_env, work, machine_modules_adf)
-        elif method == "preexpanded":
-            os_tree, boot_adf = assemble_preexpanded(recipe, local_env, work)
-        else:
-            raise SystemExit(f"Unknown assembly method: {method!r}")
+            if method == "six_disk":
+                os_tree, boot_adf = assemble_six_disk(recipe, local_env, work)
+            elif method == "wb32_adf":
+                assert machine_modules_adf is not None
+                os_tree, boot_adf = assemble_wb32_adf(recipe, local_env, work, machine_modules_adf)
+            elif method == "preexpanded":
+                os_tree, boot_adf = assemble_preexpanded(recipe, local_env, work)
+            else:
+                raise SystemExit(f"Unknown assembly method: {method!r}")
 
-        hdf_settings = recipe.get("hdf", {})
-        volume_label = hdf_settings.get("volume_label", env_id)
-        size = hdf_settings.get("size", "128M")
+            hdf_settings = recipe.get("hdf", {})
+            volume_label = hdf_settings.get("volume_label", env_id)
+            size = hdf_settings.get("size", "128M")
 
-        ffs_src = os_tree / "L" / "FastFileSystem"
-        if not ffs_src.is_file():
-            ffs_src = os_tree / "FastFileSystem"
-        if not ffs_src.is_file():
-            raise SystemExit(
-                f"Assembled OS tree for '{build_label}' is missing FastFileSystem"
+            ffs_src = os_tree / "L" / "FastFileSystem"
+            if not ffs_src.is_file():
+                ffs_src = os_tree / "FastFileSystem"
+            if not ffs_src.is_file():
+                raise SystemExit(
+                    f"Assembled OS tree for '{build_label}' is missing FastFileSystem"
+                )
+            ffs_out = out_dir / "FastFileSystem"
+            shutil.copy2(ffs_src, ffs_out)
+
+            print(f"  Packing base HDF ({size}) ...")
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts" / "build-amiga-hdf"),
+                    "--os-tree", str(os_tree),
+                    "--boot-adf", str(boot_adf),
+                    "--output", str(base_hdf),
+                    "--size", size,
+                    "--volume-label", volume_label,
+                ],
+                check=True,
             )
-        ffs_out = out_dir / "FastFileSystem"
-        shutil.copy2(ffs_src, ffs_out)
-
-        print(f"  Packing base HDF ({size}) ...")
-        subprocess.run(
-            [
-                sys.executable,
-                str(ROOT / "scripts" / "build-amiga-hdf"),
-                "--os-tree", str(os_tree),
-                "--boot-adf", str(boot_adf),
-                "--output", str(base_hdf),
-                "--size", size,
-                "--volume-label", volume_label,
-            ],
-            check=True,
-        )
 
     manifest = {
         "id": env_id,
-        "machine": machine_id if machine_modules_required and machine_id else None,
+        "machine": machine_id if machine_keyed and machine_id else None,
         "os_version": recipe.get("os_version", ""),
         "base_hdf": str(base_hdf.resolve()),
         "kickstart": str(kickstart.resolve()),
         "rom_key": str(rom_key.resolve()) if rom_key and rom_key.is_file() else None,
-        "fast_file_system": str(ffs_out.resolve()),
+        "fast_file_system": str(ffs_out.resolve()) if ffs_out else None,
         "input_hash": input_hash,
         "built_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -651,10 +689,12 @@ def cmd_status() -> None:
         assembly = recipe.get("assembly", {})
         method = assembly.get("method", "")
         machine_modules_required = assembly.get("machine_modules") == "required"
+        machine_required = assembly.get("machine") == "required"
+        machine_keyed = machine_modules_required or machine_required
 
         # Determine which output directories to check (machine-keyed or plain).
         env_base = ENVS_DIR / env_id
-        if machine_modules_required:
+        if machine_keyed:
             # Enumerate all machine sub-directories that have been built.
             candidates = [(d.name, d) for d in env_base.iterdir() if d.is_dir()] if env_base.is_dir() else []
             if not candidates:
@@ -682,6 +722,10 @@ def cmd_status() -> None:
                 media_files: list[Path] = []
                 if kickstart_val and Path(kickstart_val).is_file():
                     media_files.append(Path(kickstart_val))
+                rom_key_var = recipe.get("rom_key_var", "")
+                rom_key_val = local_env.get(rom_key_var, "")
+                if rom_key_val and Path(rom_key_val).is_file():
+                    media_files.append(Path(rom_key_val))
                 if method in ("six_disk", "wb32_adf"):
                     for var in assembly.get("disks", {}).values():
                         val = local_env.get(var, "")
@@ -700,6 +744,10 @@ def cmd_status() -> None:
                     boot_adf_val = local_env.get(assembly.get("boot_adf_var", ""), "")
                     if boot_adf_val and Path(boot_adf_val).is_file():
                         media_files.append(Path(boot_adf_val))
+                elif method == "prebuilt_hdf":
+                    source_hdf_val = local_env.get(assembly.get("source_hdf_var", ""), "")
+                    if source_hdf_val and Path(source_hdf_val).is_file():
+                        media_files.append(Path(source_hdf_val))
                 current_hash = compute_input_hash(recipe_path, media_files)
                 stored_hash = stamp_path.read_text().strip() if stamp_path.is_file() else ""
                 stale = current_hash != stored_hash
@@ -722,7 +770,7 @@ def main() -> int:
     p_build = sub.add_parser("build", help="build a base HDF for an environment")
     p_build.add_argument("env_id", help="environment id (e.g. wb31, wb32)")
     p_build.add_argument("--machine", dest="machine_id", default=None,
-                         help="machine profile id (required for environments with machine_modules: required)")
+                         help="machine profile id (required for machine-keyed environments)")
     p_build.add_argument("--force", action="store_true", help="rebuild even if up to date")
 
     p_show = sub.add_parser("show", help="print a field from the environment manifest")
