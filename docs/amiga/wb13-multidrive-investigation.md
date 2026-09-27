@@ -29,6 +29,35 @@ but `Type DN2:PERSIST.TXT` blocks on the WB1.3 "Please insert volume DN2"
 requester. DN0 remains mounted. This is a DOS/FFS static-handler lifecycle
 problem, not a FujiNet mapping failure.
 
+## September 2026 trace findings
+
+The resident command trace isolates the failure to the transition after a
+writable secondary volume is ejected.  Immediately after `TD_EJECT`, the
+WB1.3 FastFileSystem handler issues `CMD_CLEAR` and then a buffered
+`CMD_WRITE`; the write returns `TDERR_DiskChanged` (29).  The handler then
+reports the volume read/write-error requester.  This is why mapping the same
+catalogue slot again cannot restore it: the later map succeeds at the device
+layer, but the handler has already entered its error path.
+
+Clearing the trace after the eject and collecting it immediately after the
+next `FMOUNT` shows only the private catalogue-mount request.  In particular,
+the DN2 handler issues no new trackdisk request to inspect or accept the
+inserted medium.  The Amiberry task snapshot agrees: DN2 has received its
+legacy change signal (`0x100`) but is waiting on its packet-port signal.
+
+Two plausible recovery attempts are ruled out:
+
+- Sending `ACTION_FLUSH` through `DeviceProc("DN2:")` before `TD_EJECT` is
+  not supported safely by this WB1.3 FFS: it leaves the guest at the
+  "Software error - task held" requester before the eject.
+- Running the stock `DiskChange DN2:` after the next `FMOUNT` still produces
+  the FFS read/write-error requester.
+
+The next investigation must therefore find a WB1.3-safe way to make FFS
+commit writable metadata before the removable-media transition, or establish
+that the classic FFS handler cannot support writable secondary removable
+media while another static handler remains live.
+
 ## Rejected paths
 
 - Standalone `DEVS:DNn` files are not a WB1.3 replacement for its shared
