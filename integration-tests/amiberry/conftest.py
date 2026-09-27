@@ -938,7 +938,7 @@ def run_amiga_case(amiga_environment: dict[str, str],
             create_standard_adf(amiga_environment, host_root / "second.adf",
                                 "SECOND.TXT", "FUJINET SECOND DRIVE PASSED\n")
             create_standard_adf(amiga_environment, host_root / "writable.adf",
-                                "BASE.TXT", "FUJINET WRITABLE BASE\n")
+                                "BASE.TXT", "FUJINET WRITABLE BASE\n", "NIOWRITABLE")
             create_hd_adf(amiga_environment, host_root / "hd.adf")
             create_hd_adf(amiga_environment, host_root / "hd-second.adf",
                           "SECONDHD.TXT", "FUJINET SECOND HD PASSED\n")

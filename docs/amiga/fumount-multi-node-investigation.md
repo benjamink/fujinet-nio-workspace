@@ -1,6 +1,7 @@
 # FUMOUNT multi-node investigation
 
-Status: open, observed 2026-09-27.
+Status: resolved for the generated Amiberry fixtures, 2026-09-27. A separate
+same-volume-label FFS limitation remains documented below.
 
 This log preserves the investigation into the failure to unmount `DN0:` after
 the normal writable `DN2:` mount, unmount and remount path. It is deliberately
@@ -53,10 +54,11 @@ that can leave a live FFS handler attached to removed media.
 
 At the point immediately after the second `FMOUNT 13 DN2: RW`, DOS-list
 diagnostics showed the new `DN2:` node with `dol_Task == 0`; it had not yet
-started an FFS handler. The dedicated remount-without-access reduction now
-reproduces the final `DN0:` `ACTION_DIE` refusal in exactly that state. Thus
-the trigger is not a normal open file, directory lock or live `DN2:` handler:
-the presence of the second dynamic FFS node itself is sufficient.
+started an FFS handler. The dedicated remount-without-access reduction still
+reproduced the final `DN0:` `ACTION_DIE` refusal in that state. This ruled out
+a normal open file, directory lock or live second handler, but it did **not**
+prove that the dynamic node itself was sufficient: the generated DN0 and DN2
+media also had the same FFS volume identity, `NIOADF`.
 
 The guest-side `lockdiag` run after the final failed `FUMOUNT DN0:` found both
 `DN0` and `DN2` as waiting filesystem processes, but found no process whose
@@ -106,6 +108,30 @@ In the failing remount run, DN0 reported unit 0 and DN2 unit 2; both named
 accidentally recreating DN2 as unit 0, so a shared-unit identity error is
 eliminated.
 
+## Resolution: distinct fixture volume identities
+
+The harness created both `standard.adf` and `writable.adf` with the default
+volume label `NIOADF`. The two-node reproducer therefore mounted two distinct
+images that presented the same FFS volume identity. Changing only the
+`writable.adf` label to `NIOWRITABLE` makes both decisive serial reductions
+pass:
+
+1. DN0 mount/use → DN2 mount/copy → FUMOUNT DN2 → remount/access DN2 →
+   FUMOUNT DN0.
+2. The same sequence but with DN2 remounted and left inactive.
+
+No resident-driver or `FUMOUNT` source change is required. The fixture change
+removes an accidental duplicate-volume test condition, and the two formerly
+non-strict `xfail` regressions are now ordinary passing tests.
+
+This does not claim that FFS 47.4 can safely retire one of two live volumes
+which deliberately have the same identity. With duplicate labels, the
+fail-closed `ACTION_DIE` refusal remains correct: the AmigaDOS contract permits
+`ERROR_OBJECT_IN_USE` when a filesystem cannot prove that it has released all
+references. Operators should give concurrently mounted images distinct volume
+labels; a later product decision may add an explicit preflight diagnostic for
+that unsupported combination rather than attempting forced eject.
+
 ## Reusable-node experiment (rejected)
 
 The candidate changed successful `FUMOUNT` to retire/eject the handler but
@@ -148,6 +174,7 @@ non-strict `xfail` until a candidate passes both of them.
 | 2026-09-17 | `04c162085` | Ran the scenario for serial and native installations. | The test sequence and assertions were unchanged. |
 | 2026-09-27 | `6bc98080` in `nio-core-apps` | Added a `__KICK13__` static-MountList branch to `fmount.c`. | The existing WB3.2 branch is unchanged. |
 | 2026-09-27 | uncommitted candidate, reverted | Retained inactive DosNodes at `FUMOUNT`, then removed them in resident unload. | Broad path passed, but the minimal reproducer still failed with `IoErr=202`; reject the candidate. |
+| 2026-09-27 | generated-fixture correction | Named `writable.adf` `NIOWRITABLE` instead of the default `NIOADF`. | Both reduced serial regressions pass; duplicate FFS volume identity was the trigger. |
 
 The September 16 acceptance record points to
 `test-evidence/amiberry-20260916-233252/`, but that evidence directory is not
@@ -226,24 +253,11 @@ current generated HDF before changing production behaviour.
 | `Assign DN0: DISMOUNT` workaround | Removes the node before `FUMOUNT` can finish cleanup. | Reintroduces a non-standard, partial state. |
 | Ignore `ACTION_DIE` and issue `TD_EJECT` | Not implemented. | Contradicts the fail-closed AmigaDOS resource contract. |
 
-## Next evidence to obtain
+## Follow-up, if needed
 
-1. Reduce the sequence with `diskdevice-fumount-multinode-minimal`: one
-   DN0 mount/use, then DN2 writable mount/unmount/remount, then DN0 FUMOUNT.
-   Its result separates DN0 replacement history from the second dynamic node.
-2. Recover and inspect `amiberry-20260916-233252` if available outside this
-   checkout. Confirm the actual `fumount-eject.result` and exact binaries in
-   the HDF.
-3. Recover the exact September media fixture/configuration too, then rerun the
-   already reconstructed workspace rather than substituting regenerated media.
-4. Capture the complete `ACTION_DIE` transaction without the former full
-   task-list scan. `AMIGA_E2E_FUMOUNT_DIE_TRACE=1` enables the bounded host
-   controller. It refreshes only the `DN0:`/`DN2:` DosList ports, waits for a
-   selected port to exist, then records the matching `PutMsg` and `ReplyMsg`
-   packet result. This avoids stopping all Workbench startup traffic and
-   distinguishes an FFS refusal from a caller-side observation error without
-   changing guest lifecycle behaviour.
-5. If both old and current revisions reproduce the failure with equivalent
-   media, treat it as a previously unobserved FFS multi-DosNode limitation.
-   Choose a new explicit FUMOUNT contract before implementation; do not
-   silently force eject.
+The bounded packet controller was attempted with a delayed trace-only scenario
+but did not receive a breakpoint notification from this Amiberry IPC build, so
+it added no evidence and was not retained. If duplicate-label support becomes
+a product requirement, first reproduce it with intentionally identical real
+media and decide whether to reject the combination at `FMOUNT`; do not weaken
+the `ACTION_DIE`/`TD_EJECT` ordering.

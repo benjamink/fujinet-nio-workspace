@@ -73,11 +73,8 @@ def test_fmount_fumount_standard_adf(run_amiga_case, installation):
 
 
 @pytest.mark.parametrize("installation", ["serial"])
-@pytest.mark.xfail(
-    reason="FFS retains state after DN2 FUMOUNT/remount and refuses DN0 ACTION_DIE",
-)
 def test_fumount_after_minimal_multinode_path(run_amiga_case, installation):
-    """WIP reduction for the DN0 teardown refusal investigation."""
+    """A remounted distinct DN2 volume must not block DN0 teardown."""
     results = run_amiga_case(
         "diskdevice-fumount-multinode-minimal", installation=installation
     )
@@ -92,10 +89,9 @@ def test_fumount_after_minimal_multinode_path(run_amiga_case, installation):
     assert "Ejected DN0:" in results["multinode-dn0-fumount.result"]
     assert "DN0 FUMOUNT RC=0" in results["multinode-dn0-fumount.result"]
 
-
 @pytest.mark.parametrize("installation", ["serial"])
 def test_fumount_after_dn2_eject_without_remount(run_amiga_case, installation):
-    """WIP split: does DN2 FUMOUNT alone poison later DN0 teardown?"""
+    """DN2 FUMOUNT alone must not block later DN0 teardown."""
     results = run_amiga_case(
         "diskdevice-fumount-after-dn2-eject", installation=installation
     )
@@ -110,11 +106,8 @@ def test_fumount_after_dn2_eject_without_remount(run_amiga_case, installation):
 
 
 @pytest.mark.parametrize("installation", ["serial"])
-@pytest.mark.xfail(
-    reason="An inactive DN2 node recreated after FUMOUNT still blocks DN0 ACTION_DIE",
-)
 def test_fumount_after_dn2_remount_without_access(run_amiga_case, installation):
-    """WIP split: an unstarted remounted DosNode must not block DN0."""
+    """An inactive remounted distinct DN2 volume must not block DN0."""
     results = run_amiga_case(
         "diskdevice-fumount-after-dn2-remount", installation=installation
     )
@@ -132,7 +125,7 @@ def test_fumount_after_dn2_remount_without_access(run_amiga_case, installation):
 
 @pytest.mark.parametrize("installation", ["serial"])
 def test_fumount_with_inactive_second_node(run_amiga_case, installation):
-    """WIP: prove a fresh inactive DN2 node is the sufficient trigger."""
+    """A fresh inactive DN2 node must not block DN0 teardown."""
     results = run_amiga_case(
         "diskdevice-fumount-inactive-second-node", installation=installation
     )
