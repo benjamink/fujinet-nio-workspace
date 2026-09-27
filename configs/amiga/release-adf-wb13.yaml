@@ -4,18 +4,18 @@ label: NIOWB13
 output: build/NIORelease-WB13.adf
 
 files:
-  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-nio.device
-  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-disk.device
-  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-serial.device
-  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-load-resident
-  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-mount
-  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-nio-exchange
-  - repos/nio-core-apps/build/amiga/wb13/bin/fapp
-  - repos/nio-core-apps/build/amiga/wb13/bin/fboot
-  - repos/nio-core-apps/build/amiga/wb13/bin/fdrive
-  - repos/nio-core-apps/build/amiga/wb13/bin/fhost
-  - repos/nio-core-apps/build/amiga/wb13/bin/fin
-  - repos/nio-core-apps/build/amiga/wb13/bin/fls
-  - repos/nio-core-apps/build/amiga/wb13/bin/fmount
-  - repos/nio-core-apps/build/amiga/wb13/bin/fout
+  - build/amiga-artifacts/wb13/NIO/fujinet-nio.device
+  - build/amiga-artifacts/wb13/NIO/fujinet-disk.device
+  - build/amiga-artifacts/wb13/NIO/fujinet-serial.device
+  - build/amiga-artifacts/wb13/NIO/fujinet-load-resident
+  - build/amiga-artifacts/wb13/NIO/fujinet-mount
+  - build/amiga-artifacts/wb13/NIO/fujinet-nio-exchange
+  - build/amiga-artifacts/wb13/NIO/fapp
+  - build/amiga-artifacts/wb13/NIO/fboot
+  - build/amiga-artifacts/wb13/NIO/fdrive
+  - build/amiga-artifacts/wb13/NIO/fhost
+  - build/amiga-artifacts/wb13/NIO/fin
+  - build/amiga-artifacts/wb13/NIO/fls
+  - build/amiga-artifacts/wb13/NIO/fmount
+  - build/amiga-artifacts/wb13/NIO/fout
   - configs/amiga/install/Install-FujiNet-WB13

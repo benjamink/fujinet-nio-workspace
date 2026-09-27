@@ -63,6 +63,9 @@ attaches its isolated read-only package as `NIO:`. The packages live under
 unprofiled Amiga build. The persistent Workbench image is never written. Use
 the share to install or run fresh builds explicitly:
 
+The complete profile/build/release directory contract is documented in
+[Amiga artifact profiles](artifact-profiles.md).
+
 ```text
 Copy NIO:fujinet-nio.device DEVS:
 Copy NIO:fujinet-disk.device DEVS:

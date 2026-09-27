@@ -1,0 +1,29 @@
+# Workbench 3.1 release disk. Build first with:
+#   scripts/amiga-artifacts wb31
+label: NIOWB31
+output: build/NIORelease-WB31.adf
+
+files:
+  - build/amiga-artifacts/wb31/NIO/fujinet-nio.device
+  - build/amiga-artifacts/wb31/NIO/fujinet-disk.device
+  - build/amiga-artifacts/wb31/NIO/fujinet-serial.device
+  - build/amiga-artifacts/wb31/NIO/fujinet-load-resident
+  - build/amiga-artifacts/wb31/NIO/fujinet-unload-resident
+  - build/amiga-artifacts/wb31/NIO/fujinet-mount
+  - build/amiga-artifacts/wb31/NIO/fujinet-nio-baud
+  - build/amiga-artifacts/wb31/NIO/fujinet-nio-serial
+  - build/amiga-artifacts/wb31/NIO/fujinet-nio-exchange
+  - build/amiga-artifacts/wb31/NIO/fapp
+  - build/amiga-artifacts/wb31/NIO/fboot
+  - build/amiga-artifacts/wb31/NIO/fdrive
+  - build/amiga-artifacts/wb31/NIO/fhost
+  - build/amiga-artifacts/wb31/NIO/fin
+  - build/amiga-artifacts/wb31/NIO/fls
+  - build/amiga-artifacts/wb31/NIO/fmount
+  - build/amiga-artifacts/wb31/NIO/fmountrestore
+  - build/amiga-artifacts/wb31/NIO/fout
+  - build/amiga-artifacts/wb31/NIO/fumount
+  - build/amiga-artifacts/wb31/NIO/checksumbench
+  - build/amiga-artifacts/wb31/NIO/clock
+  - build/amiga-artifacts/wb31/NIO/devopencnt
+  - build/amiga-artifacts/wb31/NIO/doslistdiag

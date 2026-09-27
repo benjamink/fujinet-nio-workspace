@@ -169,10 +169,9 @@ def _build_adf_parser(sub: argparse._SubParsersAction) -> None:  # noqa: SLF001
                          f"if needed), {ADF_HD_SIZE} = HD. ADF is a physical floppy "
                          f"format — for larger content use HDF.")
 
-    rel = asub.add_parser("release",
-                          help="build the release ADF from configs/amiga/release-adf.yaml")
-    rel.add_argument("--manifest", type=Path,
-                     help="override manifest path (default: configs/amiga/release-adf.yaml)")
+    rel = asub.add_parser("release", help="build a versioned release ADF from a manifest")
+    rel.add_argument("--manifest", type=Path, required=True,
+                     help="versioned manifest (for example configs/amiga/release-adf-wb32.yaml)")
     rel.add_argument("--output", type=Path,
                      help="override output path from the manifest")
     rel.add_argument("--dry-run", action="store_true",
@@ -201,8 +200,7 @@ def _run_adf_release(args: argparse.Namespace) -> int:
     import yaml  # bundled with amitools's deps; fall back to tomllib if absent
 
     root = _workspace_root()
-    default_manifest = root / "configs" / "amiga" / "release-adf.yaml"
-    manifest_path = Path(args.manifest) if args.manifest else default_manifest
+    manifest_path = Path(args.manifest)
 
     if not manifest_path.exists():
         print(f"error: manifest not found: {manifest_path}", file=sys.stderr)
