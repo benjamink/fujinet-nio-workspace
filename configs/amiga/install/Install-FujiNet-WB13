@@ -14,31 +14,24 @@ Else
   Copy NIO:fujinet-nio-exchange TO C:
   Copy NIO:fmount TO C:
   Copy NIO:fumount TO C:
-
-  ; Mount uses the shared DEVS:MountList on Workbench 1.3. Preserve its
-  ; system entries (NEWCON:, AUX:, PIPE:) and add DN0 as a complete entry.
-  Echo >>DEVS:MountList ""
-  Echo >>DEVS:MountList "DN0:"
-  Echo >>DEVS:MountList "    Device = fujinet-disk.device"
-  Echo >>DEVS:MountList "    Unit = 0"
-  Echo >>DEVS:MountList "    Flags = 0"
-  Echo >>DEVS:MountList "    Surfaces = 2"
-  Echo >>DEVS:MountList "    BlocksPerTrack = 11"
-  Echo >>DEVS:MountList "    Reserved = 2"
-  Echo >>DEVS:MountList "    Interleave = 0"
-  Echo >>DEVS:MountList "    LowCyl = 0"
-  Echo >>DEVS:MountList "    HighCyl = 79"
-  Echo >>DEVS:MountList "    Buffers = 5"
-  Echo >>DEVS:MountList "    BufMemType = 1"
-  Echo >>DEVS:MountList "    DosType = 0x444F5300"
-  Echo >>DEVS:MountList "    StackSize = 32768"
-  Echo >>DEVS:MountList "    Priority = 5"
-  Echo >>DEVS:MountList "#"
+  ; WB1.3 Mount only reads the shared list. Keep the existing entries that
+  ; provide NEWCON:, AUX:, PIPE:, etc., and append FujiNet DN0:--DN7:.
+  Copy DEVS:MountList TO RAM:MountList-Existing
+  Join RAM:MountList-Existing NIO:MountList-FujiNet-WB13 AS DEVS:MountList
+  Delete >NIL: RAM:MountList-Existing
 
   Echo >S:FujiNet-WB13-Installed "Installed FujiNet WB1.3 files"
-  Echo "Installed. Add the following two lines before Break 1 C in S:StartupII:"
+  Echo "Installed. Add these lines before Break 1 C in S:StartupII:"
   Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
   Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
+  Echo "C:Mount DN0:"
+  Echo "C:Mount DN1:"
+  Echo "C:Mount DN2:"
+  Echo "C:Mount DN3:"
+  Echo "C:Mount DN4:"
+  Echo "C:Mount DN5:"
+  Echo "C:Mount DN6:"
+  Echo "C:Mount DN7:"
   Echo "Then, after the next boot: FMOUNT 11 DN0: RO"
   Echo "To eject it: FUMOUNT DN0:"
   Echo "To mount again after ejecting: FMOUNT 11 DN0: RO"

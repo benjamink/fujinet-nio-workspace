@@ -102,10 +102,11 @@ To install this package permanently into a WB1.3 HDF, boot it and run:
 Execute NIO:Install-FujiNet-WB13
 ```
 
-The installer copies the resident drivers and disk commands, appends a static
-`DN0:` entry to the existing `DEVS:MountList` without replacing system entries
-such as `NEWCON:`, and prints the two resident-loader lines to add before
-`Break 1 C` in `S:StartupII`. After reboot, mount catalogue slot 11 with:
+The installer copies the resident drivers and disk commands, then appends
+static `DN0:` through `DN7:` definitions to the existing `DEVS:MountList`.
+That preserves system entries such as `NEWCON:`. It prints the resident-loader
+and static `Mount DNn:` lines to add before `Break 1 C` in `S:StartupII`.
+After reboot, mount catalogue slot 11 with:
 
 ```text
 FMOUNT 11 DN0: RO

@@ -1,0 +1,128 @@
+DN0:
+    Device = fujinet-disk.device
+    Unit = 0
+    Flags = 0
+    Surfaces = 2
+    BlocksPerTrack = 11
+    Reserved = 2
+    Interleave = 0
+    LowCyl = 0
+    HighCyl = 79
+    Buffers = 5
+    BufMemType = 1
+    DosType = 0x444F5300
+    StackSize = 4000
+    Priority = 5
+#
+DN1:
+    Device = fujinet-disk.device
+    Unit = 1
+    Flags = 0
+    Surfaces = 2
+    BlocksPerTrack = 11
+    Reserved = 2
+    Interleave = 0
+    LowCyl = 0
+    HighCyl = 79
+    Buffers = 5
+    BufMemType = 1
+    DosType = 0x444F5300
+    StackSize = 4000
+    Priority = 5
+#
+DN2:
+    Device = fujinet-disk.device
+    Unit = 2
+    Flags = 0
+    Surfaces = 2
+    BlocksPerTrack = 11
+    Reserved = 2
+    Interleave = 0
+    LowCyl = 0
+    HighCyl = 79
+    Buffers = 5
+    BufMemType = 1
+    DosType = 0x444F5300
+    StackSize = 4000
+    Priority = 5
+#
+DN3:
+    Device = fujinet-disk.device
+    Unit = 3
+    Flags = 0
+    Surfaces = 2
+    BlocksPerTrack = 11
+    Reserved = 2
+    Interleave = 0
+    LowCyl = 0
+    HighCyl = 79
+    Buffers = 5
+    BufMemType = 1
+    DosType = 0x444F5300
+    StackSize = 4000
+    Priority = 5
+#
+DN4:
+    Device = fujinet-disk.device
+    Unit = 4
+    Flags = 0
+    Surfaces = 2
+    BlocksPerTrack = 11
+    Reserved = 2
+    Interleave = 0
+    LowCyl = 0
+    HighCyl = 79
+    Buffers = 5
+    BufMemType = 1
+    DosType = 0x444F5300
+    StackSize = 4000
+    Priority = 5
+#
+DN5:
+    Device = fujinet-disk.device
+    Unit = 5
+    Flags = 0
+    Surfaces = 2
+    BlocksPerTrack = 11
+    Reserved = 2
+    Interleave = 0
+    LowCyl = 0
+    HighCyl = 79
+    Buffers = 5
+    BufMemType = 1
+    DosType = 0x444F5300
+    StackSize = 4000
+    Priority = 5
+#
+DN6:
+    Device = fujinet-disk.device
+    Unit = 6
+    Flags = 0
+    Surfaces = 2
+    BlocksPerTrack = 11
+    Reserved = 2
+    Interleave = 0
+    LowCyl = 0
+    HighCyl = 79
+    Buffers = 5
+    BufMemType = 1
+    DosType = 0x444F5300
+    StackSize = 4000
+    Priority = 5
+#
+DN7:
+    Device = fujinet-disk.device
+    Unit = 7
+    Flags = 0
+    Surfaces = 2
+    BlocksPerTrack = 11
+    Reserved = 2
+    Interleave = 0
+    LowCyl = 0
+    HighCyl = 79
+    Buffers = 5
+    BufMemType = 1
+    DosType = 0x444F5300
+    StackSize = 4000
+    Priority = 5
+#

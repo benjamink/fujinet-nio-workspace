@@ -53,9 +53,14 @@ and retries eject before completing the mapping and DOS-entry removal.
 
 ### Workbench 1.3 static-unit workflow
 
-Workbench 1.3 uses a permanent `DEVS:MountList` entry for each installed
-FujiNet unit. It has the same commands, but a deliberately different handler
-lifecycle:
+Workbench 1.3 uses permanent static `DN0:` through `DN7:` entries in the
+shared `DEVS:MountList`. `Install-FujiNet-WB13` appends them without replacing
+the system definitions, so no manual setup is required for ordinary
+multi-drive use. The startup setup starts the static handlers once; `FMOUNT`
+only changes media in the selected unit. It has the same commands, but a
+deliberately different handler lifecycle. The concurrent secondary-unit
+eject/reinsert investigation remains recorded in
+`docs/amiga/wb13-multidrive-investigation.md`:
 
 ```text
 FMOUNT 11 DN0: RO
@@ -63,6 +68,10 @@ Dir DN0:
 FUMOUNT DN0:
 FMOUNT 11 DN0: RO
 Type DN0:KNOWN.TXT
+
+FMOUNT 13 DN2: RW
+Copy DH0:REPORT TO DN2:REPORT
+FUMOUNT DN2:
 ```
 
 On WB1.3, `FUMOUNT DN0:` ejects the FujiNet media through `TD_EJECT`; it does

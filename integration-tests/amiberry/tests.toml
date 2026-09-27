@@ -148,6 +148,7 @@ driver_tools = ["fujinet-nio-exchange"]
 amiga_artifact_profile = "wb13"
 core_tools = ["fmount", "fumount"]
 wb13_mountlist = true
+no_static_mountlists = true
 environments = ["wb13"]
 timeout = 75
 activity_timeout = 60
@@ -163,6 +164,38 @@ results = [
   "wb13-fumount.result",
   "wb13-fmount-second.result",
   "wb13-type-second.result",
+]
+
+[[test]]
+name = "diskdevice-wb13-multidrive"
+project = "apps"
+app = "wifitest"
+driver = true
+driver_tools = ["fujinet-nio-exchange"]
+amiga_artifact_profile = "wb13"
+core_tools = ["fmount", "fumount"]
+wb13_mountlist = true
+no_static_mountlists = true
+environments = ["wb13"]
+timeout = 120
+activity_timeout = 90
+no_activity_timeout = 45
+startup = "startup/diskdevice-wb13-multidrive.sequence"
+startup_target = "S/StartupII"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-multidrive"
+results = [
+  "wb13-multi-load.result",
+  "wb13-multi-dn0-mount.result",
+  "wb13-multi-dn0-type.result",
+  "wb13-multi-dn2-mount.result",
+  "wb13-multi-dn2-status.result",
+  "wb13-multi-copy.result",
+  "wb13-multi-dn2-eject.result",
+  "wb13-multi-dn2-remount.result",
+  "wb13-multi-persist.result",
+  "wb13-multi-dn0-eject.result",
+  "wb13-multi-dn2-final-eject.result",
 ]
 
 [[test]]

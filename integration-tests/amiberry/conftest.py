@@ -1051,7 +1051,8 @@ def run_amiga_case(amiga_environment: dict[str, str],
                 build_cmd.extend(["--disk-mountlist", driver_root / "amiga/config/DN0HD"])
             if case.get("wb13_mountlist"):
                 build_cmd.extend([
-                    "--disk-mountlist-target", driver_root / "amiga/config/DN0",
+                    "--disk-mountlist-target",
+                    ROOT / "configs/amiga/install/MountList-FujiNet-WB13",
                     "Devs/MountList",
                 ])
         for tool in case.get("driver_tools", []):
