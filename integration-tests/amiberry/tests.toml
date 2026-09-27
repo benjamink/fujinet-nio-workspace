@@ -373,6 +373,33 @@ results = [
 ]
 
 [[test]]
+name = "diskdevice-fumount-multinode-minimal"
+project = "apps"
+app = "wifitest"
+driver = true
+timeout = 75
+activity_timeout = 60
+screenshot_quiet = 15
+screenshot_interval = 1.0
+no_activity_timeout = 30
+startup = "startup/diskdevice-fumount-multinode-minimal.sequence"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-fumount-multinode-minimal"
+results = [
+  "multinode-load.result",
+  "multinode-dn0-mount.result",
+  "multinode-dn0-type.result",
+  "multinode-dn2-mount.result",
+  "multinode-dn2-copy.result",
+  "multinode-dn2-fumount.result",
+  "multinode-dn2-remount.result",
+  "multinode-dn2-persist.result",
+  "multinode-dn0-fumount.result",
+  "multinode-lockdiag.result",
+  "multinode-dn0-status.result",
+]
+
+[[test]]
 name = "diskdevice-unload-reload"
 project = "apps"
 app = "wifitest"

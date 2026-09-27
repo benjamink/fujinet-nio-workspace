@@ -78,6 +78,13 @@ and its `dol_LockList` was empty; no volume entry pointed at the still-live
 volume entry accounts for the refusal. The remaining candidates are an
 otherwise-unreachable file handle/lock or FFS-private handler state.
 
+The WIP reduced scenario `diskdevice-fumount-multinode-minimal` failed in
+`amiberry-20260927-192759` with the same `ACTION_DIE` / `IoErr=202` result.
+It contains one DN0 mount/use only—no DD/HD replacements—followed by the DN2
+writable mount, FUMOUNT, remount and persistence read. Therefore DN0 media
+replacement history is not a prerequisite; the DN2 lifecycle alone triggers
+the condition.
+
 ## Timeline and historical coverage
 
 | Date | Commit | Change | Relevance |
@@ -157,6 +164,7 @@ current generated HDF before changing production behaviour.
 | Bounded `PutMsg`/`ReplyMsg` controller | It resolved `DN0:` and `DN2:` ports but lost the debugger socket before a packet was captured. One instrumented run passed; the immediately following uninstrumented run failed with `IoErr=202`. | The debugger changes scheduling and the pass is not evidence of a fix. Retain the controller only as WIP diagnostic infrastructure; do not use it for acceptance. |
 | Public volume-lock scan | In failed run `amiberry-20260927-192357`, DN2's `NIOADF` volume had `dol_LockList=0`; no volume entry referred to live DN0. | Eliminates the remaining public volume lock chain and stale-volume theory. |
 | Resolve `dol_Task` directly instead of `DeviceProc("DN0:")` | The exact serial scenario still failed with `ACTION_DIE` / `IoErr=202` (`amiberry-20260927-192529`). | `DeviceProc` is not creating the retained resource; production code remains unchanged. |
+| Minimal multi-node scenario | A single DN0 mount/use followed by DN2 writable mount → FUMOUNT → remount → persisted Type still refused DN0 `ACTION_DIE` (`amiberry-20260927-192759`). | DN0 replacement history is eliminated; split DN2 teardown from remount next. |
 | Start `DN2:` eagerly with `ADNF_STARTPROC` | Final `DN0:` retirement still failed. | Changes the documented lazy-node model without fixing it. |
 | Remove volume entries manually after handler retirement | No improvement. | FFS owns its volume entries; manual removal is unsafe. |
 | Delay after `FUMOUNT DN2:` | A three-second delay did not change the failure. | Not a handler-exit timing race. |
@@ -166,19 +174,22 @@ current generated HDF before changing production behaviour.
 
 ## Next evidence to obtain
 
-1. Recover and inspect `amiberry-20260916-233252` if available outside this
+1. Reduce the sequence with `diskdevice-fumount-multinode-minimal`: one
+   DN0 mount/use, then DN2 writable mount/unmount/remount, then DN0 FUMOUNT.
+   Its result separates DN0 replacement history from the second dynamic node.
+2. Recover and inspect `amiberry-20260916-233252` if available outside this
    checkout. Confirm the actual `fumount-eject.result` and exact binaries in
    the HDF.
-2. Recover the exact September media fixture/configuration too, then rerun the
+3. Recover the exact September media fixture/configuration too, then rerun the
    already reconstructed workspace rather than substituting regenerated media.
-3. Capture the complete `ACTION_DIE` transaction without the former full
+4. Capture the complete `ACTION_DIE` transaction without the former full
    task-list scan. `AMIGA_E2E_FUMOUNT_DIE_TRACE=1` enables the bounded host
    controller. It refreshes only the `DN0:`/`DN2:` DosList ports, waits for a
    selected port to exist, then records the matching `PutMsg` and `ReplyMsg`
    packet result. This avoids stopping all Workbench startup traffic and
    distinguishes an FFS refusal from a caller-side observation error without
    changing guest lifecycle behaviour.
-4. If both old and current revisions reproduce the failure with equivalent
+5. If both old and current revisions reproduce the failure with equivalent
    media, treat it as a previously unobserved FFS multi-DosNode limitation.
    Choose a new explicit FUMOUNT contract before implementation; do not
    silently force eject.

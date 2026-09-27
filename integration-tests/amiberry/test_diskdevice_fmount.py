@@ -72,6 +72,24 @@ def test_fmount_fumount_standard_adf(run_amiga_case, installation):
     assert results["_mappings"] == "0100000000010d00000000000000000000"
 
 
+@pytest.mark.parametrize("installation", ["serial"])
+def test_fumount_after_minimal_multinode_path(run_amiga_case, installation):
+    """WIP reduction for the DN0 teardown refusal investigation."""
+    results = run_amiga_case(
+        "diskdevice-fumount-multinode-minimal", installation=installation
+    )
+
+    assert "DN0 MOUNT RC=0" in results["multinode-dn0-mount.result"]
+    assert "FUJINET ADF READ PASSED" in results["multinode-dn0-type.result"]
+    assert "DN2 MOUNT RC=0" in results["multinode-dn2-mount.result"]
+    assert "DN2 COPY RC=0" in results["multinode-dn2-copy.result"]
+    assert "DN2 FUMOUNT RC=0" in results["multinode-dn2-fumount.result"]
+    assert "DN2 REMOUNT RC=0" in results["multinode-dn2-remount.result"]
+    assert "FUJINET WRITE PERSISTED" in results["multinode-dn2-persist.result"]
+    assert "Ejected DN0:" in results["multinode-dn0-fumount.result"]
+    assert "DN0 FUMOUNT RC=0" in results["multinode-dn0-fumount.result"]
+
+
 @pytest.mark.parametrize("installation", ["serial", "native"])
 def test_hd_stage8_replacement_and_writable_durability(run_amiga_case, installation):
     results = run_amiga_case("diskdevice-hd-stage8", installation=installation)
