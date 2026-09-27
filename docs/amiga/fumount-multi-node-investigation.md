@@ -64,6 +64,11 @@ at `DN0`'s port. This rules out the usual shell current-directory lock and the
 standard input/output/error streams, but not other public file handles or
 FFS-private lock state.
 
+The temporary failure-only `FUMOUNT` diagnostic captured the handler reply in
+the normal serial reproducer: `ACTION_DIE` returned false with `IoErr=202`
+(`ERROR_OBJECT_IN_USE`). This is direct evidence that FFS refuses the request;
+the later unchanged `dol_Task` is a consequence, not the original failure.
+
 ## Timeline and historical coverage
 
 | Date | Commit | Change | Relevance |
