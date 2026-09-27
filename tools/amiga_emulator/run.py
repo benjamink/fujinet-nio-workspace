@@ -438,6 +438,14 @@ class AmigaRunner:
                      "--output-dir", str(self.run_dir), *handler_args],
                      self.run_dir / "dn2-handler-controller.log", cwd=ROOT,
                 )
+            elif os.environ.get("AMIGA_E2E_FUMOUNT_DIE_TRACE") == "1":
+                ipc.request(self.ipc_socket, "DEBUG_ACTIVATE")
+                self.debugger_controller = self.start_process(
+                    [sys.executable, "-m", "amiga_emulator.fumount_die_trace",
+                     "--socket", str(self.ipc_socket),
+                     "--output-dir", str(self.run_dir)],
+                    self.run_dir / "fumount-die-controller.log", cwd=ROOT,
+                )
             elif os.environ.get("AMIGA_E2E_IO_REQUEST_COMPARE") == "1":
                 ipc.request(self.ipc_socket, "DEBUG_ACTIVATE")
                 self.debugger_controller = self.start_process(

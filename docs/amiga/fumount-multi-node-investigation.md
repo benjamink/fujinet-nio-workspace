@@ -61,13 +61,22 @@ The guest-side `lockdiag` run after the final failed `FUMOUNT DN0:` found both
 `DN0` and `DN2` as waiting filesystem processes, but found no process whose
 `pr_CurrentDir`, `pr_HomeDir`, `pr_CIS`, `pr_COS`, or `pr_CES` handler pointed
 at `DN0`'s port. This rules out the usual shell current-directory lock and the
-standard input/output/error streams, but not other public file handles or
-FFS-private lock state.
+standard input/output/error streams. The next run also dumps every public
+volume entry and its `dol_LockList`, rather than only entries whose task port
+still matches the live handler: a stale or detached volume entry is itself
+relevant to an `ACTION_DIE` refusal.
 
 The temporary failure-only `FUMOUNT` diagnostic captured the handler reply in
 the normal serial reproducer: `ACTION_DIE` returned false with `IoErr=202`
 (`ERROR_OBJECT_IN_USE`). This is direct evidence that FFS refuses the request;
 the later unchanged `dol_Task` is a consequence, not the original failure.
+
+The expanded volume diagnostic then captured a failed run in
+`amiberry-20260927-192357`. It found only `NIOADF` for the live `DN2:` handler
+and its `dol_LockList` was empty; no volume entry pointed at the still-live
+`DN0:` handler. Thus neither a public volume lock nor a stale public DN0
+volume entry accounts for the refusal. The remaining candidates are an
+otherwise-unreachable file handle/lock or FFS-private handler state.
 
 ## Timeline and historical coverage
 
@@ -145,6 +154,8 @@ current generated HDF before changing production behaviour.
 | Observe retirement for 100 ticks (about two seconds) after `ACTION_DIE` | Final `DN0:` still failed. | This is not merely a short `dol_Task` clearing delay. |
 | Add temporary `DoPkt` result/`IoErr()` diagnostics | One run passed, but isolated reruns with only result capture or only `IoErr()` still failed. | The pass was nondeterministic; no diagnostic side effect is a fix. |
 | Amiberry DOS-handler packet trace for `DN0` and `DN2` | Captured `DN0` as a real active FFS process/port (`0x258948` / `0x2589a4`) while DOS separately held a `DN2` task port (`0x260a8c`), then Amiberry reset its IPC socket during the full task-list walk. | Confirms the active handler is real, but the current controller is too chatty to identify the final packet reliably. |
+| Bounded `PutMsg`/`ReplyMsg` controller | It resolved `DN0:` and `DN2:` ports but lost the debugger socket before a packet was captured. One instrumented run passed; the immediately following uninstrumented run failed with `IoErr=202`. | The debugger changes scheduling and the pass is not evidence of a fix. Retain the controller only as WIP diagnostic infrastructure; do not use it for acceptance. |
+| Public volume-lock scan | In failed run `amiberry-20260927-192357`, DN2's `NIOADF` volume had `dol_LockList=0`; no volume entry referred to live DN0. | Eliminates the remaining public volume lock chain and stale-volume theory. |
 | Start `DN2:` eagerly with `ADNF_STARTPROC` | Final `DN0:` retirement still failed. | Changes the documented lazy-node model without fixing it. |
 | Remove volume entries manually after handler retirement | No improvement. | FFS owns its volume entries; manual removal is unsafe. |
 | Delay after `FUMOUNT DN2:` | A three-second delay did not change the failure. | Not a handler-exit timing race. |
@@ -159,7 +170,14 @@ current generated HDF before changing production behaviour.
    the HDF.
 2. Recover the exact September media fixture/configuration too, then rerun the
    already reconstructed workspace rather than substituting regenerated media.
-3. If both old and current revisions reproduce the failure with equivalent
-   media, treat it as a
-   previously unobserved FFS multi-DosNode limitation. Choose a new explicit
-   FUMOUNT contract before implementation; do not silently force eject.
+3. Capture the complete `ACTION_DIE` transaction without the former full
+   task-list scan. `AMIGA_E2E_FUMOUNT_DIE_TRACE=1` enables the bounded host
+   controller. It refreshes only the `DN0:`/`DN2:` DosList ports, waits for a
+   selected port to exist, then records the matching `PutMsg` and `ReplyMsg`
+   packet result. This avoids stopping all Workbench startup traffic and
+   distinguishes an FFS refusal from a caller-side observation error without
+   changing guest lifecycle behaviour.
+4. If both old and current revisions reproduce the failure with equivalent
+   media, treat it as a previously unobserved FFS multi-DosNode limitation.
+   Choose a new explicit FUMOUNT contract before implementation; do not
+   silently force eject.
