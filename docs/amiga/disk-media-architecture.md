@@ -51,6 +51,36 @@ rolled back; a later `FUMOUNT` of an inactive node skips handler retirement
 and retries eject before completing the mapping and DOS-entry removal.
 `FMOUNTRESTORE` replays all valid saved mappings; it takes no arguments.
 
+### Mounting two images at once
+
+Before mounting images on different `DNx:` units at the same time, make sure
+the images have different Amiga volume labels. The label is stored in the
+image; `FMOUNT` selects an image but does not rename it.
+
+Good: the image in catalogue slot 11 is labelled `WORK`, and slot 13 is
+labelled `ARCHIVE`.
+
+```text
+FMOUNT 11 DN0: RO
+FMOUNT 13 DN2: RW
+Dir DN0:
+Copy DN0:README TO DN2:README
+FUMOUNT DN2:
+FUMOUNT DN0:
+```
+
+Bad: both images are labelled `NIOADF`.
+
+```text
+FMOUNT 11 DN0: RO
+FMOUNT 13 DN2: RW
+FUMOUNT DN0:
+```
+
+The commands may mount both images, but FastFileSystem 47.4 can refuse the
+last command with `ACTION_DIE refused (IoErr=202)`. Do not force eject in that
+state. Give one image a different label, then mount them again.
+
 These commands operate on images already selected in FujiNet catalogue slots.
 They do not accept a host path directly, expose partitions, or turn an
 arbitrary hard-disk image into a `DNx:` device.
