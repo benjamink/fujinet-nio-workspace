@@ -1049,6 +1049,20 @@ def run_amiga_case(amiga_environment: dict[str, str],
                 for unit in range(8):
                     build_cmd.extend(["--disk-mountlist", driver_root / f"amiga/config/DN{unit}"])
                 build_cmd.extend(["--disk-mountlist", driver_root / "amiga/config/DN0HD"])
+            if case.get("wb13_mountlist"):
+                build_cmd.extend([
+                    "--disk-mountlist-target", driver_root / "amiga/config/DN0",
+                    "Devs/MountList",
+                ])
+        for tool in case.get("driver_tools", []):
+            if not isinstance(tool, str):
+                raise AssertionError(
+                    f"Amiberry case '{name}' has invalid driver_tools entry: {tool!r}"
+                )
+            tool_path = driver_root / "build/amiga" / tool
+            if not tool_path.is_file():
+                raise AssertionError(f"Amiga driver tool was not built: {tool_path}")
+            build_cmd.extend(["--extra-app-file", tool_path])
         subprocess.run(build_cmd, cwd=ROOT, env=amiga_environment, check=True)
 
         native_adf: Path | None = None

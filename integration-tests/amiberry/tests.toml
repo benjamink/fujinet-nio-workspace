@@ -140,6 +140,23 @@ results = [
 ]
 
 [[test]]
+name = "diskdevice-wb13-ofs"
+project = "apps"
+app = "wifitest"
+driver = true
+driver_tools = ["fujinet-nio-exchange"]
+wb13_mountlist = true
+environments = ["wb13"]
+timeout = 75
+activity_timeout = 60
+no_activity_timeout = 30
+startup = "startup/diskdevice-wb13-ofs.sequence"
+startup_target = "S/StartupII"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-ofs"
+results = []
+
+[[test]]
 name = "diskdevice-hd-adf"
 project = "apps"
 app = "wifitest"
@@ -894,6 +911,7 @@ timeout = 75
 activity_timeout = 60
 no_activity_timeout = 30
 startup = "startup/nio-wb13-cold-serial-worker.sequence"
+startup_target = "S/StartupII"
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/nio-wb13-cold-serial-worker"
 results = []
