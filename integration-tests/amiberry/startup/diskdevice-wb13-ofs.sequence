@@ -1,7 +1,7 @@
 C:Assign T: RAM:
 C:Failat 100
 C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device
-C:fujinet-mount host:/standard.adf
+C:fmount 11 DN0: RO
 If NOT WARN
 C:Mount DN0:
 If NOT WARN
@@ -10,6 +10,7 @@ If NOT WARN
 C:Type DN0:KNOWN.TXT
 If NOT WARN
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/diskdevice-wb13-ofs
+EndIf
 EndIf
 EndIf
 EndIf

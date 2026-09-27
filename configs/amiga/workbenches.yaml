@@ -10,6 +10,24 @@ shares:
     path: ${NIO_WORKSPACE}/build/amiga-share
     writable: false
     sync: true
+  # Versioned package shares are assembled before their matching Workbench
+  # profile boots.  Unlike NIO, they never select a binary from an unprofiled
+  # last build.
+  NIO-WB13:
+    volume: NIO
+    path: ${NIO_WORKSPACE}/build/amiga-artifacts/wb13/NIO
+    writable: false
+    sync: false
+  NIO-WB31:
+    volume: NIO
+    path: ${NIO_WORKSPACE}/build/amiga-artifacts/wb31/NIO
+    writable: false
+    sync: false
+  NIO-WB32:
+    volume: NIO
+    path: ${NIO_WORKSPACE}/build/amiga-artifacts/wb32/NIO
+    writable: false
+    sync: false
   # Story 1.10 guest endpoint. E2E cases mount a per-run host directory as
   # NATIVE: with filesystem2=rw; interactive sessions can opt in here.
   NATIVE:
@@ -28,29 +46,29 @@ profiles:
     environment: wb32
     machine: a1200-030
     harddrive: ${NIO_WORKSPACE}/images/amigaos3.2-run.vhd
-    shares:
-      - NIO
+    artifact_profile: wb32
+    shares: [NIO-WB32]
 
   wb32-a500:
     environment: wb32
     machine: a500-030
     harddrive: ${NIO_WORKSPACE}/images/amigaos3.2-a500-run.vhd
-    shares:
-      - NIO
+    artifact_profile: wb32
+    shares: [NIO-WB32]
 
   wb31-a1200:
     environment: wb31
     machine: a1200-030
     harddrive: ${NIO_WORKSPACE}/images/amigaos3.1-run.hdf
-    shares:
-      - NIO
+    artifact_profile: wb31
+    shares: [NIO-WB31]
 
   wb13-adf:
     disk: ${AMIGA_WB13_ADF_WORKBENCH}
     kickstart: ${AMIGA_WB13_KICKSTART}
     rom_key: ${AMIGA_WB13_ROM_KEY}
-    shares:
-      - NIO
+    artifact_profile: wb13
+    shares: [NIO-WB13]
     settings:
       chipmem_size: 512
       fastmem_size: 0
@@ -62,5 +80,5 @@ profiles:
     harddrive: ${NIO_WORKSPACE}/images/amigaos1.3-run.hdf
     kickstart: ${AMIGA_WB13_KICKSTART}
     rom_key: ${AMIGA_WB13_ROM_KEY}
-    shares:
-      - NIO
+    artifact_profile: wb13
+    shares: [NIO-WB13]

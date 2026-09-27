@@ -593,6 +593,16 @@ class Build:
             self.ctx.env,
         )
         self.ctx.env["AMIGA_WORKBENCH_CONFIG"] = profile["name"]
+        artifact_profile = profile.get("artifact_profile")
+        if artifact_profile:
+            if not isinstance(artifact_profile, str):
+                raise SystemExit(
+                    f"Amiga Workbench profile '{profile['name']}' has an invalid artifact_profile"
+                )
+            self.runner.run(
+                "amiga-artifacts",
+                [self.ctx.root / "scripts" / "amiga-artifacts", artifact_profile],
+            )
         for key, env_var in (
             ("kickstart", "AMIBERRY_KICKSTART"),
             ("rom_key", "AMIBERRY_ROM_KEY"),

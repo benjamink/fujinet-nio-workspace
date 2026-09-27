@@ -12,6 +12,7 @@ Else
   Copy NIO:fujinet-load-resident TO C:
   Copy NIO:fujinet-mount TO C:
   Copy NIO:fujinet-nio-exchange TO C:
+  Copy NIO:fmount TO C:
 
   ; Mount uses the shared DEVS:MountList on Workbench 1.3. Preserve its
   ; system entries (NEWCON:, AUX:, PIPE:) and add DN0 as a complete entry.
@@ -37,4 +38,5 @@ Else
   Echo "Installed. Add the following two lines before Break 1 C in S:StartupII:"
   Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
   Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
+  Echo "Then, after the next boot: FMOUNT 11 DN0: RO ; Mount DN0:"
 EndIf

@@ -1063,6 +1063,27 @@ def run_amiga_case(amiga_environment: dict[str, str],
             if not tool_path.is_file():
                 raise AssertionError(f"Amiga driver tool was not built: {tool_path}")
             build_cmd.extend(["--extra-app-file", tool_path])
+        artifact_profile = case.get("amiga_artifact_profile")
+        core_tools = case.get("core_tools", [])
+        if core_tools:
+            if not isinstance(artifact_profile, str) or not artifact_profile:
+                raise AssertionError(
+                    f"Amiberry case '{name}' uses core_tools without amiga_artifact_profile"
+                )
+            subprocess.run(
+                [str(ROOT / "scripts/amiga-artifacts"), artifact_profile],
+                cwd=ROOT, env=amiga_environment, check=True,
+            )
+        for tool in core_tools:
+            if not isinstance(tool, str):
+                raise AssertionError(
+                    f"Amiberry case '{name}' has invalid core_tools entry: {tool!r}"
+                )
+            tool_path = (ROOT / "repos/nio-core-apps/build/amiga" /
+                         artifact_profile / "bin" / tool)
+            if not tool_path.is_file():
+                raise AssertionError(f"Amiga core tool was not built: {tool_path}")
+            build_cmd.extend(["--extra-app-file", tool_path])
         subprocess.run(build_cmd, cwd=ROOT, env=amiga_environment, check=True)
 
         native_adf: Path | None = None

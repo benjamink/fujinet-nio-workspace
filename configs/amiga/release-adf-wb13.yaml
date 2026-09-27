@@ -1,0 +1,21 @@
+# Workbench 1.3 / Kickstart 1.3 release disk. Build first with:
+#   scripts/amiga-artifacts wb13
+label: NIOWB13
+output: build/NIORelease-WB13.adf
+
+files:
+  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-nio.device
+  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-disk.device
+  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-serial.device
+  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-load-resident
+  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-mount
+  - repos/fujinet-nio-driver/build/amiga/wb13/fujinet-nio-exchange
+  - repos/nio-core-apps/build/amiga/wb13/bin/fapp
+  - repos/nio-core-apps/build/amiga/wb13/bin/fboot
+  - repos/nio-core-apps/build/amiga/wb13/bin/fdrive
+  - repos/nio-core-apps/build/amiga/wb13/bin/fhost
+  - repos/nio-core-apps/build/amiga/wb13/bin/fin
+  - repos/nio-core-apps/build/amiga/wb13/bin/fls
+  - repos/nio-core-apps/build/amiga/wb13/bin/fmount
+  - repos/nio-core-apps/build/amiga/wb13/bin/fout
+  - configs/amiga/install/Install-FujiNet-WB13

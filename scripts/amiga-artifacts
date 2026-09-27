@@ -19,24 +19,49 @@ esac
 source "$ROOT/scripts/env.sh"
 
 DRIVER_BUILD="$ROOT/repos/fujinet-nio-driver/build/amiga/$PROFILE"
+DRIVER_BUILD_REL="../build/amiga/$PROFILE"
 CORE_BUILD="$ROOT/repos/nio-core-apps/build/amiga/$PROFILE"
 APPS_BUILD="$ROOT/repos/nio-apps/build/amiga/$PROFILE"
 STAGE="$ROOT/build/amiga-artifacts/$PROFILE/NIO"
 
 make -C "$ROOT/repos/fujinet-nio-driver/amiga" \
-  "$DRIVER_BUILD/fujinet-nio.device" \
-  "$DRIVER_BUILD/fujinet-disk.device" \
-  "$DRIVER_BUILD/fujinet-serial.device" \
-  "$DRIVER_BUILD/fujinet-load-resident" \
-  "$DRIVER_BUILD/fujinet-mount" \
-  "$DRIVER_BUILD/fujinet-nio-exchange" \
-  sdk resident-artifacts "BUILD_DIR=../build/amiga/$PROFILE"
-make -C "$ROOT/repos/nio-core-apps" TARGET=amiga \
-  "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
-  "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
-make -C "$ROOT/repos/nio-apps" TARGET=amiga \
-  "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
-  "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
+  "BUILD_DIR=$DRIVER_BUILD_REL" \
+  "$DRIVER_BUILD_REL/fujinet-nio.device" \
+  "$DRIVER_BUILD_REL/fujinet-disk.device" \
+  "$DRIVER_BUILD_REL/fujinet-serial.device" \
+  "$DRIVER_BUILD_REL/fujinet-load-resident" \
+  "$DRIVER_BUILD_REL/fujinet-mount" \
+  "$DRIVER_BUILD_REL/fujinet-nio-exchange" \
+  sdk resident-artifacts
+if [[ "$PROFILE" != wb13 ]]; then
+  make -C "$ROOT/repos/fujinet-nio-driver/amiga" \
+    "BUILD_DIR=$DRIVER_BUILD_REL" \
+    "$DRIVER_BUILD_REL/fujinet-unload-resident" \
+    "$DRIVER_BUILD_REL/fujinet-td-probe" \
+    "$DRIVER_BUILD_REL/fujinet-nio-baud" \
+    "$DRIVER_BUILD_REL/fujinet-nio-serial"
+fi
+if [[ "$PROFILE" == wb13 ]]; then
+  # These commands use only the WB1.3-compatible command/device contract.
+  # FMOUNTRESTORE remains a WB2+ utility because it uses SystemTags().
+  make -C "$ROOT/repos/nio-core-apps" -f makefiles/build.mk TARGET=amiga \
+    "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+    "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD" \
+    build/amiga/$PROFILE/bin/fapp build/amiga/$PROFILE/bin/fboot \
+    build/amiga/$PROFILE/bin/fdrive build/amiga/$PROFILE/bin/fhost \
+    build/amiga/$PROFILE/bin/fin build/amiga/$PROFILE/bin/fls \
+    build/amiga/$PROFILE/bin/fmount build/amiga/$PROFILE/bin/fout
+else
+  make -C "$ROOT/repos/nio-core-apps" TARGET=amiga \
+    "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+    "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
+fi
+
+if [[ "$PROFILE" != wb13 ]]; then
+  make -C "$ROOT/repos/nio-apps" TARGET=amiga \
+    "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+    "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
+fi
 
 mkdir -p "$STAGE"
 for name in fujinet-nio.device fujinet-disk.device fujinet-serial.device \

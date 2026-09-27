@@ -57,10 +57,11 @@ development share (e.g. NIO:)
 Amiberry opens visibly. Open `System/Shell` and run commands such as
 `fhost`, `fls`, `wifitest`, `fmount`.
 
-Default WB3.x profiles attach a read-only development share `NIO:` that exposes
-current driver and app binaries from `build/amiga-share` (refreshed with
-symlinks at launch; the persistent Workbench image is never written). Use it
-to install or run fresh builds explicitly:
+Each supplied profile builds its matching artifact profile before launch and
+attaches its isolated read-only package as `NIO:`. The packages live under
+`build/amiga-artifacts/wb13`, `wb31`, or `wb32`; no profile uses the last
+unprofiled Amiga build. The persistent Workbench image is never written. Use
+the share to install or run fresh builds explicitly:
 
 ```text
 Copy NIO:fujinet-nio.device DEVS:
@@ -78,7 +79,7 @@ Profiles declare an `environment` (e.g. `wb32`) and `machine` (e.g.
 Other useful profile options:
 
 ```sh
-./scripts/build.sh amiga-workbench --profile wb1.3 -- --external-nio
+./scripts/build.sh amiga-workbench --profile wb13-a500 -- --external-nio
 ```
 
 #### Workbench 1.3 cold broker validation
@@ -88,14 +89,38 @@ persistent HDF profile. Set `AMIGA_WB13_KICKSTART`, `AMIGA_WB13_ROM_KEY` when
 the ROM is encrypted, `AMIGA_WB13_ADF_WORKBENCH`, and the clean source
 `AMIGA_WB13_HDF` in ignored `local/amiga.env`; profiles and the environment
 builder name missing or unreadable licensed media rather than selecting a
-fallback. The read-only `NIO:` share is refreshed at launch and contains the
-resident loader, `fujinet-nio.device`, and `fujinet-nio-exchange`.
+fallback. The read-only `NIO:` share is rebuilt as the `wb13`/`nix13` package
+at launch. It includes the resident drivers, `FMOUNT`, and
+`Install-FujiNet-WB13`.
+
+To install this package permanently into a WB1.3 HDF, boot it and run:
+
+```text
+Execute NIO:Install-FujiNet-WB13
+```
+
+The installer copies the resident drivers and disk commands, appends a static
+`DN0:` entry to the existing `DEVS:MountList` without replacing system entries
+such as `NEWCON:`, and prints the two resident-loader lines to add before
+`Break 1 C` in `S:StartupII`. After reboot, mount catalogue slot 11 with:
+
+```text
+FMOUNT 11 DN0: RO
+Mount DN0:
+Dir DN0:
+```
+
+Workbench 1.3 has no supported public dynamic DOS-node API: `FMOUNT` therefore
+selects media in the static unit and `Mount` starts its OFS handler. WB1.3
+does not yet package `FUMOUNT`: safely retiring a live handler requires the
+classic raw DOS-packet path, which is separate work. The WB2+ dynamic-node
+behaviour remains in the separate `wb31`/`wb32` builds.
 
 To demonstrate that the broker, rather than an earlier open, loads stock
 `serial.device` from the Workbench disk:
 
 1. Build the current artifacts, start the host NIO service, then launch a new
-   Amiberry process with `./scripts/build.sh amiga-workbench --profile wb1.3 -- --external-nio`.
+   Amiberry process with `./scripts/build.sh amiga-workbench --profile wb13-a500 -- --external-nio`.
    A reset inside an existing process is not a cold boot.
 2. In the new Workbench Shell, do not run a serial tool or preload/open
    `serial.device`. Register only the broker:
@@ -113,7 +138,7 @@ To demonstrate that the broker, rather than an earlier open, loads stock
    Record the successful clock response plus a screenshot/log. On failure,
    preserve that evidence and stop; do not warm up and retry in the same
    emulator process.
-4. Exit Amiberry completely, launch a second new `wb1.3` process, and repeat
+4. Exit Amiberry completely, launch a second new `wb13-a500` process, and repeat
    steps 2–3. Both isolated runs must succeed.
 
 ```sh
@@ -137,6 +162,13 @@ development, or copy the versions you want into `C:` / `DEVS:`.
 Automated tests are different: they copy a pristine base HDF and inject the
 exact binaries required by each case, so every test starts from a controlled
 image.
+
+To explicitly assemble a release package or build the WB1.3 release ADF:
+
+```sh
+scripts/amiga-artifacts wb13
+scripts/amiga adf release --manifest configs/amiga/release-adf-wb13.yaml
+```
 
 A useful script to put in C:copy-fujinet is:
 ```text
