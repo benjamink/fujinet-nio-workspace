@@ -100,6 +100,12 @@ new node, its task port, or public volume locks. The two failing reductions
 are marked non-strict `xfail`: an XPASS is a signal to re-evaluate the
 underlying FFS/teardown change, not proof from a single timing-sensitive run.
 
+`doslistdiag` also now records the constructed `FileSysStartupMsg` identity.
+In the failing remount run, DN0 reported unit 0 and DN2 unit 2; both named
+`fujinet-disk.device` with zero OpenDevice flags. The dynamic builder is not
+accidentally recreating DN2 as unit 0, so a shared-unit identity error is
+eliminated.
+
 ## Timeline and historical coverage
 
 | Date | Commit | Change | Relevance |
