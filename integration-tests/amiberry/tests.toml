@@ -334,6 +334,7 @@ results = [
   "fmount-rw-persist.result",
   "fmount-rw-status.result",
   "fumount-eject.result",
+  "fumount-lockdiag.result",
   "fumount-status.result",
 ]
 

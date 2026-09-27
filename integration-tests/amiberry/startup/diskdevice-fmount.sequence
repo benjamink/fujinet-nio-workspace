@@ -66,6 +66,7 @@ C:Echo "TYPE PERSIST RC=$RC" >>DH0:fmount-rw-persist.result
 C:EndIf
 C:fumount DN0: >DH0:fumount-eject.result
 C:Echo "FUMOUNT RC=$RC" >>DH0:fumount-eject.result
+C:lockdiag >DH0:fumount-lockdiag.result
 C:fujinet-mount --status 0 >DH0:fumount-status.result
 
 C:Echo "BEFORE FLS" >DH0:fmount-completion-marker.result

@@ -57,6 +57,13 @@ started an FFS handler. Thus the trigger is not a normal open file, directory
 lock or live `DN2:` handler. The condition is produced by the presence of the
 second dynamic FFS node itself (or state FFS associates with it).
 
+The guest-side `lockdiag` run after the final failed `FUMOUNT DN0:` found both
+`DN0` and `DN2` as waiting filesystem processes, but found no process whose
+`pr_CurrentDir`, `pr_HomeDir`, `pr_CIS`, `pr_COS`, or `pr_CES` handler pointed
+at `DN0`'s port. This rules out the usual shell current-directory lock and the
+standard input/output/error streams, but not other public file handles or
+FFS-private lock state.
+
 ## Timeline and historical coverage
 
 | Date | Commit | Change | Relevance |
