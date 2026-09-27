@@ -106,22 +106,33 @@ In the failing remount run, DN0 reported unit 0 and DN2 unit 2; both named
 accidentally recreating DN2 as unit 0, so a shared-unit identity error is
 eliminated.
 
-## Reusable-node experiment
+## Reusable-node experiment (rejected)
 
-An uncommitted experiment changed successful `FUMOUNT` to retire/eject the
-handler but retain its inactive `MakeDosNode` entry. The normal full WB3.2
-serial `diskdevice-fmount` scenario then passed: DN2 remount reused its
-original `FileSysStartupMsg`, and DN0's later `ACTION_DIE` succeeded. This is
-strong causal evidence that recreating the node after retirement triggers the
-FFS-private retained state.
+The candidate changed successful `FUMOUNT` to retire/eject the handler but
+retain its inactive `MakeDosNode` entry. `FMOUNT` already reuses a registered
+inactive node, so the companion candidate taught resident unload to unlink
+only those idle FujiNet nodes immediately before unloading
+`fujinet-disk.device`. It deliberately did not call `FreeDosEntry()` because
+current AmigaDOS documentation says that is unsafe for a `MakeDosNode()`
+allocation.
 
-It is not merged as-is. The established single-node teardown test proves the
-current contract removes the DosList entry so the resident may be unloaded;
-with the experiment it correctly observed `DN0 task=00000000` but still found
-the node. A durable change would need to make inactive-node retention the
-documented FUMOUNT contract and teach the explicit resident-unload workflow to
-remove those inactive nodes only after every unit is retired. Do not free a
-`MakeDosNode()` entry: current AmigaDOS documentation says that is unsafe.
+It produced a misleading positive result in the broad serial
+`test_fmount_fumount_standard_adf` path: that test passed. The decisive
+`diskdevice-fumount-multinode-minimal` reproducer still failed in a freshly
+staged candidate image (`amiberry-20260927-195547`) with the unchanged result:
+
+```text
+DN0: ACTION_DIE refused (IoErr=202)
+Cannot retire DN0: handler (busy)
+DN0 FUMOUNT RC=10
+```
+
+The candidate is therefore rejected and was reverted, including the unload
+helper and temporary test-contract changes. Node recreation is not the
+sufficient cause. The broad path remains useful regression coverage, but it
+cannot establish this fix because its extra DN0 replacement history/timing is
+not equivalent to the minimal reproducer. The two reduced regressions remain
+non-strict `xfail` until a candidate passes both of them.
 
 ## Timeline and historical coverage
 
@@ -136,6 +147,7 @@ remove those inactive nodes only after every unit is retired. Do not free a
 | 2026-09-16 | `0a77bd26` | Recorded **65 passed, no skips** on WB3.2/A1200; the suite included `test_fmount_fumount_standard_adf`. | Strong evidence that this exact scenario passed after the September teardown changes. |
 | 2026-09-17 | `04c162085` | Ran the scenario for serial and native installations. | The test sequence and assertions were unchanged. |
 | 2026-09-27 | `6bc98080` in `nio-core-apps` | Added a `__KICK13__` static-MountList branch to `fmount.c`. | The existing WB3.2 branch is unchanged. |
+| 2026-09-27 | uncommitted candidate, reverted | Retained inactive DosNodes at `FUMOUNT`, then removed them in resident unload. | Broad path passed, but the minimal reproducer still failed with `IoErr=202`; reject the candidate. |
 
 The September 16 acceptance record points to
 `test-evidence/amiberry-20260916-233252/`, but that evidence directory is not
