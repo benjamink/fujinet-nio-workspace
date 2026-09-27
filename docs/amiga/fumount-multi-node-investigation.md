@@ -130,6 +130,9 @@ current generated HDF before changing production behaviour.
 
 | Experiment | Result | Reason not adopted |
 | --- | --- | --- |
+| Observe retirement for 100 ticks (about two seconds) after `ACTION_DIE` | Final `DN0:` still failed. | This is not merely a short `dol_Task` clearing delay. |
+| Add temporary `DoPkt` result/`IoErr()` diagnostics | One run passed, but isolated reruns with only result capture or only `IoErr()` still failed. | The pass was nondeterministic; no diagnostic side effect is a fix. |
+| Amiberry DOS-handler packet trace for `DN0` and `DN2` | Captured `DN0` as a real active FFS process/port (`0x258948` / `0x2589a4`) while DOS separately held a `DN2` task port (`0x260a8c`), then Amiberry reset its IPC socket during the full task-list walk. | Confirms the active handler is real, but the current controller is too chatty to identify the final packet reliably. |
 | Start `DN2:` eagerly with `ADNF_STARTPROC` | Final `DN0:` retirement still failed. | Changes the documented lazy-node model without fixing it. |
 | Remove volume entries manually after handler retirement | No improvement. | FFS owns its volume entries; manual removal is unsafe. |
 | Delay after `FUMOUNT DN2:` | A three-second delay did not change the failure. | Not a handler-exit timing race. |
