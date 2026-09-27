@@ -241,8 +241,10 @@ def capture_task_snapshot(socket_path: Path, destination: Path) -> list[dict[str
     return tasks
 
 
-def live_dn2_processes(socket_path: Path) -> list[dict[str, int | str]]:
-    """Return all currently runnable/waiting processes named DN2 with ports."""
+def live_filesystem_processes(
+    socket_path: Path, device_names: set[str],
+) -> list[dict[str, int | str]]:
+    """Return live filesystem processes for the requested DOS device names."""
     exec_base = read_memory(socket_path, 4, 4)
     current = read_memory(socket_path, exec_base + EXEC_THIS_TASK, 4)
     tasks = [read_task(socket_path, current, "CURRENT")]
@@ -252,7 +254,8 @@ def live_dn2_processes(socket_path: Path) -> list[dict[str, int | str]]:
     seen: set[int] = set()
     for task in tasks:
         address = int(task["address"])
-        if address in seen or task["type"] != 13 or task["name"] != "DN2":
+        if (address in seen or task["type"] != 13
+                or str(task["name"]).upper() not in device_names):
             continue
         seen.add(address)
         port = read_process_port(socket_path, address)
@@ -260,6 +263,11 @@ def live_dn2_processes(socket_path: Path) -> list[dict[str, int | str]]:
         task["port_sigbit"] = int(port["sigbit"])
         result.append(task)
     return result
+
+
+def live_dn2_processes(socket_path: Path) -> list[dict[str, int | str]]:
+    """Return all currently runnable/waiting processes named DN2 with ports."""
+    return live_filesystem_processes(socket_path, {"DN2"})
 
 
 def resolve_dos_library(socket_path: Path) -> int:

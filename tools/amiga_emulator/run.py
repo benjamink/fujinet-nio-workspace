@@ -426,10 +426,16 @@ class AmigaRunner:
                 )
             elif os.environ.get("AMIGA_E2E_DN2_HANDLER_TRACE") == "1":
                 ipc.request(self.ipc_socket, "DEBUG_ACTIVATE")
+                handler_devices = os.environ.get("AMIGA_E2E_DOS_HANDLER_TRACE_DEVICES", "DN2")
+                handler_args: list[str] = []
+                for device in handler_devices.split(","):
+                    device_name = device.strip()
+                    if device_name:
+                        handler_args.extend(("--device", device_name))
                 self.debugger_controller = self.start_process(
                     [sys.executable, "-m", "amiga_emulator.dn2_handler_trace",
                      "--socket", str(self.ipc_socket),
-                     "--output-dir", str(self.run_dir)],
+                     "--output-dir", str(self.run_dir), *handler_args],
                      self.run_dir / "dn2-handler-controller.log", cwd=ROOT,
                 )
             elif os.environ.get("AMIGA_E2E_IO_REQUEST_COMPARE") == "1":
