@@ -1,6 +1,6 @@
 id: a500-000
 display_name: "Amiga 500 (68000)"
-uae_config: base.uae
+uae_config: base-68000.uae
 
 settings:
   cpu_model: 68000

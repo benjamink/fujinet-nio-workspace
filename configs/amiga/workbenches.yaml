@@ -45,7 +45,7 @@ profiles:
     shares:
       - NIO
 
-  wb1.3:
+  wb13-adf:
     disk: ${AMIGA_WB13_ADF_WORKBENCH}
     kickstart: ${AMIGA_WB13_KICKSTART}
     rom_key: ${AMIGA_WB13_ROM_KEY}
@@ -56,3 +56,11 @@ profiles:
       fastmem_size: 0
       cpu_compatible: true
       cachesize: 0
+
+  wb13-a500:
+    machine: a500-000
+    harddrive: ${NIO_WORKSPACE}/images/amigaos1.3-run.hdf
+    kickstart: ${AMIGA_WB13_KICKSTART}
+    rom_key: ${AMIGA_WB13_ROM_KEY}
+    shares:
+      - NIO
