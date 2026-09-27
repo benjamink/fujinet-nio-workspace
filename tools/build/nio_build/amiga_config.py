@@ -30,7 +30,10 @@ def _load_local_amiga_env(root: Path) -> dict[str, str]:
             continue
         if "=" in line:
             key, _, value = line.partition("=")
-            result[key.strip()] = value.strip()
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+                value = value[1:-1]
+            result[key.strip()] = value
     return result
 
 
@@ -247,6 +250,7 @@ def sync_development_share(root: Path, share_path: Path) -> list[str]:
         "fujinet-load-resident",
         "fujinet-unload-resident",
         "fujinet-mount",
+        "fujinet-nio-exchange",
         "fujinet-nio-baud",
         "fujinet-nio-serial",
     ):

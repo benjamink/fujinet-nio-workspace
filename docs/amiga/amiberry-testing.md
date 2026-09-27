@@ -81,6 +81,40 @@ Other useful profile options:
 ./scripts/build.sh amiga-workbench --profile wb1.3 -- --external-nio
 ```
 
+#### Workbench 1.3 cold broker validation
+
+`wb1.3` remains an A500/68000 direct-floppy session (512 KiB chip RAM). Set
+`AMIGA_WB13_KICKSTART`, `AMIGA_WB13_ROM_KEY` when the ROM is encrypted, and
+`AMIGA_WB13_ADF_WORKBENCH` in ignored `local/amiga.env`; the profile will name
+missing or unreadable licensed media rather than selecting a fallback. Its
+read-only `NIO:` share is refreshed at launch and contains the resident loader,
+`fujinet-nio.device`, and `fujinet-nio-exchange`.
+
+To demonstrate that the broker, rather than an earlier open, loads stock
+`serial.device` from the Workbench disk:
+
+1. Build the current artifacts, start the host NIO service, then launch a new
+   Amiberry process with `./scripts/build.sh amiga-workbench --profile wb1.3 -- --external-nio`.
+   A reset inside an existing process is not a cold boot.
+2. In the new Workbench Shell, do not run a serial tool or preload/open
+   `serial.device`. Register only the broker:
+
+   ```text
+   NIO:fujinet-load-resident NIO:fujinet-nio.device fujinet-nio.device
+   ```
+
+3. Send exactly one cold clock exchange through the stock device:
+
+   ```text
+   NIO:fujinet-nio-exchange --type clock --backend cold --baud 38400 --trials 1
+   ```
+
+   Record the successful clock response plus a screenshot/log. On failure,
+   preserve that evidence and stop; do not warm up and retry in the same
+   emulator process.
+4. Exit Amiberry completely, launch a second new `wb1.3` process, and repeat
+   steps 2–3. Both isolated runs must succeed.
+
 ```sh
 AMIGA_WORKBENCH_CONFIG_FILE="$HOME/path/to/workbenches.yaml" \
 AMIGA_WORKBENCH_CONFIG=my-profile \

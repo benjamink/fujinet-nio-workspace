@@ -13,6 +13,41 @@ from nio_build.amiga_config import (
 
 
 class DevelopmentShareTests(unittest.TestCase):
+    def test_profile_expands_quoted_local_media_path(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            local = root / "local"
+            local.mkdir()
+            (local / "amiga.env").write_text(
+                'AMIGA_WB13_ADF_WORKBENCH="/media/workbench13.adf"\n',
+                encoding="utf-8",
+            )
+            config = root / "workbenches.yaml"
+            config.write_text(
+                "profiles:\n"
+                "  wb1.3:\n"
+                "    disk: ${AMIGA_WB13_ADF_WORKBENCH}\n"
+                "    kickstart: ${NIO_WORKSPACE}/kick13.rom\n",
+                encoding="utf-8",
+            )
+            profile = load_profile(config, "wb1.3", root, {})
+            self.assertEqual(profile["disk"], "/media/workbench13.adf")
+
+    def test_wb13_profile_uses_nio_share_and_rom_key(self) -> None:
+        root = Path(__file__).resolve().parents[3]
+        profile = load_profile(
+            root / "configs" / "amiga" / "workbenches.yaml",
+            "wb1.3",
+            root,
+            {
+                "AMIGA_WB13_ADF_WORKBENCH": "/media/workbench13.adf",
+                "AMIGA_WB13_KICKSTART": "/media/kick13.rom",
+                "AMIGA_WB13_ROM_KEY": "/media/rom.key",
+            },
+        )
+        self.assertEqual(profile["rom_key"], "/media/rom.key")
+        self.assertEqual(profile["shares"][0]["volume"], "NIO")
+
     def test_profile_without_shares_is_unchanged(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -84,11 +119,13 @@ class DevelopmentShareTests(unittest.TestCase):
             bounce.mkdir(parents=True)
             (driver / "fujinet-nio.device").write_bytes(b"nio")
             (driver / "fujinet-disk.device").write_bytes(b"disk")
+            (driver / "fujinet-nio-exchange").write_bytes(b"exchange")
             (apps / "fls").write_bytes(b"fls")
             (bounce / "bwcn.amiga").write_bytes(b"bwc")
             share = root / "build" / "amiga-share"
             linked = sync_development_share(root, share)
             self.assertIn("fujinet-nio.device", linked)
+            self.assertIn("fujinet-nio-exchange", linked)
             self.assertIn("fls", linked)
             self.assertIn("bwcn.amiga", linked)
             self.assertTrue((share / "fujinet-nio.device").is_symlink())

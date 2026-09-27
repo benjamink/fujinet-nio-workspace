@@ -73,6 +73,19 @@ AMIGA_WB32_ADF_MODULES_A500=/path/to/ModulesA500_3.2.adf
 # add AMIGA_WB32_ADF_MODULES_A2000 etc. when needed
 ```
 
+**WB1.3 interactive Workbench (Amiga Forever or original media):**
+
+```bash
+AMIGA_WB13_KICKSTART=/path/to/kick13.rom
+AMIGA_WB13_ROM_KEY=/path/to/rom.key          # omit only for an unencrypted ROM
+AMIGA_WB13_ADF_WORKBENCH=/path/to/workbench13.adf
+```
+
+`wb1.3` is an interactive direct-floppy profile, not an assembled automated
+environment. Keep these licensed paths solely in ignored `local/amiga.env`.
+The launcher has no fallback media paths: a missing or unreadable ROM, key, or
+ADF is reported as a profile launch error.
+
 The Modules ADF is machine-specific because it contains chipset drivers. The generic
 Workbench and Extras ADFs are shared; only the Modules ADF differs per machine family.
 

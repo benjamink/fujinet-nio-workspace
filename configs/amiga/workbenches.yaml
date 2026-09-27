@@ -48,6 +48,9 @@ profiles:
   wb1.3:
     disk: ${AMIGA_WB13_ADF_WORKBENCH}
     kickstart: ${AMIGA_WB13_KICKSTART}
+    rom_key: ${AMIGA_WB13_ROM_KEY}
+    shares:
+      - NIO
     settings:
       chipmem_size: 512
       fastmem_size: 0
