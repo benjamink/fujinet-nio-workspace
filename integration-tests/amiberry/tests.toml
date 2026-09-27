@@ -400,6 +400,77 @@ results = [
 ]
 
 [[test]]
+name = "diskdevice-fumount-after-dn2-eject"
+project = "apps"
+app = "wifitest"
+driver = true
+timeout = 75
+activity_timeout = 60
+screenshot_quiet = 15
+screenshot_interval = 1.0
+no_activity_timeout = 30
+startup = "startup/diskdevice-fumount-after-dn2-eject.sequence"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-fumount-after-dn2-eject"
+results = [
+  "dn2-eject-load.result",
+  "dn2-eject-dn0-mount.result",
+  "dn2-eject-dn0-type.result",
+  "dn2-eject-dn2-mount.result",
+  "dn2-eject-dn2-copy.result",
+  "dn2-eject-dn2-fumount.result",
+  "dn2-eject-dn0-fumount.result",
+  "dn2-eject-lockdiag.result",
+]
+
+[[test]]
+name = "diskdevice-fumount-after-dn2-remount"
+project = "apps"
+app = "wifitest"
+driver = true
+timeout = 75
+activity_timeout = 60
+screenshot_quiet = 15
+screenshot_interval = 1.0
+no_activity_timeout = 30
+startup = "startup/diskdevice-fumount-after-dn2-remount.sequence"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-fumount-after-dn2-remount"
+results = [
+  "dn2-remount-dn0-mount.result",
+  "dn2-remount-dn0-type.result",
+  "dn2-remount-dn2-mount.result",
+  "dn2-remount-dn2-copy.result",
+  "dn2-remount-dn2-fumount.result",
+  "dn2-remount-dn2-remount.result",
+  "dn2-remount-dos.result",
+  "dn2-remount-dn0-fumount.result",
+  "dn2-remount-lockdiag.result",
+]
+
+[[test]]
+name = "diskdevice-fumount-inactive-second-node"
+project = "apps"
+app = "wifitest"
+driver = true
+timeout = 75
+activity_timeout = 60
+screenshot_quiet = 15
+screenshot_interval = 1.0
+no_activity_timeout = 30
+startup = "startup/diskdevice-fumount-inactive-second-node.sequence"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-fumount-inactive-second-node"
+results = [
+  "inode-dn0-mount.result",
+  "inode-dn0-type.result",
+  "inode-dn2-mount.result",
+  "inode-dos.result",
+  "inode-dn0-fumount.result",
+  "inode-lockdiag.result",
+]
+
+[[test]]
 name = "diskdevice-unload-reload"
 project = "apps"
 app = "wifitest"

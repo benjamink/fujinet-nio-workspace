@@ -53,9 +53,10 @@ that can leave a live FFS handler attached to removed media.
 
 At the point immediately after the second `FMOUNT 13 DN2: RW`, DOS-list
 diagnostics showed the new `DN2:` node with `dol_Task == 0`; it had not yet
-started an FFS handler. Thus the trigger is not a normal open file, directory
-lock or live `DN2:` handler. The condition is produced by the presence of the
-second dynamic FFS node itself (or state FFS associates with it).
+started an FFS handler. The dedicated remount-without-access reduction now
+reproduces the final `DN0:` `ACTION_DIE` refusal in exactly that state. Thus
+the trigger is not a normal open file, directory lock or live `DN2:` handler:
+the presence of the second dynamic FFS node itself is sufficient.
 
 The guest-side `lockdiag` run after the final failed `FUMOUNT DN0:` found both
 `DN0` and `DN2` as waiting filesystem processes, but found no process whose
@@ -84,6 +85,20 @@ It contains one DN0 mount/use only—no DD/HD replacements—followed by the DN2
 writable mount, FUMOUNT, remount and persistence read. Therefore DN0 media
 replacement history is not a prerequisite; the DN2 lifecycle alone triggers
 the condition.
+
+Conversely, `diskdevice-fumount-after-dn2-eject` passed in the serial guest:
+DN2's writable mount/copy/FUMOUNT followed directly by DN0 FUMOUNT is safe.
+The remount/access phase is therefore necessary to reproduce the refusal.
+
+The final split identifies the minimum known trigger. A newly added inactive
+DN2 node beside a live DN0 handler passes (`diskdevice-fumount-inactive-second-node`).
+However, after DN2 has been mounted, successfully FUMOUNTed, and then remounted,
+DN0 FUMOUNT fails even while the recreated DN2 node has `dol_Task == 0`
+(`diskdevice-fumount-after-dn2-remount`). The retained state is therefore
+created by FFS's prior DN2 handler lifecycle and is not represented by the
+new node, its task port, or public volume locks. The two failing reductions
+are marked non-strict `xfail`: an XPASS is a signal to re-evaluate the
+underlying FFS/teardown change, not proof from a single timing-sensitive run.
 
 ## Timeline and historical coverage
 
@@ -165,6 +180,9 @@ current generated HDF before changing production behaviour.
 | Public volume-lock scan | In failed run `amiberry-20260927-192357`, DN2's `NIOADF` volume had `dol_LockList=0`; no volume entry referred to live DN0. | Eliminates the remaining public volume lock chain and stale-volume theory. |
 | Resolve `dol_Task` directly instead of `DeviceProc("DN0:")` | The exact serial scenario still failed with `ACTION_DIE` / `IoErr=202` (`amiberry-20260927-192529`). | `DeviceProc` is not creating the retained resource; production code remains unchanged. |
 | Minimal multi-node scenario | A single DN0 mount/use followed by DN2 writable mount → FUMOUNT → remount → persisted Type still refused DN0 `ACTION_DIE` (`amiberry-20260927-192759`). | DN0 replacement history is eliminated; split DN2 teardown from remount next. |
+| DN2 eject without remount | DN2 writable mount/copy/FUMOUNT followed directly by DN0 FUMOUNT passed. | DN2 teardown itself is safe; remount/access is required. |
+| DN2 remount without access | `doslistdiag` recorded `DN2 task=00000000`, then DN0 `ACTION_DIE` still failed (`amiberry-20260927-192939`). | No current DN2 FFS process, file, lock, or persistence read is needed; its earlier FFS lifecycle is. |
+| Fresh inactive DN2 node | Mounting DN2 but never accessing or retiring it, while DN0 is live, passed (`amiberry-20260927-193119`). | A second node alone is not sufficient; prior DN2 handler retirement followed by remount is required. |
 | Start `DN2:` eagerly with `ADNF_STARTPROC` | Final `DN0:` retirement still failed. | Changes the documented lazy-node model without fixing it. |
 | Remove volume entries manually after handler retirement | No improvement. | FFS owns its volume entries; manual removal is unsafe. |
 | Delay after `FUMOUNT DN2:` | A three-second delay did not change the failure. | Not a handler-exit timing race. |

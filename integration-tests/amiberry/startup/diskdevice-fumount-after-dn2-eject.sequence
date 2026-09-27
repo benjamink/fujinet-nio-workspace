@@ -1,0 +1,20 @@
+C:Assign T: RAM:
+C:Echo "FUJINET WRITE PERSISTED" >DH0:dn2-eject-source.txt
+C:FailAt 21
+C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device
+C:Echo "LOAD RC=$RC" >DH0:dn2-eject-load.result
+C:FMOUNT 11 DN0: RO >DH0:dn2-eject-dn0-mount.result
+C:Echo "DN0 MOUNT RC=$RC" >>DH0:dn2-eject-dn0-mount.result
+C:Type DN0:KNOWN.TXT >DH0:dn2-eject-dn0-type.result
+C:Echo "DN0 TYPE RC=$RC" >>DH0:dn2-eject-dn0-type.result
+C:FMOUNT 13 DN2: RW >DH0:dn2-eject-dn2-mount.result
+C:Echo "DN2 MOUNT RC=$RC" >>DH0:dn2-eject-dn2-mount.result
+C:Copy DH0:dn2-eject-source.txt TO DN2:PERSIST.TXT
+C:Echo "DN2 COPY RC=$RC" >DH0:dn2-eject-dn2-copy.result
+C:FUMOUNT DN2: >DH0:dn2-eject-dn2-fumount.result
+C:Echo "DN2 FUMOUNT RC=$RC" >>DH0:dn2-eject-dn2-fumount.result
+C:FUMOUNT DN0: >DH0:dn2-eject-dn0-fumount.result
+C:Echo "DN0 FUMOUNT RC=$RC" >>DH0:dn2-eject-dn0-fumount.result
+C:lockdiag >DH0:dn2-eject-lockdiag.result
+C:FLS host:/amiga-e2e-complete/diskdevice-fumount-after-dn2-eject >DH0:dn2-eject-completion.result
+C:Echo "E2E COMPLETE"
