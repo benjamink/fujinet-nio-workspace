@@ -106,6 +106,23 @@ In the failing remount run, DN0 reported unit 0 and DN2 unit 2; both named
 accidentally recreating DN2 as unit 0, so a shared-unit identity error is
 eliminated.
 
+## Reusable-node experiment
+
+An uncommitted experiment changed successful `FUMOUNT` to retire/eject the
+handler but retain its inactive `MakeDosNode` entry. The normal full WB3.2
+serial `diskdevice-fmount` scenario then passed: DN2 remount reused its
+original `FileSysStartupMsg`, and DN0's later `ACTION_DIE` succeeded. This is
+strong causal evidence that recreating the node after retirement triggers the
+FFS-private retained state.
+
+It is not merged as-is. The established single-node teardown test proves the
+current contract removes the DosList entry so the resident may be unloaded;
+with the experiment it correctly observed `DN0 task=00000000` but still found
+the node. A durable change would need to make inactive-node retention the
+documented FUMOUNT contract and teach the explicit resident-unload workflow to
+remove those inactive nodes only after every unit is retired. Do not free a
+`MakeDosNode()` entry: current AmigaDOS documentation says that is unsafe.
+
 ## Timeline and historical coverage
 
 | Date | Commit | Change | Relevance |
@@ -189,6 +206,7 @@ current generated HDF before changing production behaviour.
 | DN2 eject without remount | DN2 writable mount/copy/FUMOUNT followed directly by DN0 FUMOUNT passed. | DN2 teardown itself is safe; remount/access is required. |
 | DN2 remount without access | `doslistdiag` recorded `DN2 task=00000000`, then DN0 `ACTION_DIE` still failed (`amiberry-20260927-192939`). | No current DN2 FFS process, file, lock, or persistence read is needed; its earlier FFS lifecycle is. |
 | Fresh inactive DN2 node | Mounting DN2 but never accessing or retiring it, while DN0 is live, passed (`amiberry-20260927-193119`). | A second node alone is not sufficient; prior DN2 handler retirement followed by remount is required. |
+| Retain the inactive DN2 node after FUMOUNT (uncommitted experiment) | The original full WB3.2 serial scenario passed. | Reusing the original node/startup data eliminates the refusal, but needs an unload-contract redesign. |
 | Start `DN2:` eagerly with `ADNF_STARTPROC` | Final `DN0:` retirement still failed. | Changes the documented lazy-node model without fixing it. |
 | Remove volume entries manually after handler retirement | No improvement. | FFS owns its volume entries; manual removal is unsafe. |
 | Delay after `FUMOUNT DN2:` | A three-second delay did not change the failure. | Not a handler-exit timing race. |
