@@ -112,6 +112,23 @@ Verified 2026-09-28 with:
 `scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000
 test_nio_native_test.py::test_native_exchange_tool_read_only -q`
 
+### Native disk matrix (WIP)
+
+The initial WB1.3 plan loads the native NIO device and `fujinet-disk.device`,
+then runs the native ordinary read/write workflow without the newer-Kickstart
+unload/reload branch. The native service receives and replies to both 512-byte
+read requests, but the guest then raises **“Software error -- task held”**
+before the tool returns to Shell and before StartupII can write its first
+checkpoint file. This is therefore a real post-read DiskDevice/native-backend
+fault, not the former parser-preflight watchdog issue.
+
+The normal failure evidence is
+`test-evidence/amiberry-20260928-211834/nio-native-disk/`. A debugger-controller
+attempt exited the emulator before StartupII's first checkpoint and is not
+valid diagnostic evidence. Keep the production 16 KiB worker stack unchanged;
+the next step is targeted instrumentation around the tool's post-read trace,
+close, and cleanup path.
+
 ### FFS and high-density media
 
 The default WB1.3 static MountList declares DD/OFS geometry. The mixed profile
