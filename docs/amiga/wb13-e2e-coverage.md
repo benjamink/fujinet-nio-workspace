@@ -32,9 +32,13 @@ was already written in the required form, `FLS >DH0:result host:/`.
 
 The WB1.3 static MountList currently declares DD/OFS geometry.  The WB3.2 FFS
 and HD cases depend on dynamic DosNodes or geometry-specific MountList entries.
-Port them only alongside a deliberate static FFS/HD MountList design and a
-guest fixture that supplies the required filesystem handler.  Do not claim the
-current DD static entry can validate either media type.
+An experimental DN0: entry with `DosType = 0x444F5301` and
+`FileSystem = L:FastFileSystem` allowed `FMOUNT` to report success but the
+first `Dir DN0:` raised WB1.3's **“Not a DOS disk in unit 0”** requester.  It
+was deliberately not retained.  Port these cases only alongside a deliberate
+static FFS/HD MountList design and a guest fixture that proves the filesystem
+handler is registered.  Do not claim the current DD static entry can validate
+either media type.
 
 ### Dynamic-DOS-node and removal tests
 
