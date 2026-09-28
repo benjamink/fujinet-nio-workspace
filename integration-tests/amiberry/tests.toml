@@ -1338,6 +1338,7 @@ project = "driver"
 app = "fujinet-nio-exchange"
 nio_broker = true
 nio_native_test = true
+environments = ["wb32", "wb13"]
 timeout = 75
 activity_timeout = 60
 no_activity_timeout = 30
@@ -1363,6 +1364,11 @@ results = [
   "nio-clock.result",
   "nio-list.result",
 ]
+
+[test.environment_variants.wb13]
+startup = "startup/nio-native-exchange-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
 
 [[test]]
 name = "nio-native-disk"

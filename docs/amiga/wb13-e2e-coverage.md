@@ -88,6 +88,17 @@ and the unchanged WB3.2 control:
 `scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030
 test_diskdevice_silent_timeout.py -q`.
 
+### Native exchange matrix (WIP)
+
+The larger `nio-native-exchange` matrix now has a WB1.3 startup sequence with
+redirection before arguments and an explicit post-load readiness delay. Its
+first run still times out before the native endpoint records a valid FujiBus
+request; the console reaches the deliberately-invalid command usage probes,
+but no Guru is raised. Do not enable it as accepted WB1.3 coverage yet. The
+next investigation should inspect the first valid `fujinet-nio-exchange`
+invocation and its command-line/worker boundary rather than reworking output
+redirection.
+
 ### FFS and high-density media
 
 The default WB1.3 static MountList declares DD/OFS geometry. The mixed profile
