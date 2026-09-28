@@ -23,7 +23,7 @@ C:Type >DH0:wb13-multi-persist.result DN2:PERSIST.TXT
 If NOT WARN
 C:FUMOUNT >DH0:wb13-multi-dn0-eject.result DN0:
 If NOT WARN
-C:FUMOUNT >DH0:wb13-multi-dn2-final-eject.result DN2:
+C:FUMOUNT >DH0:wb13-multi-dn2-finale.result DN2:
 If NOT WARN
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/diskdevice-wb13-multidrive
 EndIf

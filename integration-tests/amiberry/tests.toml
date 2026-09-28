@@ -195,7 +195,54 @@ results = [
   "wb13-multi-dn2-remount.result",
   "wb13-multi-persist.result",
   "wb13-multi-dn0-eject.result",
-  "wb13-multi-dn2-final-eject.result",
+  "wb13-multi-dn2-finale.result",
+]
+
+[[test]]
+name = "diskdevice-wb13-secondary-ro"
+project = "apps"
+app = "wifitest"
+driver = true
+driver_tools = ["fujinet-nio-exchange"]
+amiga_artifact_profile = "wb13"
+core_tools = ["fmount", "fumount"]
+wb13_mountlist = true
+no_static_mountlists = true
+environments = ["wb13"]
+timeout = 120
+activity_timeout = 90
+no_activity_timeout = 45
+startup = "startup/diskdevice-wb13-secondary-ro.sequence"
+startup_target = "S/StartupII"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-secondary-ro"
+results = [
+  "w13ro-load.result", "w13ro-dn0m.result", "w13ro-dn0t.result",
+  "w13ro-dn2m.result", "w13ro-dn2t.result", "w13ro-eject.result",
+  "w13ro-remnt.result", "w13ro-remntt.result",
+]
+
+[[test]]
+name = "diskdevice-wb13-secondary-rw-alone"
+project = "apps"
+app = "wifitest"
+driver = true
+driver_tools = ["fujinet-nio-exchange"]
+amiga_artifact_profile = "wb13"
+core_tools = ["fmount", "fumount"]
+wb13_mountlist = true
+no_static_mountlists = true
+environments = ["wb13"]
+timeout = 120
+activity_timeout = 90
+no_activity_timeout = 45
+startup = "startup/diskdevice-wb13-secondary-rw-alone.sequence"
+startup_target = "S/StartupII"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-secondary-rw-alone"
+results = [
+  "w13rw-load.result", "w13rw-mount.result", "w13rw-copy.result",
+  "w13rw-eject.result", "w13rw-remnt.result", "w13rw-persist.result",
 ]
 
 [[test]]

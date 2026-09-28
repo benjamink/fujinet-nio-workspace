@@ -1,0 +1,21 @@
+C:Assign T: RAM:
+C:Failat 100
+C:Echo >DH0:w13rw-source.txt "FUJINET WB13 WRITE PERSISTED"
+C:fujinet-load-resident >DH0:w13rw-load.result DEVS:fujinet-disk.device fujinet-disk.device
+C:Mount DN2:
+C:FMOUNT >DH0:w13rw-mount.result 13 DN2: RW
+If NOT WARN
+C:Copy DH0:w13rw-source.txt TO DN2:PERSIST.TXT
+C:Echo >DH0:w13rw-copy.result "COPY RC=$RC"
+If NOT WARN
+C:FUMOUNT >DH0:w13rw-eject.result DN2:
+If NOT WARN
+C:FMOUNT >DH0:w13rw-remnt.result 13 DN2: RW
+If NOT WARN
+C:Type >DH0:w13rw-persist.result DN2:PERSIST.TXT
+If NOT WARN
+C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/diskdevice-wb13-secondary-rw-alone
+EndIf
+EndIf
+EndIf
+EndIf

@@ -60,6 +60,27 @@ commit writable metadata before the removable-media transition, or establish
 that the classic FFS handler cannot support writable secondary removable
 media while another static handler remains live.
 
+## Resolution candidate: native write-back quiescence
+
+The boundary matrix shows that this is not a multi-unit limitation:
+
+- DN2 read-only eject/reinsert succeeds while DN0 remains mounted.
+- DN2 writable eject/reinsert fails even when DN2 is the only mounted FujiNet
+  unit.
+
+An earlier controlled run inserted `Wait 5` between `Copy` and `FUMOUNT`.
+The HDF evidence shows the persisted file after remount and successful final
+ejects.  The shell timestamps place the initial eject about seven seconds
+after `Copy`, compared with the immediate failure path.  This establishes
+that WB1.3 FFS's normal delayed write-back—not concurrent handlers—is the
+missing transition.
+
+`FUMOUNT` now performs the same five-second WB1.3-only quiescence internally
+before `TD_EJECT`.  The isolated writable DN2 lifecycle and the original
+concurrent DN0/DN2 lifecycle both complete through persisted-file readback
+and completion-marker emission with that change.  Later Kickstarts keep their
+existing handler-retirement lifecycle and do not take this delay.
+
 ## Rejected paths
 
 - Standalone `DEVS:DNn` files are not a WB1.3 replacement for its shared
