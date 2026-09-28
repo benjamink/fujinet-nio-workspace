@@ -13,6 +13,7 @@ pass or skip.
 * `test_amiga_fin_slot_catalog.py` runs on WB1.3 and WB3.2.
 * `test_wifi_config.py` runs on WB1.3 and WB3.2.
 * `test_diskdevice_loader.py` runs on WB1.3 and WB3.2.
+* `test_cli_stateful.py` runs on WB1.3 and WB3.2.
 * `test_diskdevice_wb13.py` exercises static-unit lifecycle, multi-drive
   reads/writes/copy, readonly media and all eight `DN` units.
 * `test_nio_wb13.py` proves the cold serial-worker load path.
@@ -21,13 +22,14 @@ pass or skip.
 
 ### Stateful CLI (`test_cli_stateful.py`)
 
-This is not enabled for WB1.3 yet.  The WB1.3-profiled `FHOST host:/` and
-subsequent `FHOST` complete successfully.  The following profiled `FLS host:/`
-never submits a FileDevice request: the NIO log contains the three Host-device
-exchanges and no FileDevice exchange.  Increasing the Shell stack from 4096
-to 8192 bytes does not change that outcome.  This is an application/runtime
-fault to diagnose, not a Workbench 1.3 redirection issue; WB1.3 redirection
-was already written in the required form, `FLS >DH0:result host:/`.
+The shared case is enabled.  On WB1.3, `FHOST`, `FLS`, and `FAPP` must write
+to the console rather than using AmigaDOS command-output redirection: a
+redirected FujiNet CLI process completes its NIO exchange but does not return
+to the 1.3 StartupII script.  The WB1.3 sequence instead checks each command's
+success, records the corresponding expected result with the known-safe
+`Echo >file` form, and spaces short-lived commands with `Wait 1`.  The guest
+proves Host, FileDevice, and AppStore exchanges in order; the WB3.2 sequence
+continues to capture each command's native stdout directly.
 
 ### FFS and high-density media
 
@@ -55,7 +57,7 @@ is static DN0:--DN7: medium replacement/eject coverage, which belongs in
 | --- | --- |
 | `test_amiga_fin_slot_catalog.py`, `test_wifi_config.py`, `test_diskdevice_loader.py` | Shared WB3.2/WB1.3 case variants are enabled and pass. |
 | `test_diskdevice_wb13.py`, `test_nio_wb13.py` | WB1.3-native acceptance modules already pass. |
-| `test_cli_stateful.py` | Blocked by the profiled `FLS` runtime fault described above. `FHOST` is proven; do not enable a partial stateful contract. |
+| `test_cli_stateful.py` | Shared WB3.2/WB1.3 case variant is enabled; see the WB1.3 Shell/redirection constraint above. |
 | `test_amiga_fin_ffs_adf.py` | Blocked pending a proven WB1.3 FFS handler-registration/static MountList design. |
 | `test_checksumbench.py` | Blocked: the WB1.3-profiled application reaches the OS **task held** requester. This needs an application/runtime fix, not a test-script variant. |
 | `test_diskdevice_adf.py`, `test_diskdevice_fmount.py`, `test_diskdevice_fmount_restore.py`, `test_diskdevice_fumount_handler.py`, `test_diskdevice_inhibit.py`, `test_diskdevice_inhibit_experiments.py`, `test_diskdevice_unload_reload.py` | Their exact contracts assert dynamic node creation/removal, handler lifecycle, or `FMOUNTRESTORE`; WB1.3 uses static MountList handlers. Extend `test_diskdevice_wb13.py` for equivalent user-visible static-media contracts rather than duplicate invalid assertions. |
