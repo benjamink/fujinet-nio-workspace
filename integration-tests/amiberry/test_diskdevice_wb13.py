@@ -73,3 +73,13 @@ def test_wb13_all_static_units_mount_and_read(run_amiga_case):
         stem = f"w13u-dn{unit}"
         assert f"Mounted slot 11 on DN{unit}:" in results[f"{stem}m.result"]
         assert "FUJINET ADF READ PASSED" in results[f"{stem}t.result"]
+
+
+def test_wb13_readonly_media_reports_protection(run_amiga_case):
+    """A read-only catalogue mount must present protected media to trackdisk."""
+    results = run_amiga_case("diskdevice-wb13-readonly")
+
+    assert "Mounted slot 11 on DN0:" in results["w13wp-mount.result"]
+    assert "STATUS drive=0" in results["w13wp-status.result"]
+    assert "protected=1" in results["w13wp-status.result"]
+    assert "FUJINET ADF READ PASSED" in results["w13wp-known.result"]

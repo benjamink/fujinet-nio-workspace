@@ -297,6 +297,28 @@ results = [
 ]
 
 [[test]]
+name = "diskdevice-wb13-readonly"
+project = "apps"
+app = "wifitest"
+driver = true
+driver_tools = ["fujinet-nio-exchange"]
+amiga_artifact_profile = "wb13"
+core_tools = ["fmount"]
+wb13_mountlist = true
+no_static_mountlists = true
+environments = ["wb13"]
+timeout = 90
+activity_timeout = 75
+no_activity_timeout = 45
+startup = "startup/diskdevice-wb13-readonly.sequence"
+startup_target = "S/StartupII"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-readonly"
+results = [
+  "w13wp-mount.result", "w13wp-status.result", "w13wp-known.result",
+]
+
+[[test]]
 name = "diskdevice-hd-adf"
 project = "apps"
 app = "wifitest"

@@ -96,6 +96,14 @@ DN0.  Treat the bulk-eject sequence as a separate WB1.3 resource/lifecycle
 investigation; do not infer a limitation in mounting or reading all eight
 units from it.
 
+## Read-only media verification
+
+Automated WB1.3 coverage verifies a catalogue `RO` mount through the device's
+`TD_PROTSTATUS` result (`protected=1`) and reads its known file.  A manual
+`Delete DN0:KNOWN.TXT` reaches the expected WB1.3 "Volume NIOADF is write
+protected" requester.  That requester is modal, so the guest test does not
+attempt to automate a Cancel click merely to obtain a shell return code.
+
 ## Rejected paths
 
 - Standalone `DEVS:DNn` files are not a WB1.3 replacement for its shared
