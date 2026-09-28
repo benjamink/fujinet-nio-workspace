@@ -45,6 +45,41 @@ from amiga_emulator import ipc as _amiberry_ipc  # noqa: E402
 from amiga_emulator.debug_snapshot import capture_debug_snapshot as _capture_debug_snapshot  # noqa: E402
 
 
+def resolve_case_for_environment(case_name: str, registered_case: dict[str, Any],
+                                 active_environment: str | None) -> dict[str, Any]:
+    """Return a case with its active Workbench guest-plan override applied."""
+    case = dict(registered_case)
+    supported_environments = case.get("environments", DEFAULT_CASE_ENVIRONMENTS)
+    if (not isinstance(supported_environments, list)
+            or not all(isinstance(item, str) for item in supported_environments)):
+        raise AssertionError(
+            f"Amiberry case '{case_name}' has invalid environments: "
+            f"{supported_environments!r}"
+        )
+    if active_environment not in supported_environments:
+        pytest.skip(
+            f"Amiberry case '{case_name}' supports only "
+            f"{', '.join(supported_environments)}; active environment is "
+            f"{active_environment or 'unknown'}"
+        )
+
+    variants = case.pop("environment_variants", {})
+    if not isinstance(variants, dict):
+        raise AssertionError(
+            f"Amiberry case '{case_name}' has invalid environment_variants: "
+            f"{variants!r}"
+        )
+    for environment, override in variants.items():
+        if environment not in supported_environments or not isinstance(override, dict):
+            raise AssertionError(
+                f"Amiberry case '{case_name}' has invalid variant "
+                f"for {environment!r}: {override!r}"
+            )
+    if active_environment in variants:
+        case.update(variants[active_environment])
+    return case
+
+
 def xdf_command(environment: dict[str, str]) -> list[str]:
     if shutil.which("xdftool", path=environment.get("PATH")):
         return ["xdftool"]
@@ -838,24 +873,10 @@ def _terminate_runner(runner: subprocess.Popen[object]) -> None:
 def run_amiga_case(amiga_environment: dict[str, str],
                    amiga_cases: dict[str, dict],
                    amiga_machine: dict[str, Any],
-                   amiga_evidence_root: Path) -> Any:
+    amiga_evidence_root: Path) -> Any:
     def run(name: str, *, installation: str | None = None) -> dict[str, str]:
-        case = dict(amiga_cases[name])
-        supported_environments = case.get("environments", DEFAULT_CASE_ENVIRONMENTS)
         active_environment = amiga_environment.get("AMIGA_ENV_ID")
-        if supported_environments is not None:
-            if (not isinstance(supported_environments, list)
-                    or not all(isinstance(item, str) for item in supported_environments)):
-                raise AssertionError(
-                    f"Amiberry case '{name}' has invalid environments: "
-                    f"{supported_environments!r}"
-                )
-            if active_environment not in supported_environments:
-                pytest.skip(
-                    f"Amiberry case '{name}' supports only "
-                    f"{', '.join(supported_environments)}; active environment is "
-                    f"{active_environment or 'unknown'}"
-                )
+        case = resolve_case_for_environment(name, amiga_cases[name], active_environment)
         if installation not in {None, "serial", "native"}:
             raise ValueError(f"Unknown installation: {installation}")
         if installation == "native":
@@ -895,12 +916,31 @@ def run_amiga_case(amiga_environment: dict[str, str],
             raise AssertionError(
                 f"Amiberry case '{name}' sets nio_native_test and fujinet_serial"
             )
+        artifact_profile = case.get("amiga_artifact_profile")
+        core_tools = case.get("core_tools", [])
+        if artifact_profile is not None:
+            if not isinstance(artifact_profile, str) or not artifact_profile:
+                raise AssertionError(
+                    f"Amiberry case '{name}' has invalid amiga_artifact_profile: "
+                    f"{artifact_profile!r}"
+                )
+            subprocess.run(
+                [str(ROOT / "scripts/amiga-artifacts"), artifact_profile],
+                cwd=ROOT, env=amiga_environment, check=True,
+            )
+        if core_tools and artifact_profile is None:
+            raise AssertionError(
+                f"Amiberry case '{name}' uses core_tools without amiga_artifact_profile"
+            )
         driver_root = ROOT / "repos/fujinet-nio-driver"
-        nio_device = driver_root / "build/amiga/fujinet-nio.device"
+        driver_build_dir = driver_root / "build/amiga"
+        if artifact_profile:
+            driver_build_dir /= artifact_profile
+        nio_device = driver_build_dir / "fujinet-nio.device"
         if case.get("nio_native_test"):
-            nio_device = driver_root / "build/amiga/fujinet-nio-native-test.device"
-        resident_loader = driver_root / "build/amiga/fujinet-load-resident"
-        resident_unloader = driver_root / "build/amiga/fujinet-unload-resident"
+            nio_device = driver_build_dir / "fujinet-nio-native-test.device"
+        resident_loader = driver_build_dir / "fujinet-load-resident"
+        resident_unloader = driver_build_dir / "fujinet-unload-resident"
         if case.get("nio_broker"):
             subprocess.run(
                 ["make", "native"],
@@ -912,7 +952,10 @@ def run_amiga_case(amiga_environment: dict[str, str],
         else:
             app_dir = ROOT / "repos" / (
                 "nio-apps" if case["project"] == "apps" else "nio-core-apps"
-            ) / "build" / "amiga" / "bin"
+            ) / "build" / "amiga"
+            if artifact_profile and case["project"] == "core-apps":
+                app_dir /= artifact_profile
+            app_dir /= "bin"
             app = app_dir / case["app"]
         if not app.is_file():
             raise AssertionError(f"Amiga test application was not built: {app}")
@@ -1024,9 +1067,13 @@ def run_amiga_case(amiga_environment: dict[str, str],
         if case.get("startup_target"):
             build_cmd.extend(["--startup-target", case["startup_target"]])
         if not case.get("nio_broker"):
+            core_app_dir = ROOT / "repos/nio-core-apps/build/amiga"
+            if artifact_profile:
+                core_app_dir /= artifact_profile
+            core_app_dir /= "bin"
             build_cmd.extend([
                 "--extra-app-dir", ROOT / "repos/nio-apps/build/amiga/bin",
-                "--extra-app-dir", ROOT / "repos/nio-core-apps/build/amiga/bin",
+                "--extra-app-dir", core_app_dir,
             ])
         if case.get("nio_broker"):
             build_cmd.extend([
@@ -1035,9 +1082,9 @@ def run_amiga_case(amiga_environment: dict[str, str],
                 "--resident-unloader", resident_unloader,
             ])
             if broker_disk:
-                build_cmd.extend(["--devs-file", driver_root / "build/amiga/fujinet-disk.device"])
+                build_cmd.extend(["--devs-file", driver_build_dir / "fujinet-disk.device"])
             if case.get("fujinet_serial"):
-                serial_device = driver_root / "build/amiga/fujinet-serial.device"
+                serial_device = driver_build_dir / "fujinet-serial.device"
                 if not serial_device.is_file():
                     raise AssertionError(
                         f"Amiga Paula serial device was not built: {serial_device}"
@@ -1052,8 +1099,8 @@ def run_amiga_case(amiga_environment: dict[str, str],
             ])
         if case.get("driver") and not case.get("nio_broker"):
             build_cmd.extend([
-                "--disk-device", driver_root / "build/amiga/fujinet-disk.device",
-                "--disk-mount-tool", driver_root / "build/amiga/fujinet-mount",
+                "--disk-device", driver_build_dir / "fujinet-disk.device",
+                "--disk-mount-tool", driver_build_dir / "fujinet-mount",
             ])
             if not case.get("no_static_mountlists"):
                 for unit in range(8):
@@ -1070,21 +1117,10 @@ def run_amiga_case(amiga_environment: dict[str, str],
                 raise AssertionError(
                     f"Amiberry case '{name}' has invalid driver_tools entry: {tool!r}"
                 )
-            tool_path = driver_root / "build/amiga" / tool
+            tool_path = driver_build_dir / tool
             if not tool_path.is_file():
                 raise AssertionError(f"Amiga driver tool was not built: {tool_path}")
             build_cmd.extend(["--extra-app-file", tool_path])
-        artifact_profile = case.get("amiga_artifact_profile")
-        core_tools = case.get("core_tools", [])
-        if core_tools:
-            if not isinstance(artifact_profile, str) or not artifact_profile:
-                raise AssertionError(
-                    f"Amiberry case '{name}' uses core_tools without amiga_artifact_profile"
-                )
-            subprocess.run(
-                [str(ROOT / "scripts/amiga-artifacts"), artifact_profile],
-                cwd=ROOT, env=amiga_environment, check=True,
-            )
         for tool in core_tools:
             if not isinstance(tool, str):
                 raise AssertionError(
@@ -1094,7 +1130,6 @@ def run_amiga_case(amiga_environment: dict[str, str],
                          artifact_profile / "bin" / tool)
             if not tool_path.is_file():
                 raise AssertionError(f"Amiga core tool was not built: {tool_path}")
-            build_cmd.extend(["--extra-app-file", tool_path])
         subprocess.run(build_cmd, cwd=ROOT, env=amiga_environment, check=True)
 
         native_adf: Path | None = None

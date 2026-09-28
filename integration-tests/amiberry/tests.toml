@@ -666,6 +666,7 @@ name = "amiga-fin-slot-catalog"
 project = "core-apps"
 app = "fmount"
 driver = true
+environments = ["wb32", "wb13"]
 no_static_mountlists = true
 timeout = 60
 activity_timeout = 45
@@ -685,6 +686,17 @@ results = [
   "fin-clear.result",
   "fin-clear-mount.result",
 ]
+
+[test.environment_variants.wb13]
+startup = "startup/amiga-fin-slot-catalog-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+driver_tools = ["fujinet-nio-exchange"]
+wb13_mountlist = true
+no_static_mountlists = true
+timeout = 120
+activity_timeout = 90
+no_activity_timeout = 45
 
 [[test]]
 name = "amiga-fin-ffs-adf"

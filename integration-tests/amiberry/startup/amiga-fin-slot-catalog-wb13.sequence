@@ -1,0 +1,51 @@
+C:Assign T: RAM:
+C:FailAt 30
+C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device
+If NOT WARN
+C:Echo >DH0:fin-load.result "LOAD RC=0"
+C:Mount DN0:
+C:Mount DN1:
+C:Mount DN2:
+C:FHOST host:/
+If NOT WARN
+C:Echo >DH0:fin-host.result "FHOST RC=0"
+C:FIN 0 standard.adf
+If NOT WARN
+C:Echo >DH0:fin-relative.result "Slot 0: host:/standard.adf"
+C:Echo >>DH0:fin-relative.result "FIN RELATIVE RC=0"
+C:FMOUNT 0 DN0: RO
+If NOT WARN
+C:Echo >DH0:fin-relative-mount.result "Mounted slot 0 on DN0:"
+C:Echo >>DH0:fin-relative-mount.result "FMOUNT RELATIVE RC=0"
+C:Dir >DH0:fin-relative-dir.result DN0:
+If NOT WARN
+C:Echo >>DH0:fin-relative-dir.result "DIR RELATIVE RC=0"
+C:FIN 1 host:/second.adf
+If NOT WARN
+C:Echo >DH0:fin-full.result "Slot 1: host:/second.adf"
+C:Echo >>DH0:fin-full.result "FIN FULL RC=0"
+C:FMOUNT 1 DN1: RO
+If NOT WARN
+C:Echo >DH0:fin-full-mount.result "Mounted slot 1 on DN1:"
+C:Echo >>DH0:fin-full-mount.result "FMOUNT FULL RC=0"
+C:Dir >DH0:fin-full-dir.result DN1:
+If NOT WARN
+C:Echo >>DH0:fin-full-dir.result "DIR FULL RC=0"
+C:FOUT 0
+If NOT WARN
+C:Echo >DH0:fin-clear.result "Slot 0 cleared"
+C:Echo >>DH0:fin-clear.result "FOUT RC=0"
+C:FMOUNT 0 DN2: RO
+If WARN
+C:Echo >DH0:fin-clear-mount.result "FMOUNT CLEAR RC=10"
+C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/amiga-fin-slot-catalog
+EndIf
+EndIf
+EndIf
+EndIf
+EndIf
+EndIf
+EndIf
+EndIf
+EndIf
+EndIf

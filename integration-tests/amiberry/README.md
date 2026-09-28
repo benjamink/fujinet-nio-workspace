@@ -43,6 +43,31 @@ Cases with no `environments` field are WB3.2 cases.  Add an explicit
 sequence; Shell redirection and the static MountList lifecycle differ from
 the WB3.2 defaults.
 
+## Workbench variants
+
+Keep one `[[test]]` and one pytest assertion module when its observable
+contract is shared across Workbench releases.  Use an environment override to
+select the guest plan instead of duplicating a `test_*_wb13.py` module:
+
+```toml
+[[test]]
+name = "example"
+environments = ["wb32", "wb13"]
+startup = "startup/example.sequence"
+
+[test.environment_variants.wb13]
+startup = "startup/example-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+wb13_mountlist = true
+```
+
+The active variant shallowly overrides the common case fields before the HDF
+is assembled.  It may select a different startup sequence, timeouts, tools,
+artifact profile, or MountList setup.  Result names should stay common so the
+same pytest assertions prove the same behaviour.  Use a separate pytest case
+only when the supported product behaviour—not merely the guest setup—differs.
+
 ### Building an environment
 
 If you haven't built the environment yet:

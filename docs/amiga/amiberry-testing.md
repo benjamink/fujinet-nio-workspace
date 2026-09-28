@@ -236,6 +236,12 @@ example `Echo >DH0:result "text"`), lacks the later `If $RC EQ` form, and uses
 the static `DN0:`--`DN7:` MountList lifecycle rather than dynamic DOS nodes.
 Do not add `wb13` to a legacy case merely because its binaries compile.
 
+When an observable test contract is shared, retain one case and pytest module
+and add `[test.environment_variants.wb13]` in `tests.toml`.  The override can
+select its WB1.3 startup script and profile-specific assets while preserving
+the common result names and assertions.  See the Amiberry README for the
+schema.
+
 Focused pytest (same harness):
 
 ```sh
