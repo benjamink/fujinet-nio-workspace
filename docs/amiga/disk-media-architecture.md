@@ -53,11 +53,18 @@ and retries eject before completing the mapping and DOS-entry removal.
 
 ### Workbench 1.3 static-unit workflow
 
-Workbench 1.3 uses permanent static `DN0:` through `DN7:` entries in the
-shared `DEVS:MountList`. `Install-FujiNet-WB13` appends them without replacing
-the system definitions, so no manual setup is required for ordinary
-multi-drive use. The startup setup starts the static handlers once; `FMOUNT`
-only changes media in the selected unit. It has the same commands, but a
+Workbench 1.3 uses permanent static entries in the shared `DEVS:MountList`.
+The handler geometry is fixed when it starts, so select one installer profile
+before installation:
+
+| Installer | Concurrent media | Static names |
+| --- | --- | --- |
+| `Install-FujiNet-WB13` | eight 880 KiB DD ADFs | `DN0:`--`DN7:` (units 0--7) |
+| `Install-FujiNet-WB13-Mixed` | four DD plus four 1760 KiB HD ADFs | `DN0:`--`DN3:` (units 0--3), `HD0:`--`HD3:` (units 4--7) |
+
+Run only one profile on a clean MountList; both define static device names.
+The startup setup starts the chosen static handlers once; `FMOUNT` only
+changes media in the selected unit. It has the same commands, but a
 deliberately different handler lifecycle. The concurrent secondary-unit
 eject/reinsert investigation remains recorded in
 `docs/amiga/wb13-multidrive-investigation.md`:
@@ -72,6 +79,16 @@ Type DN0:KNOWN.TXT
 FMOUNT 13 DN2: RW
 Copy DH0:REPORT TO DN2:REPORT
 FUMOUNT DN2:
+```
+
+For mixed media, explicitly choose the matching handler:
+
+```text
+FMOUNT 13 DN0: RW
+FMOUNT 21 HD0: RW
+Copy DN0:BASE.TXT TO HD0:FROMDD.TXT
+Copy HD0:BASEHD.TXT TO DN0:FROMHD.TXT
+FUMOUNT HD0:
 ```
 
 On WB1.3, `FUMOUNT DN0:` ejects the FujiNet media through `TD_EJECT`; it does

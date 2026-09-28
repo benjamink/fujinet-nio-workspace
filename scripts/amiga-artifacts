@@ -97,8 +97,12 @@ done
 if [[ "$PROFILE" == wb13 ]]; then
   install -m 0644 "$ROOT/configs/amiga/install/Install-FujiNet-WB13" \
     "$STAGE/Install-FujiNet-WB13"
+  install -m 0644 "$ROOT/configs/amiga/install/Install-FujiNet-WB13-Mixed" \
+    "$STAGE/Install-FujiNet-WB13-Mixed"
   install -m 0644 "$ROOT/repos/fujinet-nio-driver/amiga/config/DN0" \
     "$STAGE/DN0-MountList"
+  install -m 0644 "$ROOT/configs/amiga/install/MountList-FujiNet-WB13-Mixed" \
+    "$STAGE/MountList-FujiNet-WB13-Mixed"
 fi
 
 printf 'Amiga %s artifacts: %s\n' "$PROFILE" "$STAGE"

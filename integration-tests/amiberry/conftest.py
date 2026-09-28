@@ -1107,9 +1107,20 @@ def run_amiga_case(amiga_environment: dict[str, str],
                     build_cmd.extend(["--disk-mountlist", driver_root / f"amiga/config/DN{unit}"])
                 build_cmd.extend(["--disk-mountlist", driver_root / "amiga/config/DN0HD"])
             if case.get("wb13_mountlist"):
+                mountlist_source = case.get(
+                    "wb13_mountlist_source",
+                    ROOT / "configs/amiga/install/MountList-FujiNet-WB13",
+                )
+                if not isinstance(mountlist_source, Path):
+                    mountlist_source = ROOT / str(mountlist_source)
+                if not mountlist_source.is_file():
+                    raise AssertionError(
+                        f"Amiberry case '{name}' has no WB1.3 MountList: "
+                        f"{mountlist_source}"
+                    )
                 build_cmd.extend([
                     "--disk-mountlist-target",
-                    ROOT / "configs/amiga/install/MountList-FujiNet-WB13",
+                    mountlist_source,
                     "Devs/MountList",
                 ])
         for tool in case.get("driver_tools", []):

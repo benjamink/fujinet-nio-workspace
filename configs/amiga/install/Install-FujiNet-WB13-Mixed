@@ -1,0 +1,36 @@
+; Run on a clean WB1.3 installation when concurrent DD and HD ADF media is
+; required: Execute NIO:Install-FujiNet-WB13-Mixed
+;
+; Do not run after Install-FujiNet-WB13: both installers append static names
+; to the same DEVS:MountList. Rebuild/restore the MountList first to switch
+; profiles.
+
+If EXISTS S:FujiNet-WB13-Installed
+  Echo "A FujiNet WB1.3 MountList profile is already installed."
+  Echo "Restore DEVS:MountList before selecting the mixed DD/HD profile."
+Else
+  Copy NIO:fujinet-nio.device TO DEVS:
+  Copy NIO:fujinet-disk.device TO DEVS:
+  Copy NIO:fujinet-load-resident TO C:
+  Copy NIO:fujinet-mount TO C:
+  Copy NIO:fujinet-nio-exchange TO C:
+  Copy NIO:fmount TO C:
+  Copy NIO:fumount TO C:
+  Copy DEVS:MountList TO RAM:MountList-Existing
+  Join RAM:MountList-Existing NIO:MountList-FujiNet-WB13-Mixed AS DEVS:MountList
+  Delete >NIL: RAM:MountList-Existing
+
+  Echo >S:FujiNet-WB13-Installed "Installed FujiNet WB1.3 mixed DD/HD profile"
+  Echo "Installed mixed profile. Add these lines before Break 1 C in S:StartupII:"
+  Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
+  Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
+  Echo "C:Mount DN0:"
+  Echo "C:Mount DN1:"
+  Echo "C:Mount DN2:"
+  Echo "C:Mount DN3:"
+  Echo "C:Mount HD0:"
+  Echo "C:Mount HD1:"
+  Echo "C:Mount HD2:"
+  Echo "C:Mount HD3:"
+  Echo "After reboot: FMOUNT 11 DN0: RO or FMOUNT 21 HD0: RO"
+EndIf

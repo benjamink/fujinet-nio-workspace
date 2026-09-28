@@ -102,6 +102,11 @@ To install this package permanently into a WB1.3 HDF, boot it and run:
 Execute NIO:Install-FujiNet-WB13
 ```
 
+For a clean image that needs concurrent DD and high-density ADFs, use
+`Execute NIO:Install-FujiNet-WB13-Mixed` instead. It installs `DN0:`--`DN3:`
+for DD and `HD0:`--`HD3:` for HD media; do not install both profiles into the
+same MountList.
+
 The installer copies the resident drivers and disk commands, then appends
 static `DN0:` through `DN7:` definitions to the existing `DEVS:MountList`.
 That preserves system entries such as `NEWCON:`. It prints the resident-loader

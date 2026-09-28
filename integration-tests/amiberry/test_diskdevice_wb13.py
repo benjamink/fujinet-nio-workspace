@@ -83,3 +83,17 @@ def test_wb13_readonly_media_reports_protection(run_amiga_case):
     assert "STATUS drive=0" in results["w13wp-status.result"]
     assert "protected=1" in results["w13wp-status.result"]
     assert "FUJINET ADF READ PASSED" in results["w13wp-known.result"]
+
+
+def test_wb13_mixed_dd_and_hd_static_handlers(run_amiga_case):
+    """Mixed WB1.3 MountList supports simultaneous DD and HD read/write media."""
+    results = run_amiga_case("diskdevice-wb13-mixed-hd")
+
+    assert "Resident loaded: fujinet-disk.device" in results["wb13mix-load.result"]
+    assert "Mounted slot 13 on DN0:" in results["wb13mix-dd-mount.result"]
+    assert "Mounted slot 21 on HD0:" in results["wb13mix-hd-mount.result"]
+    assert "FUJINET WRITABLE BASE" in results["wb13mix-hd-copy.result"]
+    assert "FUJINET WRITABLE HD BASE" in results["wb13mix-dd-copy.result"]
+    assert "Ejected HD0:" in results["wb13mix-hd-eject.result"]
+    assert "Mounted slot 21 on HD0:" in results["wb13mix-hd-remount.result"]
+    assert "FUJINET WRITABLE BASE" in results["wb13mix-hd-persist.result"]
