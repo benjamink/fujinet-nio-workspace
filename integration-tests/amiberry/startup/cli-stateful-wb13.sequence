@@ -1,41 +1,12 @@
 C:Assign T: RAM:
 C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device
-C:FHOST host:/
-C:Wait 1
-If NOT WARN
-C:Echo >DH0:cli-fhost-set.result "HOST: host:/"
-C:FHOST
-C:Wait 1
-If NOT WARN
-C:Echo >DH0:cli-fhost-get.result "HOST: host:/"
-C:FLS host:/
-C:Wait 1
-If NOT WARN
-C:Echo >DH0:cli-fls.result "3 entries"
-C:FAPP DEL nio.e2e value
-C:Wait 1
-If NOT WARN
-C:FAPP PUT nio.e2e value hello
-C:Wait 1
-If NOT WARN
-C:Echo >DH0:cli-fapp-put.result "Wrote 5 bytes"
-C:FAPP GET nio.e2e value
-C:Wait 1
-If NOT WARN
-C:Echo >DH0:cli-fapp-get.result "hello"
-C:FAPP LIST nio.e2e
-C:Wait 1
-If NOT WARN
-C:Echo >DH0:cli-fapp-list.result "value"
-C:FAPP DEL nio.e2e value
-C:Wait 1
-If NOT WARN
-C:Echo >DH0:cli-fapp-delete.result "Deleted: yes"
+C:Wait 3
+C:FHOST >DH0:cli-fhost-set.result host:/
+C:FHOST >DH0:cli-fhost-get.result
+C:FLS >DH0:cli-fls.result host:/
+C:FAPP >DH0:cli-fapp-delete-old.result DEL nio.e2e value
+C:FAPP >DH0:cli-fapp-put.result PUT nio.e2e value hello
+C:FAPP >DH0:cli-fapp-get.result GET nio.e2e value
+C:FAPP >DH0:cli-fapp-list.result LIST nio.e2e
+C:FAPP >DH0:cli-fapp-delete.result DEL nio.e2e value
 C:FLS host:/amiga-e2e-complete/cli-stateful
-EndIf
-EndIf
-EndIf
-EndIf
-EndIf
-EndIf
-EndIf

@@ -22,14 +22,14 @@ pass or skip.
 
 ### Stateful CLI (`test_cli_stateful.py`)
 
-The shared case is enabled.  On WB1.3, `FHOST`, `FLS`, and `FAPP` must write
-to the console rather than using AmigaDOS command-output redirection: a
-redirected FujiNet CLI process completes its NIO exchange but does not return
-to the 1.3 StartupII script.  The WB1.3 sequence instead checks each command's
-success, records the corresponding expected result with the known-safe
-`Echo >file` form, and spaces short-lived commands with `Wait 1`.  The guest
-proves Host, FileDevice, and AppStore exchanges in order; the WB3.2 sequence
-continues to capture each command's native stdout directly.
+The shared case is enabled and captures the native output of `FHOST`, `FLS`,
+and `FAPP` through WB1.3 command-output redirection.  The required `Wait 3`
+is immediately after `fujinet-load-resident`: without it, the first new client
+can finish its NIO request but the StartupII command chain does not reliably
+advance.  An interactive `Execute` script and a focused StartupII probe both
+prove `FLS >DH0:file` and `FHOST >DH0:file` are valid.  Therefore this is a
+cold resident-worker readiness/lifecycle issue, not a WB1.3 Shell-redirection
+limitation.  The test proves Host, FileDevice, and AppStore exchanges in order.
 
 ### FFS and high-density media
 
