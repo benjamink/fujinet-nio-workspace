@@ -52,6 +52,8 @@ Two plausible recovery attempts are ruled out:
   "Software error - task held" requester before the eject.
 - Running the stock `DiskChange DN2:` after the next `FMOUNT` still produces
   the FFS read/write-error requester.
+- `Inhibit(DN2:, TRUE)` before the eject is also unsafe: it leaves the guest
+  at the "Software error - task held" requester, as does `ACTION_FLUSH`.
 
 The next investigation must therefore find a WB1.3-safe way to make FFS
 commit writable metadata before the removable-media transition, or establish
