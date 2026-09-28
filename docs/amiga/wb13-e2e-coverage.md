@@ -18,6 +18,8 @@ pass or skip.
 * `test_diskdevice_wb13.py` exercises static-unit lifecycle, multi-drive
   reads/writes/copy, readonly media and all eight `DN` units.
 * `test_nio_wb13.py` proves the cold serial-worker load path.
+* `test_nio_broker.py`, `test_nio_native_test.py::test_native_test_clock_exchange`,
+  and `test_nio_paula_serial.py` run against the WB1.3 artifact profile.
 * `test_diskdevice_wb13.py::test_wb13_mount_times_out_against_stalled_external_peer`
   proves that a serial peer which accepts a connection but does not complete a
   FujiBus reply produces the normal bounded `FMOUNT` failure (`RC=20`), not a
@@ -121,5 +123,5 @@ is static DN0:--DN7: medium replacement/eject coverage, which belongs in
 | HD-specific nodes in `test_diskdevice_adf.py` and `test_diskdevice_fmount.py` | User-visible concurrent DD/HD static media is covered by `test_diskdevice_wb13.py`; dynamic-node assertions remain WB2+ only. |
 | `test_diskdevice_silent_timeout.py` | Its static-handler equivalent is enabled as `test_wb13_mount_times_out_against_stalled_external_peer` in `test_diskdevice_wb13.py`; it proves the same bounded `FMOUNT` timeout against an external stalled peer. |
 | `test_diskdevice_mapping_failure.py`, `test_inspect_causal*.py` | These inspect dynamic DOS/handler state or targeted failure recovery. First specify the observable WB1.3 static-handler equivalent; they are not mechanical Shell ports. |
-| `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py` | Need a profile-aware broker/native-tool build path. The present `nio_broker` fixture invokes the unprofiled native build, so claiming WB1.3 coverage would test the wrong artifact. |
+| `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py::test_native_test_clock_exchange` | Profile-aware WB1.3 variants are enabled and verified on the A500/KS1.3 environment. The native-test clock case checks the profile-specific native device map as well as its exchange. The larger native disk/fault matrix is the next porting candidate. |
 | `test_harness_completion.py` | Host harness coverage, not a guest Workbench capability. |
