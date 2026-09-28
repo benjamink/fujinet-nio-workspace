@@ -1473,6 +1473,15 @@ def run_amiga_case(amiga_environment: dict[str, str],
                     ),
                 ))
                 if action == "success":
+                    # The host-side completion marker is emitted by the
+                    # final NIO reply, a few guest instructions before the
+                    # redirected CLI tool closes its result file.  Give DOS
+                    # that bounded interval before IPC quits Amiberry; on
+                    # WB3.2 an immediate quit can leave an FFS file chain
+                    # visible but not yet complete to xdf.
+                    settle = float(case.get("completion_settle", 1.0))
+                    if settle > 0:
+                        time.sleep(settle)
                     termination_reason = reason
                     break
                 if action == "failure":
