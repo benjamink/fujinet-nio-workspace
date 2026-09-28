@@ -34,13 +34,16 @@ limitation.  The test proves Host, FileDevice, and AppStore exchanges in order.
 
 ### Checksum benchmark (`test_checksumbench.py`)
 
-`timer.device` can be opened on WB1.3, but its V34 implementation does not
-provide a usable `ReadEClock()` library vector. Calling it produced the
-**“Software error -- task held”** requester before the benchmark emitted a
-row. The compatible path sends `TR_GETSYSTIME` through the opened
-`timerequest` with `DoIO()`, yielding a 1 MHz microsecond clock. It uses
-32-bit modular tick differences, which are sufficient for each short timing
-interval and avoid unnecessary 64-bit arithmetic on the 68000 path.
+`timer.device` can be opened on WB1.3, but `ReadEClock()` is a V36
+(Workbench 2.0) interface, not a V34 one. Calling it through WB1.3's timer
+library vector produced the **“Software error -- task held”** requester before
+the benchmark emitted a row. The newer-artifact path now calls it only when
+`TimerBase->dd_Library.lib_Version >= 36`; otherwise it uses
+`TR_GETSYSTIME` through the opened `timerequest` with `DoIO()`, yielding a
+1 MHz microsecond clock. The WB1.3 artifact always uses that compatible
+command-clock path and 32-bit modular tick differences, which are sufficient
+for each short timing interval and avoid unnecessary 64-bit arithmetic on the
+68000 path.
 
 The WB1.3 artifact retains all six buffer sizes and C/ADDX/branch checksum
 implementations, with one tenth of the existing iteration counts so the
@@ -48,8 +51,8 @@ acceptance run is practical at real A500 speed. Its StartupII sequence also
 places output redirection before the `FLS` path, as required by Shell 1.3.
 The shared assertion verifies all 18 rows. Verified 2026-09-28 with
 `scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000
-test_checksumbench.py -q` (pass, 36.09 s) and the unchanged WB3.2 case
-(`--amiga-env wb32 --amiga-machine a1200-030`, pass, 11.52 s).
+test_checksumbench.py -q` (pass, 36.21 s) and the unchanged WB3.2 case
+(`--amiga-env wb32 --amiga-machine a1200-030`, pass, 11.45 s).
 
 ### FFS and high-density media
 
