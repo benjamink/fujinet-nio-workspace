@@ -425,6 +425,7 @@ results = [
 name = "diskdevice-loader"
 project = "apps"
 app = "wifitest"
+environments = ["wb32", "wb13"]
 driver = true
 no_static_mountlists = true
 timeout = 45
@@ -440,6 +441,12 @@ results = [
   "loader-invalid.result",
   "loader-status.result",
 ]
+
+[test.environment_variants.wb13]
+startup = "startup/diskdevice-loader-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+driver_tools = ["fujinet-nio-exchange"]
 
 [[test]]
 name = "diskdevice-inhibit-exp-b"
