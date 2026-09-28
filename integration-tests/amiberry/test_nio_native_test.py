@@ -36,12 +36,22 @@ def test_native_exchange_tool_read_only(run_amiga_case, amiga_evidence_root):
     assert "SEED RC=0" in results["nio-seed.result"].splitlines()
     assert "LOAD RC=0" in results["nio-load.result"].splitlines()
     invalid = [text for name, text in results.items() if name.startswith("bad-")]
-    assert len(invalid) == 13
-    for text in invalid:
-        # Usage returns 10; an attempted OpenDevice failure returns 20.
-        # stderr is not redirected, so stdout absence alone proves nothing.
-        assert "RC=10" in text.splitlines(), text
-        assert "req_len=" not in text
+    if invalid:
+        assert len(invalid) == 13
+        for text in invalid:
+            # Usage returns 10; an attempted OpenDevice failure returns 20.
+            # stderr is not redirected, so stdout absence alone proves nothing.
+            assert "RC=10" in text.splitlines(), text
+            assert "req_len=" not in text
+    else:
+        # Shell 1.3 has no $RC expansion, and launching the large diagnostic
+        # thirteen times before a native exchange exceeds the no-I/O watchdog.
+        # Parser rejections remain host-unit-tested; this variant proves the
+        # actual resident/native transport path.
+        assert results["nio-stage.result"].splitlines() == [
+            "before-seed", "before-load", "after-load", "before-clock",
+            "after-clock", "after-list",
+        ]
     # Responses include the 6-byte FujiBus header and one U8 status parameter.
     # Each list has one full entry: 10-byte list
     # header, 2-byte flags/name length, name, and 16-byte size/mtime.

@@ -88,20 +88,29 @@ and the unchanged WB3.2 control:
 `scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030
 test_diskdevice_silent_timeout.py -q`.
 
-### Native exchange matrix (WIP)
+### Native exchange matrix
 
-The larger `nio-native-exchange` matrix now has a WB1.3 startup sequence with
-redirection before arguments and an explicit post-load readiness delay. Its
-first run still times out before the native endpoint records a valid FujiBus
-request; the console reaches the deliberately-invalid command usage probes,
-but no Guru is raised. Do not enable it as accepted WB1.3 coverage yet. The
-next investigation should inspect the first valid `fujinet-nio-exchange`
-invocation and its command-line/worker boundary rather than reworking output
-redirection. Rejected experiments: disabling optional elapsed-time setup and
-forming the `OpenDevice` IORequest like the small native probe did not alter
-the timeout; reducing the tool's 16 KiB stack to 4 KiB made it exit before its
-first result checkpoint. The 16 KiB stack is therefore required for this tool
-and remains unchanged.
+The WB1.3 variant now loads the native resident device, waits for the cold
+worker, then performs two warm clock exchanges and two warm file-list
+exchanges. It records explicit shell-stage markers around the loader and each
+operation. The focused A500/KS1.3 run completed those markers, wrote the
+completion file, and the independent native-service log recorded five clock
+requests and two list requests with successful replies.
+
+The prior apparent transport timeout was test orchestration: its thirteen
+deliberately-invalid parser invocations ran before the first native request.
+On a real-speed A500 they consumed the no-I/O watchdog, so the harness ended
+the guest after only some parser files had appeared. WB1.3 Shell 1.3 also has
+no `$RC` expansion. The option rejections remain covered by the portable
+host-side option-parser tests; this guest variant uses `If NOT WARN` to record
+the actual return class and concentrates on the resident/native exchange
+contract. The tool retains its 16 KiB stack: reducing it to 4 KiB causes it to
+exit before the first result checkpoint.
+
+Verified 2026-09-28 with:
+
+`scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000
+test_nio_native_test.py::test_native_exchange_tool_read_only -q`
 
 ### FFS and high-density media
 
@@ -138,5 +147,5 @@ is static DN0:--DN7: medium replacement/eject coverage, which belongs in
 | HD-specific nodes in `test_diskdevice_adf.py` and `test_diskdevice_fmount.py` | User-visible concurrent DD/HD static media is covered by `test_diskdevice_wb13.py`; dynamic-node assertions remain WB2+ only. |
 | `test_diskdevice_silent_timeout.py` | Its static-handler equivalent is enabled as `test_wb13_mount_times_out_against_stalled_external_peer` in `test_diskdevice_wb13.py`; it proves the same bounded `FMOUNT` timeout against an external stalled peer. |
 | `test_diskdevice_mapping_failure.py`, `test_inspect_causal*.py` | These inspect dynamic DOS/handler state or targeted failure recovery. First specify the observable WB1.3 static-handler equivalent; they are not mechanical Shell ports. |
-| `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py::test_native_test_clock_exchange` | Profile-aware WB1.3 variants are enabled and verified on the A500/KS1.3 environment. The native-test clock case checks the profile-specific native device map as well as its exchange. The larger native disk/fault matrix is the next porting candidate. |
+| `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py::test_native_test_clock_exchange`, `test_nio_native_test.py::test_native_exchange_tool_read_only` | Profile-aware WB1.3 variants are enabled and verified on the A500/KS1.3 environment. The native-test clock case checks the profile-specific native device map; the exchange case proves warm native clock and file-list operations. The native disk/fault matrix is the next porting candidate. |
 | `test_harness_completion.py` | Host harness coverage, not a guest Workbench capability. |
