@@ -953,7 +953,7 @@ def run_amiga_case(amiga_environment: dict[str, str],
             app_dir = ROOT / "repos" / (
                 "nio-apps" if case["project"] == "apps" else "nio-core-apps"
             ) / "build" / "amiga"
-            if artifact_profile and case["project"] == "core-apps":
+            if artifact_profile:
                 app_dir /= artifact_profile
             app_dir /= "bin"
             app = app_dir / case["app"]

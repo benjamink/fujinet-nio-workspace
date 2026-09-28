@@ -27,10 +27,17 @@ results = ["checksumbench.result"]
 name = "wifi-config"
 project = "apps"
 app = "wificonfigtest"
+environments = ["wb32", "wb13"]
 startup = "startup/wifi-config.sequence"
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/wifi-config"
 results = ["wificonfigtest.result"]
+
+[test.environment_variants.wb13]
+startup = "startup/wifi-config-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+core_tools = ["fls"]
 
 [[test]]
 name = "cli-stateful"

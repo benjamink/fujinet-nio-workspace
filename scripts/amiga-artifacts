@@ -58,7 +58,17 @@ else
     "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
 fi
 
-if [[ "$PROFILE" != wb13 ]]; then
+if [[ "$PROFILE" == wb13 ]]; then
+  # These application tests compile and run against the KS1.3 API surface.
+  # Diagnostics which use WB2+ DosList lifecycle APIs are built separately
+  # once they have an equivalent KS1.3 implementation.
+  make -C "$ROOT/repos/nio-apps" -f makefiles/build.mk TARGET=amiga \
+    "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+    "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD" \
+    build/amiga/$PROFILE/bin/checksumbench \
+    build/amiga/$PROFILE/bin/wificonfigtest \
+    build/amiga/$PROFILE/bin/wifitest
+else
   make -C "$ROOT/repos/nio-apps" TARGET=amiga \
     "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
     "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
