@@ -1381,6 +1381,7 @@ results = [
 name = "nio-native-disk"
 project = "driver"
 app = "fujinet-nio-exchange"
+environments = ["wb32", "wb13"]
 nio_broker = true
 nio_native_test = true
 driver = true
@@ -1409,6 +1410,21 @@ results = [
   "disk-unload.result",
   "disk-reload.result",
   "occupied-remote.result",
+  "missing-fixture.result",
+  "bounds.result",
+  "disk-write.result",
+]
+
+[test.environment_variants.wb13]
+startup = "startup/nio-native-disk-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+results = [
+  "nio-stage.result",
+  "nio-load.result",
+  "disk-load.result",
+  "disk-read.result",
+  "occupied-local.result",
   "missing-fixture.result",
   "bounds.result",
   "disk-write.result",

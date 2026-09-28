@@ -106,12 +106,27 @@ def test_native_exchange_tool_read_only(run_amiga_case, amiga_evidence_root):
 
 def test_native_exchange_tool_disk(run_amiga_case, amiga_evidence_root):
     results = run_amiga_case("nio-native-disk")
-    for name, text in results.items():
-        if name.startswith("bad-"):
-            assert "RC=10" in text.splitlines(), (name, text)
-            assert "ordinary" not in text
-    for name in ("nio-load", "disk-load", "disk-unload", "disk-reload"):
-        assert "RC=0" in results[f"{name}.result"].splitlines()
+    wb13_static = "nio-stage.result" in results
+    if wb13_static:
+        assert results["nio-stage.result"].splitlines() == [
+            "before-nio-load", "after-nio-load", "before-disk-load",
+            "after-disk-load", "after-disk-write",
+        ]
+        for name in ("nio-load", "disk-load"):
+            assert "RC=0" in results[f"{name}.result"].splitlines()
+        for name, failure in (("occupied-local", "local-slot-occupied"),
+                              ("missing-fixture", "mount"),
+                              ("bounds", "geometry-bounds")):
+            text = results[f"{name}.result"]
+            assert "RC=20" in text.splitlines(), text
+            assert f"failure={failure}" in text
+    else:
+        for name, text in results.items():
+            if name.startswith("bad-"):
+                assert "RC=10" in text.splitlines(), (name, text)
+                assert "ordinary" not in text
+        for name in ("nio-load", "disk-load", "disk-unload", "disk-reload"):
+            assert "RC=0" in results[f"{name}.result"].splitlines()
     for name, trials in (("disk-read", 2), ("disk-write", 3)):
         text = results[f"{name}.result"]
         assert "RC=0" in text.splitlines(), text
@@ -121,16 +136,17 @@ def test_native_exchange_tool_disk(run_amiga_case, amiga_evidence_root):
         assert "io_Error=0 io_Actual=512" in text
         for serial in ("GET_BAUD", "SET_BAUD", "GET_SERIAL", "SET_SERIAL", "pacing="):
             assert serial not in text
-    for name, failure in (("occupied-local", "local-slot-occupied"),
-                          ("occupied-remote", "remote-slot-occupied"),
-                          ("missing-fixture", "mount"),
-                          ("bounds", "geometry-bounds")):
-        text = results[f"{name}.result"]
-        assert "RC=20" in text.splitlines(), text
-        assert f"failure={failure}" in text
-        assert "ordinary op=write " not in text
-        assert ("FIXTURE LEFT MOUNTED" in text) == (name == "bounds")
-    assert "ordinary op=local-state slot=1 lba=17 io_Error=0 io_Actual=1" in results["occupied-remote.result"]
+    if not wb13_static:
+        for name, failure in (("occupied-local", "local-slot-occupied"),
+                              ("occupied-remote", "remote-slot-occupied"),
+                              ("missing-fixture", "mount"),
+                              ("bounds", "geometry-bounds")):
+            text = results[f"{name}.result"]
+            assert "RC=20" in text.splitlines(), text
+            assert f"failure={failure}" in text
+            assert "ordinary op=write " not in text
+            assert ("FIXTURE LEFT MOUNTED" in text) == (name == "bounds")
+        assert "ordinary op=local-state slot=1 lba=17 io_Error=0 io_Actual=1" in results["occupied-remote.result"]
     run = amiga_evidence_root / "nio-native-disk"
     host = run / "native-test-records" / "host-fs"
     read_bytes = (run / "read-original.adf").read_bytes()[17 * 512:18 * 512]

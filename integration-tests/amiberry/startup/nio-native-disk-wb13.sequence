@@ -1,0 +1,51 @@
+C:Assign T: RAM:
+C:FailAt 100
+C:Echo >DH0:nio-stage.result "before-nio-load"
+C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device
+If NOT WARN
+C:Echo >DH0:nio-load.result "RC=0"
+Else
+C:Echo >DH0:nio-load.result "RC=20"
+EndIf
+C:Echo >>DH0:nio-stage.result "after-nio-load"
+C:Wait 3
+C:Echo >>DH0:nio-stage.result "before-disk-load"
+C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device
+If NOT WARN
+C:Echo >DH0:disk-load.result "RC=0"
+Else
+C:Echo >DH0:disk-load.result "RC=20"
+EndIf
+C:Echo >>DH0:nio-stage.result "after-disk-load"
+C:fujinet-nio-exchange >DH0:disk-read.result --installed-backend native --backend warm --type disk-read --slot 1 --lba 17 --fixture-uri host:/read.adf --disposable-fixture --trials 2
+If NOT WARN
+C:Echo >>DH0:disk-read.result "RC=0"
+Else
+C:Echo >>DH0:disk-read.result "RC=20"
+EndIf
+C:fujinet-nio-exchange >DH0:occupied-local.result --installed-backend native --backend warm --type disk-write --slot 1 --lba 17 --fixture-uri host:/write.adf --disposable-fixture --write-intent
+If NOT WARN
+C:Echo >>DH0:occupied-local.result "RC=0"
+Else
+C:Echo >>DH0:occupied-local.result "RC=20"
+EndIf
+C:fujinet-nio-exchange >DH0:missing-fixture.result --installed-backend native --backend warm --type disk-write --slot 3 --lba 17 --fixture-uri host:/missing.adf --disposable-fixture --write-intent
+If NOT WARN
+C:Echo >>DH0:missing-fixture.result "RC=0"
+Else
+C:Echo >>DH0:missing-fixture.result "RC=20"
+EndIf
+C:fujinet-nio-exchange >DH0:bounds.result --installed-backend native --backend warm --type disk-write --slot 2 --lba 1760 --fixture-uri host:/bounds.adf --disposable-fixture --write-intent
+If NOT WARN
+C:Echo >>DH0:bounds.result "RC=0"
+Else
+C:Echo >>DH0:bounds.result "RC=20"
+EndIf
+C:fujinet-nio-exchange >DH0:disk-write.result --installed-backend native --backend warm --type disk-write --slot 8 --lba 17 --fixture-uri host:/write.adf --disposable-fixture --write-intent --trials 3
+If NOT WARN
+C:Echo >>DH0:disk-write.result "RC=0"
+Else
+C:Echo >>DH0:disk-write.result "RC=20"
+EndIf
+C:Echo >>DH0:nio-stage.result "after-disk-write"
+C:Echo >NATIVE:complete "PASS"
