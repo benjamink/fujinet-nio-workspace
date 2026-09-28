@@ -77,8 +77,14 @@ profiles:
 
   wb13-a500:
     machine: a500-000
-    harddrive: ${NIO_WORKSPACE}/images/amigaos1.3-run.hdf
+    harddrive: ${AMIGA_WB13_HDF_MUTABLE}
     kickstart: ${AMIGA_WB13_KICKSTART}
     rom_key: ${AMIGA_WB13_ROM_KEY}
     artifact_profile: wb13
     shares: [NIO-WB13]
+    settings:
+      chipmem_size: 1
+      fastmem_size: 1
+      cpu_compatible: true
+      cachesize: 0
+      cpu_speed: max
