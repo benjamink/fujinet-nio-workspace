@@ -18,6 +18,10 @@ pass or skip.
 * `test_diskdevice_wb13.py` exercises static-unit lifecycle, multi-drive
   reads/writes/copy, readonly media and all eight `DN` units.
 * `test_nio_wb13.py` proves the cold serial-worker load path.
+* `test_diskdevice_wb13.py::test_wb13_mount_times_out_against_stalled_external_peer`
+  proves that a serial peer which accepts a connection but does not complete a
+  FujiBus reply produces the normal bounded `FMOUNT` failure (`RC=20`), not a
+  Guru requester.
 
 ## Current porting findings
 
@@ -54,6 +58,34 @@ The shared assertion verifies all 18 rows. Verified 2026-09-28 with
 test_checksumbench.py -q` (pass, 36.21 s) and the unchanged WB3.2 case
 (`--amiga-env wb32 --amiga-machine a1200-030`, pass, 11.45 s).
 
+### Stalled external serial peer (`test_diskdevice_wb13.py`)
+
+The static-handler mount timeout case originally raised WB1.3's **“Software
+error -- task held”** requester.  This was not a DiskDevice worker stack
+shortage: retaining the original 16 KiB worker stacks and mapping the fault
+placed it at entry to the NIO serial backend.  The 68000 call had received an
+invalid trailing diagnostic-output pointer (`0xfc081a`) while the response
+length pointer and the request itself were valid.  The backend was therefore
+faulting before it could return the expected timeout.
+
+The production device now calls the serial backend with only the response
+length as a caller-owned output and obtains detail/native-I/O diagnostics from
+backend-owned state immediately after the exchange.  This retains the
+diagnostic contract without passing the three unsafe trailing pointers through
+the KS1.3 serial-worker call.  The host native-device tests cover the original
+callback diagnostic contract; the guest case is the regression proof for the
+real serial ABI.
+
+Verified 2026-09-28 with the original stack sizes:
+
+`scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000
+test_diskdevice_wb13.py::test_wb13_mount_times_out_against_stalled_external_peer -q`
+
+and the unchanged WB3.2 control:
+
+`scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030
+test_diskdevice_silent_timeout.py -q`.
+
 ### FFS and high-density media
 
 The default WB1.3 static MountList declares DD/OFS geometry. The mixed profile
@@ -87,6 +119,7 @@ is static DN0:--DN7: medium replacement/eject coverage, which belongs in
 | `test_checksumbench.py` | Shared WB3.2/WB1.3 case variant is enabled; WB1.3 uses the timer-device command clock rather than the unavailable `ReadEClock()` vector. |
 | `test_diskdevice_adf.py`, `test_diskdevice_fmount.py`, `test_diskdevice_fmount_restore.py`, `test_diskdevice_fumount_handler.py`, `test_diskdevice_inhibit.py`, `test_diskdevice_inhibit_experiments.py`, `test_diskdevice_unload_reload.py` | Their exact contracts assert dynamic node creation/removal, handler lifecycle, or `FMOUNTRESTORE`; WB1.3 uses static MountList handlers. Extend `test_diskdevice_wb13.py` for equivalent user-visible static-media contracts rather than duplicate invalid assertions. |
 | HD-specific nodes in `test_diskdevice_adf.py` and `test_diskdevice_fmount.py` | User-visible concurrent DD/HD static media is covered by `test_diskdevice_wb13.py`; dynamic-node assertions remain WB2+ only. |
-| `test_diskdevice_mapping_failure.py`, `test_diskdevice_silent_timeout.py`, `test_inspect_causal*.py` | These inspect dynamic DOS/handler state or targeted failure recovery. First specify the observable WB1.3 static-handler equivalent; they are not mechanical Shell ports. |
+| `test_diskdevice_silent_timeout.py` | Its static-handler equivalent is enabled as `test_wb13_mount_times_out_against_stalled_external_peer` in `test_diskdevice_wb13.py`; it proves the same bounded `FMOUNT` timeout against an external stalled peer. |
+| `test_diskdevice_mapping_failure.py`, `test_inspect_causal*.py` | These inspect dynamic DOS/handler state or targeted failure recovery. First specify the observable WB1.3 static-handler equivalent; they are not mechanical Shell ports. |
 | `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py` | Need a profile-aware broker/native-tool build path. The present `nio_broker` fixture invokes the unprofiled native build, so claiming WB1.3 coverage would test the wrong artifact. |
 | `test_harness_completion.py` | Host harness coverage, not a guest Workbench capability. |
