@@ -61,8 +61,11 @@ before installation:
 | --- | --- | --- |
 | `Install-FujiNet-WB13` | eight 880 KiB DD ADFs | `DN0:`--`DN7:` (units 0--7) |
 | `Install-FujiNet-WB13-Mixed` | four DD plus four 1760 KiB HD ADFs | `DN0:`--`DN3:` (units 0--3), `HD0:`--`HD3:` (units 4--7) |
+| `Install-FujiNet-WB13-FFS` after the standard profile | eight 880 KiB DD FFS aliases | `FF0:`--`FF7:` (same units 0--7 as `DN0:`--`DN7:`) |
 
-Run only one profile on a clean MountList; both define static device names.
+Run only one of the default or mixed geometry profiles on a clean MountList;
+both define the primary static device names. The FFS installer is an extension
+to the default profile, not a third geometry profile.
 The startup setup starts the chosen static handlers once; `FMOUNT` only
 changes media in the selected unit. It has the same commands, but a
 deliberately different handler lifecycle. The concurrent secondary-unit
@@ -89,6 +92,20 @@ FMOUNT 21 HD0: RW
 Copy DN0:BASE.TXT TO HD0:FROMDD.TXT
 Copy HD0:BASEHD.TXT TO DN0:FROMHD.TXT
 FUMOUNT HD0:
+```
+
+The FFS extension requires `L:FastFileSystem` on the boot volume. It is an
+add-on to the standard all-DD profile, not the mixed profile: use an `FFx:`
+name for a `DOS\\1` FFS ADF and its corresponding `DNx:` name for an OFS ADF.
+`FFx:` and `DNx:` address the same FujiNet unit, so never mount both aliases
+for one unit at the same time:
+
+```text
+FMOUNT 11 FF0: RW
+Copy DH0:REPORT TO FF0:REPORT
+FUMOUNT FF0:
+FMOUNT 11 FF0: RO
+Type FF0:REPORT
 ```
 
 On WB1.3, `FUMOUNT DN0:` ejects the FujiNet media through `TD_EJECT`; it does

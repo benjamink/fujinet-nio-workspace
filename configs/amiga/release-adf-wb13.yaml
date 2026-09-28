@@ -21,5 +21,7 @@ files:
   - build/amiga-artifacts/wb13/NIO/fout
   - configs/amiga/install/Install-FujiNet-WB13
   - configs/amiga/install/Install-FujiNet-WB13-Mixed
+  - configs/amiga/install/Install-FujiNet-WB13-FFS
   - configs/amiga/install/MountList-FujiNet-WB13
   - configs/amiga/install/MountList-FujiNet-WB13-Mixed
+  - configs/amiga/install/MountList-FujiNet-WB13-FFS

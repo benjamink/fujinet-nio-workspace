@@ -107,6 +107,29 @@ For a clean image that needs concurrent DD and high-density ADFs, use
 for DD and `HD0:`--`HD3:` for HD media; do not install both profiles into the
 same MountList.
 
+To use standard 880 KiB `DOS\\1` FFS ADFs with the normal all-DD profile,
+first run `Execute NIO:Install-FujiNet-WB13`, then run:
+
+```text
+Execute NIO:Install-FujiNet-WB13-FFS
+```
+
+The HDF needs `L:FastFileSystem` (the supplied WB1.3 environment has it).
+Add `C:Mount FF0:` through `C:Mount FF7:` beside the existing `DN` mount
+lines, reboot, then use `FFx:` for FFS media. `FFx:` and `DNx:` are aliases
+for the same FujiNet unit, so choose exactly one of them per unit:
+
+```text
+FMOUNT 11 FF0: RW
+Copy DH0:REPORT TO FF0:REPORT
+FUMOUNT FF0:
+FMOUNT 11 FF0: RO
+Type FF0:REPORT
+```
+
+The FFS extension is not for the mixed DD/HD profile: its `FF0:`--`FF7:`
+entries use DD geometry.
+
 The installer copies the resident drivers and the supported operational CLI
 commands (`FAPP`, `FBOOT`, `FDRIVE`, `FHOST`, `FIN`, `FLS`, `FMOUNT`,
 `FUMOUNT`, and `FOUT`), then appends

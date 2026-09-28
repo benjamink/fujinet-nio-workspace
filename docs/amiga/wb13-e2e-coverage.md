@@ -143,13 +143,14 @@ The default WB1.3 static MountList declares DD/OFS geometry. The mixed profile
 now supplies static `HD0:`--`HD3:` handlers (units 4--7, 22 blocks/track),
 with `DN0:`--`DN3:` retaining DD geometry. The mixed-profile acceptance case
 proves concurrent DD/HD read/write copy, HD eject, remount, and persistence.
-The WB3.2 FFS cases still depend on a registered FFS handler.
-An experimental DN0: entry with `DosType = 0x444F5301` and
-`FileSystem = L:FastFileSystem` allowed `FMOUNT` to report success but the
-first `Dir DN0:` raised WB1.3's **“Not a DOS disk in unit 0”** requester.  It
-was deliberately not retained. Port the FFS case only alongside a deliberate
-static FFS MountList design and a guest fixture that proves the filesystem
-handler is registered.
+The standard DD profile can additionally install `FF0:`--`FF7:` aliases for
+`DOS\\1` FFS media. Each alias uses `L:FastFileSystem`, `GlobVec = -1`, and
+the same driver unit as its `DNx:` counterpart. The focused FFS case mounts a
+standard 880 KiB `DOS\\1` ADF read/write, creates `WRITE.TXT`, ejects it, waits
+for the V34 write-back interval, remounts it, and reads the persisted file.
+Do not mount `DNx:` and `FFx:` for the same unit concurrently. The FFS alias
+extension is currently for the all-DD profile; FFS high-density aliases are a
+separate future profile.
 
 ### Dynamic-DOS-node and removal tests
 
@@ -166,11 +167,11 @@ is static DN0:--DN7: medium replacement/eject coverage, which belongs in
 | `test_amiga_fin_slot_catalog.py`, `test_wifi_config.py`, `test_diskdevice_loader.py` | Shared WB3.2/WB1.3 case variants are enabled and pass. |
 | `test_diskdevice_wb13.py`, `test_nio_wb13.py` | WB1.3-native acceptance modules already pass. |
 | `test_cli_stateful.py` | Shared WB3.2/WB1.3 case variant is enabled; it waits for cold resident-worker readiness before the first client. |
-| `test_amiga_fin_ffs_adf.py` | Blocked pending a proven WB1.3 FFS handler-registration/static MountList design. |
+| `test_amiga_fin_ffs_adf.py` | Shared WB3.2/WB1.3 case variant is enabled. WB1.3 uses a static `FF0:` FFS handler and proves read/write/eject/remount persistence. |
 | `test_checksumbench.py` | Shared WB3.2/WB1.3 case variant is enabled; WB1.3 uses the timer-device command clock rather than the unavailable `ReadEClock()` vector. |
 | `test_diskdevice_adf.py`, `test_diskdevice_fmount.py`, `test_diskdevice_fmount_restore.py`, `test_diskdevice_fumount_handler.py`, `test_diskdevice_inhibit.py`, `test_diskdevice_inhibit_experiments.py`, `test_diskdevice_unload_reload.py` | Their exact contracts assert dynamic node creation/removal, handler lifecycle, or `FMOUNTRESTORE`; WB1.3 uses static MountList handlers. Extend `test_diskdevice_wb13.py` for equivalent user-visible static-media contracts rather than duplicate invalid assertions. |
 | HD-specific nodes in `test_diskdevice_adf.py` and `test_diskdevice_fmount.py` | User-visible concurrent DD/HD static media is covered by `test_diskdevice_wb13.py`; dynamic-node assertions remain WB2+ only. |
 | `test_diskdevice_silent_timeout.py` | Its static-handler equivalent is enabled as `test_wb13_mount_times_out_against_stalled_external_peer` in `test_diskdevice_wb13.py`; it proves the same bounded `FMOUNT` timeout against an external stalled peer. |
 | `test_diskdevice_mapping_failure.py`, `test_inspect_causal*.py` | These inspect dynamic DOS/handler state or targeted failure recovery. First specify the observable WB1.3 static-handler equivalent; they are not mechanical Shell ports. |
-| `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py::test_native_test_clock_exchange`, `test_nio_native_test.py::test_native_exchange_tool_read_only` | Profile-aware WB1.3 variants are enabled and verified on the A500/KS1.3 environment. The native-test clock case checks the profile-specific native device map; the exchange case proves warm native clock and file-list operations. The native disk/fault matrix is the next porting candidate. |
+| `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py::test_native_test_clock_exchange`, `test_nio_native_test.py::test_native_exchange_tool_read_only`, `test_nio_native_test.py::test_native_exchange_tool_disk` | Profile-aware WB1.3 variants are enabled and verified on the A500/KS1.3 environment. The native-test clock case checks the profile-specific native device map; the exchange cases prove warm native clock/file-list and DiskDevice read/write/fault handling. |
 | `test_harness_completion.py` | Host harness coverage, not a guest Workbench capability. |

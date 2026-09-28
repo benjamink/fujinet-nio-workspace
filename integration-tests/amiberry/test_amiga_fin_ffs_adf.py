@@ -7,3 +7,6 @@ def test_fin_mounts_and_reads_ffs_adf(run_amiga_case):
     assert "FMOUNT RC=0" in results["ffs-mount.result"]
     assert "KNOWN.TXT" in results["ffs-dir.result"].upper()
     assert "DIR RC=0" in results["ffs-dir.result"]
+    if "ffs-write.result" in results:
+        assert "FUJINET FFS ADF WRITE PASSED" in results["ffs-write.result"]
+        assert "FUJINET FFS ADF WRITE PASSED" in results["ffs-remount.result"]

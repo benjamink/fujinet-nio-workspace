@@ -782,6 +782,7 @@ no_activity_timeout = 45
 name = "amiga-fin-ffs-adf"
 project = "core-apps"
 app = "fmount"
+environments = ["wb32", "wb13"]
 driver = true
 ffs_adf = true
 no_static_mountlists = true
@@ -798,6 +799,29 @@ results = [
   "ffs-mount.result",
   "ffs-dir.result",
 ]
+
+[test.environment_variants.wb13]
+startup = "startup/amiga-fin-ffs-adf-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+driver_tools = ["fujinet-nio-exchange"]
+core_tools = ["fhost", "fin", "fmount", "fumount"]
+wb13_mountlist = true
+wb13_mountlist_source = "configs/amiga/install/MountList-FujiNet-WB13-FFS"
+no_static_mountlists = true
+results = [
+  "ffs-load.result",
+  "ffs-host.result",
+  "ffs-fin.result",
+  "ffs-mount.result",
+  "ffs-dir.result",
+  "ffs-write.result",
+  "ffs-unmount.result",
+  "ffs-remount.result",
+]
+timeout = 120
+activity_timeout = 90
+no_activity_timeout = 45
 
 [[test]]
 name = "diskdevice-dynamic-fmount-dd"

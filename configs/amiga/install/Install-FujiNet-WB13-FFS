@@ -1,0 +1,32 @@
+; Add static FFS aliases to a standard WB1.3 FujiNet installation:
+;   Execute NIO:Install-FujiNet-WB13-FFS
+;
+; This extension is for the normal all-DD Install-FujiNet-WB13 profile.  Do
+; not add it to the mixed DD/HD profile: FF4:--FF7: have DD geometry.
+;
+; FF0:--FF7: alias the same driver units as DN0:--DN7:, but load the KS1.3
+; FastFileSystem handler.  Never mount both aliases for one unit at once.
+
+If EXISTS L:FastFileSystem
+  If EXISTS S:FujiNet-WB13-FFS-Installed
+    Echo "FujiNet WB1.3 FFS aliases already installed."
+  Else
+    Copy DEVS:MountList TO RAM:MountList-Existing
+    Join RAM:MountList-Existing NIO:MountList-FujiNet-WB13-FFS AS DEVS:MountList
+    Delete >NIL: RAM:MountList-Existing
+    Echo >S:FujiNet-WB13-FFS-Installed "Installed FujiNet WB1.3 FFS aliases"
+    Echo "Installed FFS aliases. Add these lines before Break 1 C in S:StartupII:"
+    Echo "C:Mount FF0:"
+    Echo "C:Mount FF1:"
+    Echo "C:Mount FF2:"
+    Echo "C:Mount FF3:"
+    Echo "C:Mount FF4:"
+    Echo "C:Mount FF5:"
+    Echo "C:Mount FF6:"
+    Echo "C:Mount FF7:"
+    Echo "After reboot: FMOUNT 11 FF0: RO"
+    Echo "To eject: FUMOUNT FF0:"
+  EndIf
+Else
+  Echo "L:FastFileSystem is required; install it before adding FFS aliases."
+EndIf

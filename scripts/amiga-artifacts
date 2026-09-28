@@ -101,6 +101,8 @@ if [[ "$PROFILE" == wb13 ]]; then
     "$STAGE/Install-FujiNet-WB13"
   install -m 0644 "$ROOT/configs/amiga/install/Install-FujiNet-WB13-Mixed" \
     "$STAGE/Install-FujiNet-WB13-Mixed"
+  install -m 0644 "$ROOT/configs/amiga/install/Install-FujiNet-WB13-FFS" \
+    "$STAGE/Install-FujiNet-WB13-FFS"
   # Keep the staged filename aligned with both the installer and the release
   # manifest.  The default WB1.3 installer refers to this file through the
   # NIO: share, so staging it as DN0-MountList leaves that installer broken.
@@ -108,6 +110,8 @@ if [[ "$PROFILE" == wb13 ]]; then
     "$STAGE/MountList-FujiNet-WB13"
   install -m 0644 "$ROOT/configs/amiga/install/MountList-FujiNet-WB13-Mixed" \
     "$STAGE/MountList-FujiNet-WB13-Mixed"
+  install -m 0644 "$ROOT/configs/amiga/install/MountList-FujiNet-WB13-FFS" \
+    "$STAGE/MountList-FujiNet-WB13-FFS"
 fi
 
 printf 'Amiga %s artifacts: %s\n' "$PROFILE" "$STAGE"
