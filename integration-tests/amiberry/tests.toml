@@ -43,6 +43,7 @@ core_tools = ["fls"]
 name = "cli-stateful"
 project = "apps"
 app = "wifitest"
+environments = ["wb32", "wb13"]
 startup = "startup/cli-stateful.sequence"
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/cli-stateful"
@@ -55,6 +56,15 @@ results = [
   "cli-fapp-list.result",
   "cli-fapp-delete.result",
 ]
+
+[test.environment_variants.wb13]
+startup = "startup/cli-stateful-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+core_tools = ["fapp", "fhost", "fls"]
+timeout = 60
+activity_timeout = 60
+no_activity_timeout = 60
 
 [[test]]
 name = "diskdevice-dynamic-dd"
