@@ -112,22 +112,30 @@ Verified 2026-09-28 with:
 `scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000
 test_nio_native_test.py::test_native_exchange_tool_read_only -q`
 
-### Native disk matrix (WIP)
+### Native disk matrix
 
-The initial WB1.3 plan loads the native NIO device and `fujinet-disk.device`,
-then runs the native ordinary read/write workflow without the newer-Kickstart
-unload/reload branch. The native service receives and replies to both 512-byte
-read requests, but the guest then raises **“Software error -- task held”**
-before the tool returns to Shell and before StartupII can write its first
-checkpoint file. This is therefore a real post-read DiskDevice/native-backend
-fault, not the former parser-preflight watchdog issue.
+The WB1.3 variant loads the native NIO and DiskDevice residents, then proves
+two 512-byte reads, expected local-occupancy/missing-fixture/bounds failures,
+and three writable write/flush/read-back trials. It omits only the newer
+Kickstart dynamic unload/reload branch.
 
-The normal failure evidence is
-`test-evidence/amiberry-20260928-211834/nio-native-disk/`. A debugger-controller
-attempt exited the emulator before StartupII's first checkpoint and is not
-valid diagnostic evidence. Keep the production 16 KiB worker stack unchanged;
-the next step is targeted instrumentation around the tool's post-read trace,
-close, and cleanup path.
+The initial run raised **“Software error -- task held”** after a successful
+native disk read. Targeted breadcrumbs proved that both DiskDevice I/O and all
+tool cleanup had completed; the fault occurred while returning through the
+verbose per-operation diagnostic formatter. The V34 build now suppresses that
+diagnostic-only formatter and the private trace query. It still reports the
+ordinary pass/fail summary and the test independently checks every FujiBus
+request, the untouched read/bounds images, and the final writable image bytes.
+This is not a DiskDevice worker-stack or media-I/O workaround.
+
+Verified 2026-09-28 with:
+
+`scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000
+test_nio_native_test.py::test_native_exchange_tool_disk -q`
+
+Evidence: `test-evidence/amiberry-20260928-223103/nio-native-disk/`;
+the host service records two reads and three write/flush/read-back cycles and
+the guest publishes `PASS`.
 
 ### FFS and high-density media
 

@@ -77,6 +77,13 @@ def resolve_case_for_environment(case_name: str, registered_case: dict[str, Any]
             )
     if active_environment in variants:
         case.update(variants[active_environment])
+    # Every guest plan must deploy artifacts compiled for that same Workbench
+    # generation.  Falling back to build/amiga/ makes the outcome depend on
+    # whichever profile was built most recently (and can silently put a
+    # nix13 binary into a WB3.x control run).  Environment IDs intentionally
+    # match the named Amiga artifact profiles.
+    if "amiga_artifact_profile" not in case and active_environment:
+        case["amiga_artifact_profile"] = active_environment
     return case
 
 
@@ -952,6 +959,9 @@ def run_amiga_case(amiga_environment: dict[str, str],
             if artifact_profile:
                 build_dir_rel += f"/{artifact_profile}"
                 make_args.append(f"BUILD_DIR={build_dir_rel}")
+            make_args.append(
+                f"AMIGA_WB13={1 if artifact_profile == 'wb13' else 0}"
+            )
             make_args.append(
                 f"NIO_TEST_CRT={'nix13' if artifact_profile == 'wb13' else 'clib2'}"
             )

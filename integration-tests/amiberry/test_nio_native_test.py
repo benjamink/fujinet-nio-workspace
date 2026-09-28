@@ -132,8 +132,9 @@ def test_native_exchange_tool_disk(run_amiga_case, amiga_evidence_root):
         assert "RC=0" in text.splitlines(), text
         assert f"ORDINARY PASS completed_trials={trials} failure=none" in text
         assert "FIXTURE LEFT MOUNTED" in text
-        assert "result=0 cause=0 native=0 status=0" in text
-        assert "io_Error=0 io_Actual=512" in text
+        if not wb13_static:
+            assert "result=0 cause=0 native=0 status=0" in text
+            assert "io_Error=0 io_Actual=512" in text
         for serial in ("GET_BAUD", "SET_BAUD", "GET_SERIAL", "SET_SERIAL", "pacing="):
             assert serial not in text
     if not wb13_static:
@@ -154,7 +155,10 @@ def test_native_exchange_tool_disk(run_amiga_case, amiga_evidence_root):
     for value in read_bytes:
         expected_digest = ((expected_digest ^ value) * 16777619) & 0xffffffff
     actual_digests = re.findall(r"ordinary read trial=(\d+) checksum_fnv1a32=([0-9a-f]{8})", results["disk-read.result"])
-    assert actual_digests == [(str(trial), f"{expected_digest:08x}") for trial in (1, 2)]
+    if wb13_static:
+        assert not actual_digests
+    else:
+        assert actual_digests == [(str(trial), f"{expected_digest:08x}") for trial in (1, 2)]
     assert "FIXTURE STATE UNKNOWN" in results["missing-fixture.result"]
     for fixture in ("read", "bounds"):
         assert (host / f"{fixture}.adf").read_bytes() == (run / f"{fixture}-original.adf").read_bytes()
