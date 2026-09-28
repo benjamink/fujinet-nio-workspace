@@ -107,7 +107,9 @@ For a clean image that needs concurrent DD and high-density ADFs, use
 for DD and `HD0:`--`HD3:` for HD media; do not install both profiles into the
 same MountList.
 
-The installer copies the resident drivers and disk commands, then appends
+The installer copies the resident drivers and the supported operational CLI
+commands (`FAPP`, `FBOOT`, `FDRIVE`, `FHOST`, `FIN`, `FLS`, `FMOUNT`,
+`FUMOUNT`, and `FOUT`), then appends
 static `DN0:` through `DN7:` definitions to the existing `DEVS:MountList`.
 That preserves system entries such as `NEWCON:`. It prints the resident-loader
 and static `Mount DNn:` lines to add before `Break 1 C` in `S:StartupII`.

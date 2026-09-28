@@ -5,17 +5,26 @@
 ; to the same DEVS:MountList. Rebuild/restore the MountList first to switch
 ; profiles.
 
+; Always refresh the operational tools, including when upgrading an existing
+; installation.  Only MountList installation must remain one-time.
+Copy NIO:fujinet-nio.device TO DEVS:
+Copy NIO:fujinet-disk.device TO DEVS:
+Copy NIO:fujinet-load-resident TO C:
+Copy NIO:fujinet-mount TO C:
+Copy NIO:fujinet-nio-exchange TO C:
+Copy NIO:fapp TO C:
+Copy NIO:fboot TO C:
+Copy NIO:fdrive TO C:
+Copy NIO:fhost TO C:
+Copy NIO:fin TO C:
+Copy NIO:fls TO C:
+Copy NIO:fmount TO C:
+Copy NIO:fumount TO C:
+Copy NIO:fout TO C:
+
 If EXISTS S:FujiNet-WB13-Installed
-  Echo "A FujiNet WB1.3 MountList profile is already installed."
-  Echo "Restore DEVS:MountList before selecting the mixed DD/HD profile."
+  Echo "FujiNet WB1.3 files refreshed; existing MountList profile retained."
 Else
-  Copy NIO:fujinet-nio.device TO DEVS:
-  Copy NIO:fujinet-disk.device TO DEVS:
-  Copy NIO:fujinet-load-resident TO C:
-  Copy NIO:fujinet-mount TO C:
-  Copy NIO:fujinet-nio-exchange TO C:
-  Copy NIO:fmount TO C:
-  Copy NIO:fumount TO C:
   Copy DEVS:MountList TO RAM:MountList-Existing
   Join RAM:MountList-Existing NIO:MountList-FujiNet-WB13-Mixed AS DEVS:MountList
   Delete >NIL: RAM:MountList-Existing

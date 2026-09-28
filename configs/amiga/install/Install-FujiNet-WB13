@@ -4,16 +4,26 @@
 ; This installs the WB1.3/nix13 FujiNet artifacts. It is safe to run again;
 ; the MountList block is written only on the first successful installation.
 
+; Always refresh the operational tools, including when upgrading an existing
+; installation.  Only MountList installation must remain one-time.
+Copy NIO:fujinet-nio.device TO DEVS:
+Copy NIO:fujinet-disk.device TO DEVS:
+Copy NIO:fujinet-load-resident TO C:
+Copy NIO:fujinet-mount TO C:
+Copy NIO:fujinet-nio-exchange TO C:
+Copy NIO:fapp TO C:
+Copy NIO:fboot TO C:
+Copy NIO:fdrive TO C:
+Copy NIO:fhost TO C:
+Copy NIO:fin TO C:
+Copy NIO:fls TO C:
+Copy NIO:fmount TO C:
+Copy NIO:fumount TO C:
+Copy NIO:fout TO C:
+
 If EXISTS S:FujiNet-WB13-Installed
-  Echo "FujiNet WB1.3 files are already installed."
+  Echo "FujiNet WB1.3 files refreshed; existing MountList profile retained."
 Else
-  Copy NIO:fujinet-nio.device TO DEVS:
-  Copy NIO:fujinet-disk.device TO DEVS:
-  Copy NIO:fujinet-load-resident TO C:
-  Copy NIO:fujinet-mount TO C:
-  Copy NIO:fujinet-nio-exchange TO C:
-  Copy NIO:fmount TO C:
-  Copy NIO:fumount TO C:
   ; WB1.3 Mount only reads the shared list. Keep the existing entries that
   ; provide NEWCON:, AUX:, PIPE:, etc., and append FujiNet DN0:--DN7:.
   Copy DEVS:MountList TO RAM:MountList-Existing
