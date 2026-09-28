@@ -217,6 +217,7 @@ Build Amiga artefacts and run the guest suite:
 
 ```sh
 ./scripts/build.sh amiga-tests --amiga-env wb32 --amiga-machine a1200-030
+./scripts/build.sh amiga-tests --amiga-env wb13 --amiga-machine a500-000
 ```
 
 When binaries are already built:
@@ -225,7 +226,15 @@ When binaries are already built:
 scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030
 scripts/amiga-tests --amiga-env wb32 --amiga-machine a1200-030 -k wifi -v
 scripts/amiga-tests --amiga-env wb31 --amiga-machine a1200-030 -k cli -v
+scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000
 ```
+
+Test cases without an explicit `environments` entry target `wb32`.  A WB1.3
+case must explicitly declare `environments = ["wb13"]` and use a WB1.3-safe
+startup sequence: Shell 1.3 takes redirection before command arguments (for
+example `Echo >DH0:result "text"`), lacks the later `If $RC EQ` form, and uses
+the static `DN0:`--`DN7:` MountList lifecycle rather than dynamic DOS nodes.
+Do not add `wb13` to a legacy case merely because its binaries compile.
 
 Focused pytest (same harness):
 

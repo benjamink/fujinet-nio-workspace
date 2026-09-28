@@ -31,6 +31,10 @@ SUITE = ROOT / "integration-tests" / "amiberry"
 sys.path.insert(0, str(ROOT / "tools" / "build"))
 from nio_build.amiga_config import filesystem2_setting, resolve_fast_file_system
 DEFAULT_EVIDENCE_DIR = ROOT / "test-evidence"
+# Legacy startup sequences target the WB3.2 Shell and dynamic DOS-node
+# lifecycle.  A case must opt into another environment explicitly after its
+# commands, artefacts, and MountList lifecycle have been validated there.
+DEFAULT_CASE_ENVIRONMENTS = ["wb32"]
 
 # Add tools/ to path so we can call amiga_emulator.ipc directly.
 _TOOLS = ROOT / "tools"
@@ -837,7 +841,7 @@ def run_amiga_case(amiga_environment: dict[str, str],
                    amiga_evidence_root: Path) -> Any:
     def run(name: str, *, installation: str | None = None) -> dict[str, str]:
         case = dict(amiga_cases[name])
-        supported_environments = case.get("environments")
+        supported_environments = case.get("environments", DEFAULT_CASE_ENVIRONMENTS)
         active_environment = amiga_environment.get("AMIGA_ENV_ID")
         if supported_environments is not None:
             if (not isinstance(supported_environments, list)
