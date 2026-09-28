@@ -97,7 +97,11 @@ request; the console reaches the deliberately-invalid command usage probes,
 but no Guru is raised. Do not enable it as accepted WB1.3 coverage yet. The
 next investigation should inspect the first valid `fujinet-nio-exchange`
 invocation and its command-line/worker boundary rather than reworking output
-redirection.
+redirection. Rejected experiments: disabling optional elapsed-time setup and
+forming the `OpenDevice` IORequest like the small native probe did not alter
+the timeout; reducing the tool's 16 KiB stack to 4 KiB made it exit before its
+first result checkpoint. The 16 KiB stack is therefore required for this tool
+and remains unchanged.
 
 ### FFS and high-density media
 
