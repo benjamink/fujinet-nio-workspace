@@ -369,6 +369,29 @@ results = [
 ]
 
 [[test]]
+name = "diskdevice-wb13-failed-secondary-mount"
+project = "apps"
+app = "wifitest"
+driver = true
+driver_tools = ["fujinet-nio-exchange"]
+amiga_artifact_profile = "wb13"
+core_tools = ["fmount", "fumount"]
+wb13_mountlist = true
+no_static_mountlists = true
+environments = ["wb13"]
+timeout = 90
+activity_timeout = 75
+no_activity_timeout = 45
+startup = "startup/diskdevice-wb13-failed-secondary-mount.sequence"
+startup_target = "S/StartupII"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-failed-secondary-mount"
+results = [
+  "w13fail-load.result", "w13fail-dn0-mount.result", "w13fail-dn2-invalid.result",
+  "w13fail-dn0-type.result", "w13fail-dn0-status.result", "w13fail-dn0-eject.result",
+]
+
+[[test]]
 name = "diskdevice-hd-adf"
 project = "apps"
 app = "wifitest"
@@ -906,6 +929,7 @@ name = "diskdevice-stalled-external-peer"
 project = "apps"
 app = "wifitest"
 driver = true
+environments = ["wb32", "wb13"]
 silent_peer = true
 # This case does not launch a local fujinet-nio instance. It connects Amiberry
 # to a fake external TCP peer that accepts the connection, emits a single SLIP
@@ -918,6 +942,13 @@ screenshot_interval = 0.5
 startup = "startup/diskdevice-silent-timeout.sequence"
 completion_mode = "expected_timeout"
 results = ["fmount.result", "stalled-peer-timeout.result"]
+
+[test.environment_variants.wb13]
+startup = "startup/diskdevice-silent-timeout-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+no_static_mountlists = true
+defer_nio_load = true
 
 [[test]]
 name = "diskdevice-adf-native-floppy"
@@ -1219,6 +1250,7 @@ name = "nio-broker-isolated"
 project = "driver"
 app = "fujinet-nio-exchange"
 nio_broker = true
+environments = ["wb32", "wb13"]
 timeout = 75
 activity_timeout = 60
 no_activity_timeout = 30
@@ -1230,6 +1262,11 @@ results = [
   "nio-exchange.result",
   "nio-tool-rc.result",
 ]
+
+[test.environment_variants.wb13]
+startup = "startup/nio-broker-isolated-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
 
 [[test]]
 name = "nio-wb13-cold-serial-worker"
@@ -1252,6 +1289,7 @@ project = "driver"
 app = "fujinet-nio-native-test-probe"
 nio_broker = true
 nio_native_test = true
+environments = ["wb32", "wb13"]
 timeout = 75
 activity_timeout = 60
 no_activity_timeout = 30
@@ -1264,12 +1302,18 @@ results = [
   "nio-tool-rc.result",
 ]
 
+[test.environment_variants.wb13]
+startup = "startup/nio-native-test-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+
 [[test]]
 name = "nio-paula-serial"
 project = "driver"
 app = "fujinet-nio-exchange"
 nio_broker = true
 fujinet_serial = true
+environments = ["wb32", "wb13"]
 timeout = 75
 activity_timeout = 60
 no_activity_timeout = 30
@@ -1282,6 +1326,11 @@ results = [
   "nio-exchange.result",
   "nio-tool-rc.result",
 ]
+
+[test.environment_variants.wb13]
+startup = "startup/nio-paula-serial-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
 
 [[test]]
 name = "nio-native-exchange"

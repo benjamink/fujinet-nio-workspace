@@ -1,0 +1,19 @@
+C:Assign T: RAM:
+C:FailAt 100
+C:fujinet-load-resident >DH0:nio-load.result DEVS:fujinet-nio.device fujinet-nio.device
+If NOT WARN
+C:Echo >>DH0:nio-load.result "LOAD RC=0"
+C:fujinet-nio-exchange >DH0:nio-exchange.result
+If NOT WARN
+C:Echo >DH0:nio-tool-rc.result "TOOL RC=0"
+Else
+C:Echo >DH0:nio-tool-rc.result "TOOL RC=20"
+EndIf
+Else
+C:Echo >>DH0:nio-load.result "LOAD FAILED"
+C:Echo >DH0:nio-exchange.result "TOOL SKIPPED"
+C:Echo >DH0:nio-tool-rc.result "TOOL SKIPPED"
+EndIf
+C:Type DH0:nio-load.result
+C:Type DH0:nio-exchange.result
+C:Type DH0:nio-tool-rc.result

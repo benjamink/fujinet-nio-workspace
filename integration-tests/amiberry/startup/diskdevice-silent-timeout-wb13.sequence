@@ -1,0 +1,15 @@
+C:Assign T: RAM:
+C:FailAt 100
+C:Echo "Loading Module"
+C:fujinet-load-resident >DH0:nio-load.result DEVS:fujinet-nio.device fujinet-nio.device
+C:fujinet-load-resident >DH0:disk-load.result DEVS:fujinet-disk.device fujinet-disk.device
+C:Echo "... Module loaded"
+C:FailAt 30
+C:Echo >DH0:before-fmount.result "before fujinet-mount"
+C:fujinet-mount >DH0:fmount.result --uri 0 host:/standard.adf RO
+C:Echo >DH0:after-fmount.result "after fujinet-mount"
+C:Echo >DH0:stalled-peer-timeout.result "STALLED PEER TIMEOUT RC=$RC"
+C:FailAt 10
+C:Type DH0:fmount.result
+C:Type DH0:stalled-peer-timeout.result
+C:Echo "E2E COMPLETE"

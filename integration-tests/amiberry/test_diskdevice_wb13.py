@@ -97,3 +97,22 @@ def test_wb13_mixed_dd_and_hd_static_handlers(run_amiga_case):
     assert "Ejected HD0:" in results["wb13mix-hd-eject.result"]
     assert "Mounted slot 21 on HD0:" in results["wb13mix-hd-remount.result"]
     assert "FUJINET WRITABLE BASE" in results["wb13mix-hd-persist.result"]
+
+
+def test_wb13_failed_secondary_mount_preserves_primary_media(run_amiga_case):
+    """A bad static DN2: mount must not disrupt a usable DN0: medium."""
+    results = run_amiga_case("diskdevice-wb13-failed-secondary-mount")
+
+    assert "Mounted slot 11 on DN0:" in results["w13fail-dn0-mount.result"]
+    assert "INVALID REJECTED" in results["w13fail-dn2-invalid.result"]
+    assert "FUJINET ADF READ PASSED" in results["w13fail-dn0-type.result"]
+    assert "STATUS drive=0" in results["w13fail-dn0-status.result"]
+    assert "absent=0" in results["w13fail-dn0-status.result"]
+
+
+def test_wb13_mount_times_out_against_stalled_external_peer(run_amiga_case):
+    """WB1.3 command-clock client must return a bounded mount failure."""
+    results = run_amiga_case("diskdevice-stalled-external-peer")
+
+    assert "STALLED PEER TIMEOUT RC=20" in results["stalled-peer-timeout.result"]
+    assert results["fmount.result"].strip() == ""

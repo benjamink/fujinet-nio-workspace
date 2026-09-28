@@ -940,15 +940,39 @@ def run_amiga_case(amiga_environment: dict[str, str],
         if case.get("nio_native_test"):
             nio_device = driver_build_dir / "fujinet-nio-native-test.device"
         resident_loader = driver_build_dir / "fujinet-load-resident"
-        resident_unloader = driver_build_dir / "fujinet-unload-resident"
+        resident_unloader: Path | None = driver_build_dir / "fujinet-unload-resident"
+        # fujinet-unload-resident uses newer DOS node-removal support and is
+        # deliberately not a WB1.3 artefact.  Passing a stale binary from a
+        # previous build would make the guest plan non-reproducible.
+        if artifact_profile == "wb13":
+            resident_unloader = None
         if case.get("nio_broker"):
+            build_dir_rel = "../build/amiga"
+            make_args = ["make"]
+            if artifact_profile:
+                build_dir_rel += f"/{artifact_profile}"
+                make_args.append(f"BUILD_DIR={build_dir_rel}")
+            make_args.append(
+                f"NIO_TEST_CRT={'nix13' if artifact_profile == 'wb13' else 'clib2'}"
+            )
+            make_args.extend([
+                f"{build_dir_rel}/fujinet-nio.device",
+                f"{build_dir_rel}/fujinet-load-resident",
+                f"{build_dir_rel}/{case['app']}",
+            ])
+            if case.get("nio_native_test"):
+                make_args.append(f"{build_dir_rel}/fujinet-nio-native-test.device")
+            if case.get("fujinet_serial"):
+                make_args.append(f"{build_dir_rel}/fujinet-serial.device")
+            if resident_unloader is not None:
+                make_args.append(f"{build_dir_rel}/fujinet-unload-resident")
             subprocess.run(
-                ["make", "native"],
+                make_args,
                 cwd=driver_root / "amiga",
                 env=amiga_environment,
                 check=True,
             )
-            app = driver_root / "build/amiga" / case["app"]
+            app = driver_build_dir / case["app"]
         else:
             app_dir = ROOT / "repos" / (
                 "nio-apps" if case["project"] == "apps" else "nio-core-apps"
@@ -1079,8 +1103,9 @@ def run_amiga_case(amiga_environment: dict[str, str],
             build_cmd.extend([
                 "--nio-device", nio_device,
                 "--resident-loader", resident_loader,
-                "--resident-unloader", resident_unloader,
             ])
+            if resident_unloader is not None:
+                build_cmd.extend(["--resident-unloader", resident_unloader])
             if broker_disk:
                 build_cmd.extend(["--devs-file", driver_build_dir / "fujinet-disk.device"])
             if case.get("fujinet_serial"):
@@ -1094,9 +1119,11 @@ def run_amiga_case(amiga_environment: dict[str, str],
             build_cmd.extend([
                 "--nio-device", nio_device,
                 "--resident-loader", resident_loader,
-                "--resident-unloader", resident_unloader,
-                "--load-nio",
             ])
+            if resident_unloader is not None:
+                build_cmd.extend(["--resident-unloader", resident_unloader])
+            if not case.get("defer_nio_load"):
+                build_cmd.append("--load-nio")
         if case.get("driver") and not case.get("nio_broker"):
             build_cmd.extend([
                 "--disk-device", driver_build_dir / "fujinet-disk.device",
