@@ -15,6 +15,7 @@ settings = [
 name = "checksumbench"
 project = "apps"
 app = "checksumbench"
+environments = ["wb32", "wb13"]
 timeout = 600
 activity_timeout = 600
 no_activity_timeout = 120
@@ -22,6 +23,12 @@ startup = "startup/checksumbench.sequence"
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/checksumbench"
 results = ["checksumbench.result"]
+
+[test.environment_variants.wb13]
+startup = "startup/checksumbench-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+core_tools = ["fls"]
 
 [[test]]
 name = "wifi-config"

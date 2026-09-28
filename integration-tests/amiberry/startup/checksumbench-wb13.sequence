@@ -1,0 +1,5 @@
+C:Assign T: RAM:
+C:checksumbench >DH0:checksumbench.result
+C:Type DH0:checksumbench.result
+C:FLS >NIL: host:/amiga-e2e-complete/checksumbench
+C:EndCLI

@@ -310,7 +310,11 @@ def wait_for_breakpoint(socket_path: Path, timeout: float = 60.0) -> str:
     last_status = ""
     while time.monotonic() < deadline:
         last_status = ipc.request(socket_path, "DEBUG_STATUS")
-        paused = "Paused=true" in last_status
+        # Amiberry IPC 8.3 reports ``stopped=1``; an earlier controller
+        # implementation expected the unreleased ``Paused=true`` spelling.
+        # Accept both so a debugger controller can observe a real breakpoint
+        # instead of timing out while the emulator is already stopped.
+        paused = "Paused=true" in last_status or "stopped=1" in last_status
         if not paused:
             observed_running = True
         elif observed_running:

@@ -14,6 +14,7 @@ pass or skip.
 * `test_wifi_config.py` runs on WB1.3 and WB3.2.
 * `test_diskdevice_loader.py` runs on WB1.3 and WB3.2.
 * `test_cli_stateful.py` runs on WB1.3 and WB3.2.
+* `test_checksumbench.py` runs on WB1.3 and WB3.2.
 * `test_diskdevice_wb13.py` exercises static-unit lifecycle, multi-drive
   reads/writes/copy, readonly media and all eight `DN` units.
 * `test_nio_wb13.py` proves the cold serial-worker load path.
@@ -30,6 +31,25 @@ advance.  An interactive `Execute` script and a focused StartupII probe both
 prove `FLS >DH0:file` and `FHOST >DH0:file` are valid.  Therefore this is a
 cold resident-worker readiness/lifecycle issue, not a WB1.3 Shell-redirection
 limitation.  The test proves Host, FileDevice, and AppStore exchanges in order.
+
+### Checksum benchmark (`test_checksumbench.py`)
+
+`timer.device` can be opened on WB1.3, but its V34 implementation does not
+provide a usable `ReadEClock()` library vector. Calling it produced the
+**“Software error -- task held”** requester before the benchmark emitted a
+row. The compatible path sends `TR_GETSYSTIME` through the opened
+`timerequest` with `DoIO()`, yielding a 1 MHz microsecond clock. It uses
+32-bit modular tick differences, which are sufficient for each short timing
+interval and avoid unnecessary 64-bit arithmetic on the 68000 path.
+
+The WB1.3 artifact retains all six buffer sizes and C/ADDX/branch checksum
+implementations, with one tenth of the existing iteration counts so the
+acceptance run is practical at real A500 speed. Its StartupII sequence also
+places output redirection before the `FLS` path, as required by Shell 1.3.
+The shared assertion verifies all 18 rows. Verified 2026-09-28 with
+`scripts/amiga-tests --amiga-env wb13 --amiga-machine a500-000
+test_checksumbench.py -q` (pass, 36.09 s) and the unchanged WB3.2 case
+(`--amiga-env wb32 --amiga-machine a1200-030`, pass, 11.52 s).
 
 ### FFS and high-density media
 
@@ -61,7 +81,7 @@ is static DN0:--DN7: medium replacement/eject coverage, which belongs in
 | `test_diskdevice_wb13.py`, `test_nio_wb13.py` | WB1.3-native acceptance modules already pass. |
 | `test_cli_stateful.py` | Shared WB3.2/WB1.3 case variant is enabled; it waits for cold resident-worker readiness before the first client. |
 | `test_amiga_fin_ffs_adf.py` | Blocked pending a proven WB1.3 FFS handler-registration/static MountList design. |
-| `test_checksumbench.py` | Blocked: the WB1.3-profiled application reaches the OS **task held** requester. This needs an application/runtime fix, not a test-script variant. |
+| `test_checksumbench.py` | Shared WB3.2/WB1.3 case variant is enabled; WB1.3 uses the timer-device command clock rather than the unavailable `ReadEClock()` vector. |
 | `test_diskdevice_adf.py`, `test_diskdevice_fmount.py`, `test_diskdevice_fmount_restore.py`, `test_diskdevice_fumount_handler.py`, `test_diskdevice_inhibit.py`, `test_diskdevice_inhibit_experiments.py`, `test_diskdevice_unload_reload.py` | Their exact contracts assert dynamic node creation/removal, handler lifecycle, or `FMOUNTRESTORE`; WB1.3 uses static MountList handlers. Extend `test_diskdevice_wb13.py` for equivalent user-visible static-media contracts rather than duplicate invalid assertions. |
 | HD-specific nodes in `test_diskdevice_adf.py` and `test_diskdevice_fmount.py` | User-visible concurrent DD/HD static media is covered by `test_diskdevice_wb13.py`; dynamic-node assertions remain WB2+ only. |
 | `test_diskdevice_mapping_failure.py`, `test_diskdevice_silent_timeout.py`, `test_inspect_causal*.py` | These inspect dynamic DOS/handler state or targeted failure recovery. First specify the observable WB1.3 static-handler equivalent; they are not mechanical Shell ports. |
