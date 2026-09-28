@@ -46,3 +46,30 @@ def test_wb13_secondary_writable_lifecycle_without_dn0(run_amiga_case):
     assert "Ejected DN2:" in results["w13rw-eject.result"]
     assert "Mounted slot 13 on DN2:" in results["w13rw-remnt.result"]
     assert "FUJINET WB13 WRITE PERSISTED" in results["w13rw-persist.result"]
+
+
+def test_wb13_static_drives_cross_copy_and_eject_independently(run_amiga_case):
+    """WB1.3 static drives must copy via DH0: and each other, then eject."""
+    results = run_amiga_case("diskdevice-wb13-cross-copy")
+
+    assert "Mounted slot 13 on DN0:" in results["w13xc-dn0m.result"]
+    assert "Mounted slot 20 on DN2:" in results["w13xc-dn2m.result"]
+    assert "COPY RC=$RC" in results["w13xc-to-dn2.result"]
+    assert "COPY RC=$RC" in results["w13xc-to-dn0.result"]
+    assert "COPY RC=$RC" in results["w13xc-to-dh0.result"]
+    assert "FUJINET WB13 CROSS COPY" in results["w13xc-dh0.result"]
+    assert "FUJINET WB13 CROSS COPY" in results["w13xc-dn0.result"]
+    assert "FUJINET WB13 CROSS COPY" in results["w13xc-dn2.result"]
+    assert "Ejected DN0:" in results["w13xc-dn0e.result"]
+    assert "Ejected DN2:" in results["w13xc-dn2e.result"]
+
+
+def test_wb13_all_static_units_mount_and_read(run_amiga_case):
+    """Every installed WB1.3 MountList unit DN0: through DN7: can read media."""
+    results = run_amiga_case("diskdevice-wb13-all-units")
+
+    assert "Resident loaded: fujinet-disk.device" in results["w13u-load.result"]
+    for unit in range(8):
+        stem = f"w13u-dn{unit}"
+        assert f"Mounted slot 11 on DN{unit}:" in results[f"{stem}m.result"]
+        assert "FUJINET ADF READ PASSED" in results[f"{stem}t.result"]

@@ -939,6 +939,9 @@ def run_amiga_case(amiga_environment: dict[str, str],
                                 "SECOND.TXT", "FUJINET SECOND DRIVE PASSED\n")
             create_standard_adf(amiga_environment, host_root / "writable.adf",
                                 "BASE.TXT", "FUJINET WRITABLE BASE\n", "NIOWRITABLE")
+            create_standard_adf(amiga_environment, host_root / "writable-second.adf",
+                                "BASE2.TXT", "FUJINET SECOND WRITABLE BASE\n",
+                                "NIOWRITABLE2")
             create_hd_adf(amiga_environment, host_root / "hd.adf")
             create_hd_adf(amiga_environment, host_root / "hd-second.adf",
                           "SECONDHD.TXT", "FUJINET SECOND HD PASSED\n")
@@ -954,6 +957,9 @@ def run_amiga_case(amiga_environment: dict[str, str],
             (catalog_dir / "slot-011.bin").write_bytes(b"\x01\x01host:/standard.adf")
             (catalog_dir / "slot-012.bin").write_bytes(b"\x01\x01host:/second.adf")
             (catalog_dir / "slot-013.bin").write_bytes(b"\x01\x00host:/writable.adf")
+            (catalog_dir / "slot-020.bin").write_bytes(
+                b"\x01\x00host:/writable-second.adf"
+            )
             (catalog_dir / "slot-014.bin").write_bytes(b"\x01\x01host:/hd.adf")
             (catalog_dir / "slot-017.bin").write_bytes(b"\x01\x01host:/hd-second.adf")
             (catalog_dir / "slot-018.bin").write_bytes(b"\x01\x00host:/hd-writable.adf")

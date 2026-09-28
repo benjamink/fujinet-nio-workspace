@@ -246,6 +246,57 @@ results = [
 ]
 
 [[test]]
+name = "diskdevice-wb13-cross-copy"
+project = "apps"
+app = "wifitest"
+driver = true
+driver_tools = ["fujinet-nio-exchange"]
+amiga_artifact_profile = "wb13"
+core_tools = ["fmount", "fumount"]
+wb13_mountlist = true
+no_static_mountlists = true
+environments = ["wb13"]
+timeout = 150
+activity_timeout = 120
+no_activity_timeout = 60
+startup = "startup/diskdevice-wb13-cross-copy.sequence"
+startup_target = "S/StartupII"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-cross-copy"
+results = [
+  "w13xc-load.result", "w13xc-dn0m.result", "w13xc-dn2m.result",
+  "w13xc-to-dn2.result", "w13xc-to-dn0.result", "w13xc-to-dh0.result",
+  "w13xc-dh0.result", "w13xc-dn0.result", "w13xc-dn2.result",
+  "w13xc-dn0e.result", "w13xc-dn2e.result",
+]
+
+[[test]]
+name = "diskdevice-wb13-all-units"
+project = "apps"
+app = "wifitest"
+driver = true
+driver_tools = ["fujinet-nio-exchange"]
+amiga_artifact_profile = "wb13"
+core_tools = ["fmount", "fumount"]
+wb13_mountlist = true
+no_static_mountlists = true
+environments = ["wb13"]
+timeout = 180
+activity_timeout = 150
+no_activity_timeout = 75
+startup = "startup/diskdevice-wb13-all-units.sequence"
+startup_target = "S/StartupII"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-all-units"
+results = [
+  "w13u-load.result",
+  "w13u-dn0m.result", "w13u-dn1m.result", "w13u-dn2m.result", "w13u-dn3m.result",
+  "w13u-dn4m.result", "w13u-dn5m.result", "w13u-dn6m.result", "w13u-dn7m.result",
+  "w13u-dn0t.result", "w13u-dn1t.result", "w13u-dn2t.result", "w13u-dn3t.result",
+  "w13u-dn4t.result", "w13u-dn5t.result", "w13u-dn6t.result", "w13u-dn7t.result",
+]
+
+[[test]]
 name = "diskdevice-hd-adf"
 project = "apps"
 app = "wifitest"

@@ -81,6 +81,21 @@ concurrent DN0/DN2 lifecycle both complete through persisted-file readback
 and completion-marker emission with that change.  Later Kickstarts keep their
 existing handler-retirement lifecycle and do not take this delay.
 
+## Eight static MountList units
+
+The `wb13-a500` acceptance environment successfully starts `DN0:` through
+`DN7:`, maps read-only DD media to every unit, and reads `KNOWN.TXT` from each
+one.  This proves the shipped static MountList supplies all eight independently
+addressable DiskDevice units.
+
+A deliberately diagnostic batch of eight sequential `FUMOUNT` commands
+ejected DN0 and DN1, then stalled while beginning DN2's transition.  It is not
+part of the normal acceptance case: the established workflows already prove
+independent eject/reinsert for DN0 and DN2, including writable DN2 beside live
+DN0.  Treat the bulk-eject sequence as a separate WB1.3 resource/lifecycle
+investigation; do not infer a limitation in mounting or reading all eight
+units from it.
+
 ## Rejected paths
 
 - Standalone `DEVS:DNn` files are not a WB1.3 replacement for its shared
@@ -96,5 +111,6 @@ existing handler-retirement lifecycle and do not take this delay.
 
 WB1.3 must use one shared MountList augmented with static `DN0:`--`DN7:`
 entries. The installer/startup setup should load the resident disk device and
-then start those static handlers before `FMOUNT` is used. The remaining work
-is to make independent eject/reinsert of a secondary active unit reliable.
+then start those static handlers before `FMOUNT` is used. Independent
+eject/reinsert of a secondary active unit is established; a bulk-eject stress
+case remains to be understood separately.
