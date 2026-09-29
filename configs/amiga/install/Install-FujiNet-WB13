@@ -42,9 +42,10 @@ Else
     Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
     Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
     Echo "Do not add C:Mount lines: FMOUNT starts the matching handler."
-    Echo "Then, after the next boot: FMOUNT 11 DO0: RO"
+    Echo "Then, after the next boot: FMOUNT 11 0 RO"
     Echo "Endpoints: DN=DD/FFS HN=HD/FFS DO=DD/OFS HO=HD/OFS."
-    Echo "To eject it: FUMOUNT DO0:"
-    Echo "To mount again after ejecting: FMOUNT 11 DO0: RO"
+    Echo "It reports DN0:/HN0:/DO0:/HO0: after inspecting the image."
+    Echo "To eject it: FUMOUNT 0"
+    Echo "To mount again after ejecting: FMOUNT 11 0 RO"
   EndIf
 EndIf

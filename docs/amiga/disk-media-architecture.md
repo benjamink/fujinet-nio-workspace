@@ -57,15 +57,16 @@ Workbench 1.3 uses permanent static entries in the shared `DEVS:MountList`.
 The supplied profile contains eight initially inactive endpoints with no shared
 device units: `DN0:`--`DN1:` (DD/FFS, units 0--1), `HN0:`--`HN1:` (HD/FFS,
 units 2--3), `DO0:`--`DO1:` (DD/OFS, units 4--5), and `HO0:`--`HO1:`
-(HD/OFS, units 6--7). `FMOUNT` inspects the selected catalogue ADF and
-rejects an endpoint whose geometry or DOS type does not match. Users select
-the compatible endpoint:
+(HD/OFS, units 6--7). `FMOUNT` inspects the selected catalogue ADF. With a
+logical unit (`0` or `1`) it selects and reports the compatible endpoint; an
+explicit endpoint remains available and is validated against the media:
 
 ```text
-FMOUNT 11 DO0: RO
+FMOUNT 11 0 RO
+; reports: Mounted slot 11 on DO0: (DD, OFS)
 Dir DO0:
-FUMOUNT DO0:
-FMOUNT 11 DO0: RO
+FUMOUNT 0
+FMOUNT 11 0 RO
 ```
 
 `L:FastFileSystem` is required for the `DNx:` and `HNx:` recipes. The supplied
@@ -75,8 +76,10 @@ recipes: a KS1.3 FastFileSystem handler configured for `DOS\\1` rejects a
 
 KS1.3 cannot safely retire a live static filesystem handler: `ACTION_DIE` on
 the tested FFS handler produces a task-held software error. The non-overlapping
-unit allocation avoids that operation entirely: an FFS/DD disk on `DN0:` and
-an OFS/HD disk on `HO0:` can coexist and be ejected/remounted independently.
+unit allocation avoids that operation entirely. Logical units are session
+aliases: `FMOUNT 11 0` chooses `DN0:`, `HN0:`, `DO0:`, or `HO0:` from the
+inspected media; `FUMOUNT 0` ejects that selected endpoint. Use explicit
+endpoint names to keep more than one category with the same suffix mounted.
 This is the static-handler limitation absent from WB2+ dynamic-node builds.
 
 ### Mounting two images at once

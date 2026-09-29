@@ -111,22 +111,22 @@ the existing `DEVS:MountList`. That preserves system entries such as
 11 as a DD/OFS image with:
 
 ```text
-FMOUNT 11 DO0: RO
-FUMOUNT DO0:
+FMOUNT 11 0 RO
+FUMOUNT 0
 ```
 
 Workbench 1.3 has no supported public dynamic DOS-node API: `FMOUNT` therefore
-checks the selected endpoint against the media before starting its static
-handler. The supplied endpoints are `DN0:`--`DN1:` (DD/FFS), `HN0:`--`HN1:`
+selects the compatible endpoint for logical unit `0` or `1`, and checks an
+explicit endpoint against the media before starting its static handler. The supplied endpoints are `DN0:`--`DN1:` (DD/FFS), `HN0:`--`HN1:`
 (HD/FFS), `DO0:`--`DO1:` (DD/OFS), and `HO0:`--`HO1:` (HD/OFS). They map to
 separate physical device units, so different media types may coexist. WB1.3
-packages `FUMOUNT` with the endpoint form:
+packages `FUMOUNT` with the same logical-unit form:
 
 ```text
-FMOUNT 11 DO0: RO
+FMOUNT 11 0 RO
 Dir DO0:
-FUMOUNT DO0:
-FMOUNT 11 DO0: RO
+FUMOUNT 0
+FMOUNT 11 0 RO
 ```
 
 On WB1.3, `FUMOUNT` ejects the media but deliberately retains the static
