@@ -18,8 +18,9 @@ pass or skip.
 * `test_diskdevice_wb13.py` exercises static-unit lifecycle, multi-drive
   reads/writes/copy, readonly media and all eight `DN` units.
 * `test_nio_wb13.py` proves the cold serial-worker load path.
-* `test_nio_broker.py`, `test_nio_native_test.py::test_native_test_clock_exchange`,
-  and `test_nio_paula_serial.py` run against the WB1.3 artifact profile.
+* `test_nio_broker.py`, `test_nio_native_test.py` (clock exchange and injected
+  late/drop-reply recovery), and `test_nio_paula_serial.py` run against the
+  WB1.3 artifact profile.
 * `test_diskdevice_wb13.py::test_wb13_mount_times_out_against_stalled_external_peer`
   proves that a serial peer which accepts a connection but does not complete a
   FujiBus reply produces the normal bounded `FMOUNT` failure (`RC=20`), not a
@@ -146,10 +147,11 @@ The WB1.3 static MountList is one profile with eight non-overlapping endpoints:
 2--3), `DO0:`--`DO1:` for DD/OFS (units 4--5), and `HO0:`--`HO1:` for HD/OFS
 (units 6--7). FFS entries use `L:FastFileSystem` and `GlobVec = -1`.
 Acceptance cases prove DD/OFS and HD/OFS concurrent copy, HD eject/remount,
-and DD/FFS write/eject/remount persistence. `FMOUNT slot 0|1 [RO|RW]`
-inspects the catalogue image and selects the matching endpoint automatically;
-for example it reports `DO0:` for a DD/OFS image. An explicit endpoint is
-still accepted and is validated against the inspected image before mounting.
+and both DD/FFS and HD/FFS write/eject/remount persistence. `FMOUNT slot 0|1
+[RO|RW]` inspects the catalogue image and selects the matching endpoint
+automatically; for example it reports `DO0:` for a DD/OFS image and `HN1:` for
+an HD/FFS image. An explicit endpoint is still accepted and is validated
+against the inspected image before mounting.
 
 ### Dynamic-DOS-node and removal tests
 
@@ -168,6 +170,7 @@ is static endpoint medium replacement/eject coverage, which belongs in
 | `test_cli_stateful.py` | Shared WB3.2/WB1.3 case variant is enabled; it waits for cold resident-worker readiness before the first client. |
 | `test_amiga_fin_ffs_adf.py` | Shared WB3.2/WB1.3 case variant is enabled. WB1.3 uses static `DN0:` (DD/FFS) and proves read/write/eject/remount persistence. |
 | `test_checksumbench.py` | Shared WB3.2/WB1.3 case variant is enabled; WB1.3 uses the timer-device command clock rather than the unavailable `ReadEClock()` vector. |
+| `test_nio_native_test.py::test_native_fault_isolation` | Shared WB3.2/WB1.3 fault variant is enabled. It proves that ambiguous late and dropped replies remain quarantined until peer-acknowledged recovery, then validates a fresh raw call and resident disk retry/recovery. |
 | `test_diskdevice_adf.py`, `test_diskdevice_fmount.py`, `test_diskdevice_fmount_restore.py`, `test_diskdevice_fumount_handler.py`, `test_diskdevice_inhibit.py`, `test_diskdevice_inhibit_experiments.py`, `test_diskdevice_unload_reload.py` | Their exact contracts assert dynamic node creation/removal, handler lifecycle, or `FMOUNTRESTORE`; WB1.3 uses static MountList handlers. Extend `test_diskdevice_wb13.py` for equivalent user-visible static-media contracts rather than duplicate invalid assertions. |
 | HD-specific nodes in `test_diskdevice_adf.py` and `test_diskdevice_fmount.py` | User-visible concurrent DD/HD static media is covered by `test_diskdevice_wb13.py`; dynamic-node assertions remain WB2+ only. |
 | `test_diskdevice_silent_timeout.py` | Its static-handler equivalent is enabled as `test_wb13_mount_times_out_against_stalled_external_peer` in `test_diskdevice_wb13.py`; it proves the same bounded `FMOUNT` timeout against an external stalled peer. |

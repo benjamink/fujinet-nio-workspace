@@ -1466,6 +1466,7 @@ results = [
 name = "nio-native-fault-hold"
 project = "driver"
 app = "fujinet-nio-native-fault-probe"
+environments = ["wb32", "wb13"]
 nio_broker = true
 nio_native_test = true
 driver = true
@@ -1478,10 +1479,16 @@ completion_mode = "host_file"
 completion_log = "complete"
 results = ["nio-fault.result"]
 
+[test.environment_variants.wb13]
+startup = "startup/nio-native-fault-hold-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+
 [[test]]
 name = "nio-native-fault-drop"
 project = "driver"
 app = "fujinet-nio-native-fault-probe"
+environments = ["wb32", "wb13"]
 nio_broker = true
 nio_native_test = true
 driver = true
@@ -1493,6 +1500,11 @@ startup = "startup/nio-native-fault-drop.sequence"
 completion_mode = "host_file"
 completion_log = "complete"
 results = ["nio-fault.result"]
+
+[test.environment_variants.wb13]
+startup = "startup/nio-native-fault-drop-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
 
 [[test]]
 name = "nio-tool-parity"
