@@ -17,14 +17,14 @@ def test_wb13_static_multidrive_writable_lifecycle(run_amiga_case):
     assert "Resident loaded: fujinet-disk.device" in results["wb13-multi-load.result"]
     assert "Mounted slot 11 on DO0: (DD, OFS)" in results["wb13-multi-dn0-mount.result"]
     assert "FUJINET ADF READ PASSED" in results["wb13-multi-dn0-type.result"]
-    assert "Mounted slot 13 on DO2: (DD, OFS)" in results["wb13-multi-dn2-mount.result"]
-    assert "STATUS drive=2" in results["wb13-multi-dn2-status.result"]
+    assert "Mounted slot 13 on DO1: (DD, OFS)" in results["wb13-multi-dn2-mount.result"]
+    assert "STATUS drive=5" in results["wb13-multi-dn2-status.result"]
     assert "COPY RC=$RC" in results["wb13-multi-copy.result"]
-    assert "Ejected DO2:" in results["wb13-multi-dn2-eject.result"]
-    assert "Mounted slot 13 on DO2: (DD, OFS)" in results["wb13-multi-dn2-remount.result"]
+    assert "Ejected DO1:" in results["wb13-multi-dn2-eject.result"]
+    assert "Mounted slot 13 on DO1: (DD, OFS)" in results["wb13-multi-dn2-remount.result"]
     assert "FUJINET WB13 WRITE PERSISTED" in results["wb13-multi-persist.result"]
     assert "Ejected DO0:" in results["wb13-multi-dn0-eject.result"]
-    assert "Ejected DO2:" in results["wb13-multi-dn2-finale.result"]
+    assert "Ejected DO1:" in results["wb13-multi-dn2-finale.result"]
 
 
 def test_wb13_secondary_readonly_lifecycle(run_amiga_case):
@@ -33,8 +33,8 @@ def test_wb13_secondary_readonly_lifecycle(run_amiga_case):
 
     assert "FUJINET ADF READ PASSED" in results["w13ro-dn0t.result"]
     assert "FUJINET ADF READ PASSED" in results["w13ro-dn2t.result"]
-    assert "Ejected DO2:" in results["w13ro-eject.result"]
-    assert "Mounted slot 11 on DO2: (DD, OFS)" in results["w13ro-remnt.result"]
+    assert "Ejected DO1:" in results["w13ro-eject.result"]
+    assert "Mounted slot 11 on DO1: (DD, OFS)" in results["w13ro-remnt.result"]
     assert "FUJINET ADF READ PASSED" in results["w13ro-remntt.result"]
 
 
@@ -43,8 +43,8 @@ def test_wb13_secondary_writable_lifecycle_without_dn0(run_amiga_case):
     results = run_amiga_case("diskdevice-wb13-secondary-rw-alone")
 
     assert "COPY RC=$RC" in results["w13rw-copy.result"]
-    assert "Ejected DO2:" in results["w13rw-eject.result"]
-    assert "Mounted slot 13 on DO2: (DD, OFS)" in results["w13rw-remnt.result"]
+    assert "Ejected DO1:" in results["w13rw-eject.result"]
+    assert "Mounted slot 13 on DO1: (DD, OFS)" in results["w13rw-remnt.result"]
     assert "FUJINET WB13 WRITE PERSISTED" in results["w13rw-persist.result"]
 
 
@@ -53,7 +53,7 @@ def test_wb13_static_drives_cross_copy_and_eject_independently(run_amiga_case):
     results = run_amiga_case("diskdevice-wb13-cross-copy")
 
     assert "Mounted slot 13 on DO0: (DD, OFS)" in results["w13xc-dn0m.result"]
-    assert "Mounted slot 20 on DO2: (DD, OFS)" in results["w13xc-dn2m.result"]
+    assert "Mounted slot 20 on DO1: (DD, OFS)" in results["w13xc-dn2m.result"]
     assert "COPY RC=$RC" in results["w13xc-to-dn2.result"]
     assert "COPY RC=$RC" in results["w13xc-to-dn0.result"]
     assert "COPY RC=$RC" in results["w13xc-to-dh0.result"]
@@ -61,15 +61,15 @@ def test_wb13_static_drives_cross_copy_and_eject_independently(run_amiga_case):
     assert "FUJINET WB13 CROSS COPY" in results["w13xc-dn0.result"]
     assert "FUJINET WB13 CROSS COPY" in results["w13xc-dn2.result"]
     assert "Ejected DO0:" in results["w13xc-dn0e.result"]
-    assert "Ejected DO2:" in results["w13xc-dn2e.result"]
+    assert "Ejected DO1:" in results["w13xc-dn2e.result"]
 
 
-def test_wb13_all_static_units_mount_and_read(run_amiga_case):
-    """Every installed WB1.3 MountList unit DN0: through DN7: can read media."""
+def test_wb13_all_static_ofs_endpoints_mount_and_read(run_amiga_case):
+    """Both installed WB1.3 DD/OFS endpoints can read media concurrently."""
     results = run_amiga_case("diskdevice-wb13-all-units")
 
     assert "Resident loaded: fujinet-disk.device" in results["w13u-load.result"]
-    for unit in range(8):
+    for unit in range(2):
         stem = f"w13u-dn{unit}"
         assert f"Mounted slot 11 on DO{unit}: (DD, OFS)" in results[f"{stem}m.result"]
         assert "FUJINET ADF READ PASSED" in results[f"{stem}t.result"]
@@ -91,11 +91,11 @@ def test_wb13_mixed_dd_and_hd_static_handlers(run_amiga_case):
 
     assert "Resident loaded: fujinet-disk.device" in results["wb13mix-load.result"]
     assert "Mounted slot 13 on DO0: (DD, OFS)" in results["wb13mix-dd-mount.result"]
-    assert "Mounted slot 21 on HO4: (HD, OFS)" in results["wb13mix-hd-mount.result"]
+    assert "Mounted slot 21 on HO0: (HD, OFS)" in results["wb13mix-hd-mount.result"]
     assert "FUJINET WRITABLE BASE" in results["wb13mix-hd-copy.result"]
     assert "FUJINET WRITABLE HD BASE" in results["wb13mix-dd-copy.result"]
-    assert "Ejected HO4:" in results["wb13mix-hd-eject.result"]
-    assert "Mounted slot 21 on HO4: (HD, OFS)" in results["wb13mix-hd-remount.result"]
+    assert "Ejected HO0:" in results["wb13mix-hd-eject.result"]
+    assert "Mounted slot 21 on HO0: (HD, OFS)" in results["wb13mix-hd-remount.result"]
     assert "FUJINET WRITABLE BASE" in results["wb13mix-hd-persist.result"]
 
 

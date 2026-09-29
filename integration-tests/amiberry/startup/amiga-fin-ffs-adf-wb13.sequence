@@ -9,7 +9,7 @@ C:Echo >>DH0:ffs-host.result "FHOST RC=0"
 C:FIN >DH0:ffs-fin.result 0 ffs.adf
 If NOT WARN
 C:Echo >>DH0:ffs-fin.result "FIN RC=0"
-C:FMOUNT >DH0:ffs-mount.result 0 0 RW
+C:FMOUNT >DH0:ffs-mount.result 0 DN0: RW
 If NOT WARN
 C:Echo >>DH0:ffs-mount.result "FMOUNT RC=0"
 C:Dir >DH0:ffs-dir.result DN0:
@@ -18,10 +18,10 @@ C:Echo >>DH0:ffs-dir.result "DIR RC=0"
 C:Echo >DN0:WRITE.TXT "FUJINET FFS ADF WRITE PASSED"
 C:Type >DH0:ffs-write.result DN0:WRITE.TXT
 If NOT WARN
-C:FUMOUNT >DH0:ffs-unmount.result 0
+C:FUMOUNT >DH0:ffs-unmount.result DN0:
 If NOT WARN
 C:Wait 5
-C:FMOUNT >DH0:ffs-remount.result 0 0 RW
+C:FMOUNT >DH0:ffs-remount.result 0 DN0: RW
 If NOT WARN
 C:Type >DH0:ffs-remount.result DN0:WRITE.TXT
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/amiga-fin-ffs-adf

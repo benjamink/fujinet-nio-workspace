@@ -139,25 +139,20 @@ the guest publishes `PASS`.
 
 ### FFS and high-density media
 
-The default WB1.3 static MountList declares DD/OFS geometry. The mixed profile
-now supplies static `HD0:`--`HD3:` handlers (units 4--7, 22 blocks/track),
-with `DN0:`--`DN3:` retaining DD geometry. The mixed-profile acceptance case
-proves concurrent DD/HD read/write copy, HD eject, remount, and persistence.
-The standard DD profile can additionally install `FF0:`--`FF7:` aliases for
-`DOS\\1` FFS media. Each alias uses `L:FastFileSystem`, `GlobVec = -1`, and
-the same driver unit as its `DNx:` counterpart. The focused FFS case mounts a
-standard 880 KiB `DOS\\1` ADF read/write, creates `WRITE.TXT`, ejects it, waits
-for the V34 write-back interval, remounts it, and reads the persisted file.
-Do not mount `DNx:` and `FFx:` for the same unit concurrently. The FFS alias
-extension is currently for the all-DD profile; FFS high-density aliases are a
-separate future profile.
+The WB1.3 static MountList is one profile with eight non-overlapping endpoints:
+`DN0:`--`DN1:` for DD/FFS (units 0--1), `HN0:`--`HN1:` for HD/FFS (units
+2--3), `DO0:`--`DO1:` for DD/OFS (units 4--5), and `HO0:`--`HO1:` for HD/OFS
+(units 6--7). FFS entries use `L:FastFileSystem` and `GlobVec = -1`.
+Acceptance cases prove DD/OFS and HD/OFS concurrent copy, HD eject/remount,
+and DD/FFS write/eject/remount persistence. A command must name the endpoint;
+`FMOUNT` verifies the inspected image matches it before mounting.
 
 ### Dynamic-DOS-node and removal tests
 
 WB1.3 has no public DOS-list locking/dynamic DosNode API.  Cases whose
 assertion is creation/removal of a dynamic node (including unload/reload and
 handler-removal tests) cannot be direct WB1.3 ports.  Their WB1.3 equivalent
-is static DN0:--DN7: medium replacement/eject coverage, which belongs in
+is static endpoint medium replacement/eject coverage, which belongs in
 `test_diskdevice_wb13.py`.
 
 ## Remaining pytest modules: porting disposition
@@ -167,7 +162,7 @@ is static DN0:--DN7: medium replacement/eject coverage, which belongs in
 | `test_amiga_fin_slot_catalog.py`, `test_wifi_config.py`, `test_diskdevice_loader.py` | Shared WB3.2/WB1.3 case variants are enabled and pass. |
 | `test_diskdevice_wb13.py`, `test_nio_wb13.py` | WB1.3-native acceptance modules already pass. |
 | `test_cli_stateful.py` | Shared WB3.2/WB1.3 case variant is enabled; it waits for cold resident-worker readiness before the first client. |
-| `test_amiga_fin_ffs_adf.py` | Shared WB3.2/WB1.3 case variant is enabled. WB1.3 uses a static `FF0:` FFS handler and proves read/write/eject/remount persistence. |
+| `test_amiga_fin_ffs_adf.py` | Shared WB3.2/WB1.3 case variant is enabled. WB1.3 uses static `DN0:` (DD/FFS) and proves read/write/eject/remount persistence. |
 | `test_checksumbench.py` | Shared WB3.2/WB1.3 case variant is enabled; WB1.3 uses the timer-device command clock rather than the unavailable `ReadEClock()` vector. |
 | `test_diskdevice_adf.py`, `test_diskdevice_fmount.py`, `test_diskdevice_fmount_restore.py`, `test_diskdevice_fumount_handler.py`, `test_diskdevice_inhibit.py`, `test_diskdevice_inhibit_experiments.py`, `test_diskdevice_unload_reload.py` | Their exact contracts assert dynamic node creation/removal, handler lifecycle, or `FMOUNTRESTORE`; WB1.3 uses static MountList handlers. Extend `test_diskdevice_wb13.py` for equivalent user-visible static-media contracts rather than duplicate invalid assertions. |
 | HD-specific nodes in `test_diskdevice_adf.py` and `test_diskdevice_fmount.py` | User-visible concurrent DD/HD static media is covered by `test_diskdevice_wb13.py`; dynamic-node assertions remain WB2+ only. |

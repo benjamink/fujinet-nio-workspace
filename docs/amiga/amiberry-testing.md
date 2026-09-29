@@ -108,28 +108,30 @@ commands (`FAPP`, `FBOOT`, `FDRIVE`, `FHOST`, `FIN`, `FLS`, `FMOUNT`,
 the existing `DEVS:MountList`. That preserves system entries such as
 `NEWCON:`. Add only the resident-loader lines before `Break 1 C` in
 `S:StartupII`; do not add `Mount` lines. After reboot, mount catalogue slot
-11 with:
+11 as a DD/OFS image with:
 
 ```text
-FMOUNT 11 0 RO
-; FMOUNT reports DN0:, HN0:, DO0:, or HO0: after inspecting the ADF.
-FUMOUNT 0
+FMOUNT 11 DO0: RO
+FUMOUNT DO0:
 ```
 
 Workbench 1.3 has no supported public dynamic DOS-node API: `FMOUNT` therefore
-selects media in the static unit and starts its OFS handler itself. WB1.3 now
-packages `FUMOUNT`, with the same command form as newer releases:
+checks the selected endpoint against the media before starting its static
+handler. The supplied endpoints are `DN0:`--`DN1:` (DD/FFS), `HN0:`--`HN1:`
+(HD/FFS), `DO0:`--`DO1:` (DD/OFS), and `HO0:`--`HO1:` (HD/OFS). They map to
+separate physical device units, so different media types may coexist. WB1.3
+packages `FUMOUNT` with the endpoint form:
 
 ```text
-FMOUNT 11 DN0: RO
-Dir DN0:
-FUMOUNT DN0:
-FMOUNT 11 DN0: RO
+FMOUNT 11 DO0: RO
+Dir DO0:
+FUMOUNT DO0:
+FMOUNT 11 DO0: RO
 ```
 
 On WB1.3, `FUMOUNT` ejects the media but deliberately retains the static
-`DN0:` handler and MountList entry. A later `FMOUNT` replaces the media on
-that unit. This is not the WB2+ lifecycle, where `FUMOUNT` retires and removes
+selected handler and MountList entry. A later `FMOUNT` replaces media on that
+same endpoint. This is not the WB2+ lifecycle, where `FUMOUNT` retires and removes
 a dynamic DOS node. `FMOUNTRESTORE` remains WB2+ only.
 
 To demonstrate that the broker, rather than an earlier open, loads stock
@@ -236,7 +238,7 @@ Test cases without an explicit `environments` entry target `wb32`.  A WB1.3
 case must explicitly declare `environments = ["wb13"]` and use a WB1.3-safe
 startup sequence: Shell 1.3 takes redirection before command arguments (for
 example `Echo >DH0:result "text"`), lacks the later `If $RC EQ` form, and uses
-the static `DN0:`--`DN7:` MountList lifecycle rather than dynamic DOS nodes.
+the static `DN0:`/`HN0:`/`DO0:`/`HO0:` MountList lifecycle rather than dynamic DOS nodes.
 Do not add `wb13` to a legacy case merely because its binaries compile.
 
 When an observable test contract is shared, retain one case and pytest module

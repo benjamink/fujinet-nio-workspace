@@ -2,14 +2,14 @@ C:Assign T: RAM:
 C:Failat 100
 C:Echo >DH0:w13xc-source.txt "FUJINET WB13 CROSS COPY"
 C:fujinet-load-resident >DH0:w13xc-load.result DEVS:fujinet-disk.device fujinet-disk.device
-C:FMOUNT >DH0:w13xc-dn0m.result 13 0 RW
+C:FMOUNT >DH0:w13xc-dn0m.result 13 DO0: RW
 If NOT WARN
-C:FMOUNT >DH0:w13xc-dn2m.result 20 2 RW
+C:FMOUNT >DH0:w13xc-dn2m.result 20 DO1: RW
 If NOT WARN
-C:Copy DH0:w13xc-source.txt TO DO2:FROMDH0.TXT
+C:Copy DH0:w13xc-source.txt TO DO1:FROMDH0.TXT
 C:Echo >DH0:w13xc-to-dn2.result "COPY RC=$RC"
 If NOT WARN
-C:Copy DO2:FROMDH0.TXT TO DO0:FROMDN2.TXT
+C:Copy DO1:FROMDH0.TXT TO DO0:FROMDN2.TXT
 C:Echo >DH0:w13xc-to-dn0.result "COPY RC=$RC"
 If NOT WARN
 C:Copy DO0:FROMDN2.TXT TO DH0:w13xc-back.txt
@@ -17,10 +17,10 @@ C:Echo >DH0:w13xc-to-dh0.result "COPY RC=$RC"
 If NOT WARN
 C:Type >DH0:w13xc-dh0.result DH0:w13xc-back.txt
 C:Type >DH0:w13xc-dn0.result DO0:FROMDN2.TXT
-C:Type >DH0:w13xc-dn2.result DO2:FROMDH0.TXT
-C:FUMOUNT >DH0:w13xc-dn0e.result 0
+C:Type >DH0:w13xc-dn2.result DO1:FROMDH0.TXT
+C:FUMOUNT >DH0:w13xc-dn0e.result DO0:
 If NOT WARN
-C:FUMOUNT >DH0:w13xc-dn2e.result 2
+C:FUMOUNT >DH0:w13xc-dn2e.result DO1:
 If NOT WARN
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/diskdevice-wb13-cross-copy
 EndIf

@@ -1,15 +1,15 @@
 C:Assign T: RAM:
 C:Failat 100
 C:fujinet-load-resident >DH0:wb13-load.result DEVS:fujinet-disk.device fujinet-disk.device
-C:fmount >DH0:wb13-fmount-first.result 11 0 RO
+C:fmount >DH0:wb13-fmount-first.result 11 DO0: RO
 If NOT WARN
 C:Dir DO0:
 If NOT WARN
 C:Type >DH0:wb13-type-first.result DO0:KNOWN.TXT
 If NOT WARN
-C:FUMOUNT >DH0:wb13-fumount.result 0
+C:FUMOUNT >DH0:wb13-fumount.result DO0:
 If NOT WARN
-C:FMOUNT >DH0:wb13-fmount-second.result 11 0 RO
+C:FMOUNT >DH0:wb13-fmount-second.result 11 DO0: RO
 If NOT WARN
 C:Type >DH0:wb13-type-second.result DO0:KNOWN.TXT
 If NOT WARN

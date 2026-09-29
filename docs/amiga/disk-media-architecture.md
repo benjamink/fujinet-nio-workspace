@@ -54,18 +54,18 @@ and retries eject before completing the mapping and DOS-entry removal.
 ### Workbench 1.3 static-unit workflow
 
 Workbench 1.3 uses permanent static entries in the shared `DEVS:MountList`.
-The installed list contains four initially inactive recipes for each physical
-unit: `DNx:` (DD/FFS), `HNx:` (HD/FFS), `DOx:` (DD/OFS), and `HOx:` (HD/OFS).
-`FMOUNT` inspects the selected catalogue ADF, chooses the recipe, starts its
-handler, and reports the resulting name. Users select only catalogue slot and
-unit:
+The supplied profile contains eight initially inactive endpoints with no shared
+device units: `DN0:`--`DN1:` (DD/FFS, units 0--1), `HN0:`--`HN1:` (HD/FFS,
+units 2--3), `DO0:`--`DO1:` (DD/OFS, units 4--5), and `HO0:`--`HO1:`
+(HD/OFS, units 6--7). `FMOUNT` inspects the selected catalogue ADF and
+rejects an endpoint whose geometry or DOS type does not match. Users select
+the compatible endpoint:
 
 ```text
-FMOUNT 11 0 RO
-; reports, for example: Mounted slot 11 on DO0: (DD, OFS)
+FMOUNT 11 DO0: RO
 Dir DO0:
-FUMOUNT 0
-FMOUNT 11 0 RO
+FUMOUNT DO0:
+FMOUNT 11 DO0: RO
 ```
 
 `L:FastFileSystem` is required for the `DNx:` and `HNx:` recipes. The supplied
@@ -74,11 +74,10 @@ recipes: a KS1.3 FastFileSystem handler configured for `DOS\\1` rejects a
 `DOS\\0` image.
 
 KS1.3 cannot safely retire a live static filesystem handler: `ACTION_DIE` on
-the tested FFS handler produces a task-held software error. After a unit has
-started one recipe, it can eject and remount media of that same type during
-the boot. Switching that unit to a different DD/HD or OFS/FFS type requires a
-reboot; `FMOUNT` reports this instead of creating competing handlers. This is
-the static-handler limitation absent from WB2+ dynamic-node builds.
+the tested FFS handler produces a task-held software error. The non-overlapping
+unit allocation avoids that operation entirely: an FFS/DD disk on `DN0:` and
+an OFS/HD disk on `HO0:` can coexist and be ejected/remounted independently.
+This is the static-handler limitation absent from WB2+ dynamic-node builds.
 
 ### Mounting two images at once
 

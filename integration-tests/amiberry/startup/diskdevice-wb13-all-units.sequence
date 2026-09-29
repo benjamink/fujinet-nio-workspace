@@ -1,36 +1,12 @@
 C:Assign T: RAM:
 C:Failat 100
 C:fujinet-load-resident >DH0:w13u-load.result DEVS:fujinet-disk.device fujinet-disk.device
-C:FMOUNT >DH0:w13u-dn0m.result 11 0 RO
+C:FMOUNT >DH0:w13u-dn0m.result 11 DO0: RO
 If NOT WARN
-C:FMOUNT >DH0:w13u-dn1m.result 11 1 RO
-If NOT WARN
-C:FMOUNT >DH0:w13u-dn2m.result 11 2 RO
-If NOT WARN
-C:FMOUNT >DH0:w13u-dn3m.result 11 3 RO
-If NOT WARN
-C:FMOUNT >DH0:w13u-dn4m.result 11 4 RO
-If NOT WARN
-C:FMOUNT >DH0:w13u-dn5m.result 11 5 RO
-If NOT WARN
-C:FMOUNT >DH0:w13u-dn6m.result 11 6 RO
-If NOT WARN
-C:FMOUNT >DH0:w13u-dn7m.result 11 7 RO
+C:FMOUNT >DH0:w13u-dn1m.result 11 DO1: RO
 If NOT WARN
 C:Type >DH0:w13u-dn0t.result DO0:KNOWN.TXT
 C:Type >DH0:w13u-dn1t.result DO1:KNOWN.TXT
-C:Type >DH0:w13u-dn2t.result DO2:KNOWN.TXT
-C:Type >DH0:w13u-dn3t.result DO3:KNOWN.TXT
-C:Type >DH0:w13u-dn4t.result DO4:KNOWN.TXT
-C:Type >DH0:w13u-dn5t.result DO5:KNOWN.TXT
-C:Type >DH0:w13u-dn6t.result DO6:KNOWN.TXT
-C:Type >DH0:w13u-dn7t.result DO7:KNOWN.TXT
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/diskdevice-wb13-all-units
-EndIf
-EndIf
-EndIf
-EndIf
-EndIf
-EndIf
 EndIf
 EndIf

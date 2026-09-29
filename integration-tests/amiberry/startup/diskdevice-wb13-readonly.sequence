@@ -1,7 +1,7 @@
 C:Assign T: RAM:
 C:Failat 100
 C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device
-C:FMOUNT >DH0:w13wp-mount.result 11 0 RO
+C:FMOUNT >DH0:w13wp-mount.result 11 DO0: RO
 If NOT WARN
 C:fujinet-mount >DH0:w13wp-status.result --status 0
 C:Type >DH0:w13wp-known.result DO0:KNOWN.TXT
