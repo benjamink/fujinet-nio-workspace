@@ -374,7 +374,7 @@ app = "wifitest"
 driver = true
 driver_tools = ["fujinet-nio-exchange"]
 amiga_artifact_profile = "wb13"
-core_tools = ["fmount", "fumount"]
+core_tools = ["fin", "fmount", "fumount"]
 wb13_mountlist = true
 no_static_mountlists = true
 environments = ["wb13"]
@@ -386,7 +386,7 @@ startup_target = "S/StartupII"
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-failed-secondary-mount"
 results = [
-  "w13fail-load.result", "w13fail-dn0-mount.result", "w13fail-dn2-invalid.result",
+  "w13fail-load.result", "w13fail-dn0-mount.result", "w13fail-inspect.result",
   "w13fail-dn0-type.result", "w13fail-dn0-status.result", "w13fail-dn0-eject.result",
 ]
 

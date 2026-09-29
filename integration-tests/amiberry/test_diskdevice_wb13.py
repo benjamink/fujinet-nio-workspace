@@ -101,12 +101,12 @@ def test_wb13_mixed_dd_and_hd_static_handlers(run_amiga_case):
     assert "FUJINET WRITABLE BASE" in results["wb13mix-hd-persist.result"]
 
 
-def test_wb13_failed_secondary_mount_preserves_primary_media(run_amiga_case):
-    """A bad static DN2: mount must not disrupt a usable DN0: medium."""
+def test_wb13_failed_inspection_preserves_primary_media(run_amiga_case):
+    """A failed catalogue inspection must not disrupt a usable static medium."""
     results = run_amiga_case("diskdevice-wb13-failed-secondary-mount")
 
     assert "Mounted slot 11 on DO0: (DD, OFS)" in results["w13fail-dn0-mount.result"]
-    assert "INVALID REJECTED" in results["w13fail-dn2-invalid.result"]
+    assert "INSPECT FAILURE REJECTED" in results["w13fail-inspect.result"]
     assert "FUJINET ADF READ PASSED" in results["w13fail-dn0-type.result"]
     assert "STATUS drive=4" in results["w13fail-dn0-status.result"]
     assert "absent=0" in results["w13fail-dn0-status.result"]

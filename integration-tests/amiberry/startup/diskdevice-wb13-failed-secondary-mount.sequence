@@ -3,14 +3,17 @@ C:FailAt 100
 C:fujinet-load-resident >DH0:w13fail-load.result DEVS:fujinet-disk.device fujinet-disk.device
 C:FMOUNT >DH0:w13fail-dn0-mount.result 11 DO0: RO
 If NOT WARN
-C:FMOUNT >DH0:w13fail-dn2-invalid.result 99 DO1: RO
+C:FIN 99 host:/missing-inspect-fixture.adf
 If NOT WARN
-C:Echo >>DH0:w13fail-dn2-invalid.result "INVALID UNEXPECTED SUCCESS"
+C:FMOUNT >DH0:w13fail-inspect.result 99 1 RO
+If NOT WARN
+C:Echo >>DH0:w13fail-inspect.result "INSPECT FAILURE UNEXPECTED SUCCESS"
 Else
-C:Echo >>DH0:w13fail-dn2-invalid.result "INVALID REJECTED"
+C:Echo >>DH0:w13fail-inspect.result "INSPECT FAILURE REJECTED"
 EndIf
 C:Type >DH0:w13fail-dn0-type.result DO0:KNOWN.TXT
 C:fujinet-mount >DH0:w13fail-dn0-status.result --status 4
 C:FUMOUNT >DH0:w13fail-dn0-eject.result DO0:
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/diskdevice-wb13-failed-secondary-mount
+EndIf
 EndIf
