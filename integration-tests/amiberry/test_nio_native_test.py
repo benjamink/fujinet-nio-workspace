@@ -218,7 +218,8 @@ def test_native_fault_isolation(run_amiga_case, amiga_evidence_root, fault):
 
 
 @pytest.mark.parametrize("installation", ["serial", "native"])
-def test_exchange_tool_installation_parity(run_amiga_case, amiga_evidence_root, installation):
+def test_exchange_tool_installation_parity(run_amiga_case, amiga_evidence_root,
+                                           amiga_environment, installation):
     started = int(time.time())
     results = run_amiga_case("nio-tool-parity", installation=installation)
     finished = int(time.time())
@@ -242,7 +243,19 @@ def test_exchange_tool_installation_parity(run_amiga_case, amiga_evidence_root, 
     digest = 2166136261
     for value in seed[17 * 512:18 * 512]:
         digest = ((digest ^ value) * 16777619) & 0xffffffff
-    assert re.findall(r"ordinary read trial=(\d+) checksum_fnv1a32=([0-9a-f]{8})", results["parity-read.result"]) == [(str(i), f"{digest:08x}") for i in (1, 2)]
+    actual_digests = re.findall(
+        r"ordinary read trial=(\d+) checksum_fnv1a32=([0-9a-f]{8})",
+        results["parity-read.result"],
+    )
+    if amiga_environment["AMIGA_ENV_ID"] == "wb13":
+        # The nix13 exchange build deliberately omits the diagnostic digest;
+        # the real read result and independently checked unchanged host image
+        # above remain the WB1.3 contract.
+        assert actual_digests == []
+    else:
+        assert actual_digests == [
+            (str(i), f"{digest:08x}") for i in (1, 2)
+        ]
     expected = bytearray((run / "write-original.adf").read_bytes())
     expected[17 * 512:18 * 512] = bytes(((i ^ 0x5a) ^ (2 >> ((i % 4) * 8))) & 255 for i in range(512))
     assert (host / "write.adf").read_bytes() == expected

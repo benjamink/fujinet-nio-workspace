@@ -18,9 +18,9 @@ pass or skip.
 * `test_diskdevice_wb13.py` exercises static-unit lifecycle, multi-drive
   reads/writes/copy, readonly media and all eight `DN` units.
 * `test_nio_wb13.py` proves the cold serial-worker load path.
-* `test_nio_broker.py`, `test_nio_native_test.py` (clock exchange and injected
-  late/drop-reply recovery), and `test_nio_paula_serial.py` run against the
-  WB1.3 artifact profile.
+* `test_nio_broker.py`, `test_nio_native_test.py` (clock exchange, injected
+  late/drop-reply recovery, and serial/native tool parity), and
+  `test_nio_paula_serial.py` run against the WB1.3 artifact profile.
 * `test_diskdevice_wb13.py::test_wb13_mount_times_out_against_stalled_external_peer`
   proves that a serial peer which accepts a connection but does not complete a
   FujiBus reply produces the normal bounded `FMOUNT` failure (`RC=20`), not a
@@ -171,9 +171,10 @@ is static endpoint medium replacement/eject coverage, which belongs in
 | `test_amiga_fin_ffs_adf.py` | Shared WB3.2/WB1.3 case variant is enabled. WB1.3 uses static `DN0:` (DD/FFS) and proves read/write/eject/remount persistence. |
 | `test_checksumbench.py` | Shared WB3.2/WB1.3 case variant is enabled; WB1.3 uses the timer-device command clock rather than the unavailable `ReadEClock()` vector. |
 | `test_nio_native_test.py::test_native_fault_isolation` | Shared WB3.2/WB1.3 fault variant is enabled. It proves that ambiguous late and dropped replies remain quarantined until peer-acknowledged recovery, then validates a fresh raw call and resident disk retry/recovery. |
+| `test_nio_native_test.py::test_exchange_tool_installation_parity` | Shared WB3.2/WB1.3 variant is enabled. Both serial and native installations run warm clock and directory-list calls plus disposable direct disk read/write; the guest result, host image, and service log are checked independently. |
 | `test_diskdevice_adf.py`, `test_diskdevice_fmount.py`, `test_diskdevice_fmount_restore.py`, `test_diskdevice_fumount_handler.py`, `test_diskdevice_inhibit.py`, `test_diskdevice_inhibit_experiments.py`, `test_diskdevice_unload_reload.py` | Their exact contracts assert dynamic node creation/removal, handler lifecycle, or `FMOUNTRESTORE`; WB1.3 uses static MountList handlers. Extend `test_diskdevice_wb13.py` for equivalent user-visible static-media contracts rather than duplicate invalid assertions. |
 | HD-specific nodes in `test_diskdevice_adf.py` and `test_diskdevice_fmount.py` | User-visible concurrent DD/HD static media is covered by `test_diskdevice_wb13.py`; dynamic-node assertions remain WB2+ only. |
 | `test_diskdevice_silent_timeout.py` | Its static-handler equivalent is enabled as `test_wb13_mount_times_out_against_stalled_external_peer` in `test_diskdevice_wb13.py`; it proves the same bounded `FMOUNT` timeout against an external stalled peer. |
 | `test_diskdevice_mapping_failure.py`, `test_inspect_causal*.py` | These inspect dynamic DOS/handler state or targeted failure recovery. First specify the observable WB1.3 static-handler equivalent; they are not mechanical Shell ports. |
-| `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py::test_native_test_clock_exchange`, `test_nio_native_test.py::test_native_exchange_tool_read_only`, `test_nio_native_test.py::test_native_exchange_tool_disk` | Profile-aware WB1.3 variants are enabled and verified on the A500/KS1.3 environment. The native-test clock case checks the profile-specific native device map; the exchange cases prove warm native clock/file-list and DiskDevice read/write/fault handling. |
+| `test_nio_broker.py`, `test_nio_paula_serial.py`, `test_nio_native_test.py::test_native_test_clock_exchange`, `test_nio_native_test.py::test_native_exchange_tool_read_only`, `test_nio_native_test.py::test_native_exchange_tool_disk`, `test_nio_native_test.py::test_exchange_tool_installation_parity` | Profile-aware WB1.3 variants are enabled and verified on the A500/KS1.3 environment. The native-test clock case checks the profile-specific native device map; the exchange cases prove warm native clock/file-list and DiskDevice read/write/fault handling. |
 | `test_harness_completion.py` | Host harness coverage, not a guest Workbench capability. |

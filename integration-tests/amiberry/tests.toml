@@ -1510,6 +1510,7 @@ amiga_artifact_profile = "wb13"
 name = "nio-tool-parity"
 project = "driver"
 app = "fujinet-nio-exchange"
+environments = ["wb32", "wb13"]
 nio_broker = true
 driver = true
 ordinary_disk_fixture = true
@@ -1520,3 +1521,8 @@ startup = "startup/nio-tool-parity.sequence"
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/nio-tool-parity"
 results = ["parity-clock.result", "parity-list.result", "parity-read.result", "parity-write.result"]
+
+[test.environment_variants.wb13]
+startup = "startup/nio-tool-parity-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
