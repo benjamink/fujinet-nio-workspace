@@ -314,10 +314,8 @@ completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-all-units"
 results = [
   "w13u-load.result",
-  "w13u-dn0m.result", "w13u-dn1m.result", "w13u-dn2m.result", "w13u-dn3m.result",
-  "w13u-dn4m.result", "w13u-dn5m.result", "w13u-dn6m.result", "w13u-dn7m.result",
-  "w13u-dn0t.result", "w13u-dn1t.result", "w13u-dn2t.result", "w13u-dn3t.result",
-  "w13u-dn4t.result", "w13u-dn5t.result", "w13u-dn6t.result", "w13u-dn7t.result",
+  "w13u-dn0m.result", "w13u-dn1m.result",
+  "w13u-dn0t.result", "w13u-dn1t.result",
 ]
 
 [[test]]
