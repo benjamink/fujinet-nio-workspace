@@ -360,6 +360,7 @@ completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/diskdevice-wb13-mixed-hd"
 results = [
   "wb13mix-load.result", "wb13mix-dd-mount.result", "wb13mix-hd-mount.result",
+  "wb13mix-dd-status.result", "wb13mix-hd-status.result",
   "wb13mix-dd-to-hd.result", "wb13mix-hd-to-dd.result", "wb13mix-hd-copy.result",
   "wb13mix-dd-copy.result", "wb13mix-hd-eject.result", "wb13mix-hd-remount.result",
   "wb13mix-hd-persist.result",
