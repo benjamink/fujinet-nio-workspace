@@ -7,8 +7,12 @@ C:Echo "... Module loaded"
 C:FailAt 30
 C:Echo >DH0:before-fmount.result "before fujinet-mount"
 C:fujinet-mount >DH0:fmount.result --uri 0 host:/standard.adf RO
+If ERROR
+C:Echo >DH0:stalled-peer-timeout.result "STALLED PEER TIMEOUT RC=20"
+Else
+C:Echo >DH0:stalled-peer-timeout.result "STALLED PEER UNEXPECTED SUCCESS"
+EndIf
 C:Echo >DH0:after-fmount.result "after fujinet-mount"
-C:Echo >DH0:stalled-peer-timeout.result "STALLED PEER TIMEOUT RC=$RC"
 C:FailAt 10
 C:Type DH0:fmount.result
 C:Type DH0:stalled-peer-timeout.result

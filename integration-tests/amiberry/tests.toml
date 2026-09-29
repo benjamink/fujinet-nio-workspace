@@ -956,8 +956,11 @@ silent_peer = true
 # to a fake external TCP peer that accepts the connection, emits a single SLIP
 # delimiter, then stalls. The mount command must fail in bounded time and must
 # not leave behind a successful mount result artifact.
-timeout = 40
-activity_timeout = 25
+# A real-speed A500 takes roughly 20 seconds to boot and load the residents;
+# retain enough time for the three bounded 5-second transport attempts before
+# expected_timeout ends the otherwise-idle guest run.
+timeout = 60
+activity_timeout = 45
 screenshot_quiet = 2
 screenshot_interval = 0.5
 startup = "startup/diskdevice-silent-timeout.sequence"
