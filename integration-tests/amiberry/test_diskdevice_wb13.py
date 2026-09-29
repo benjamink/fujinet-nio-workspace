@@ -92,6 +92,8 @@ def test_wb13_mixed_dd_and_hd_static_handlers(run_amiga_case):
     assert "Resident loaded: fujinet-disk.device" in results["wb13mix-load.result"]
     assert "Mounted slot 13 on DO0: (DD, OFS)" in results["wb13mix-dd-mount.result"]
     assert "Mounted slot 21 on HO0: (HD, OFS)" in results["wb13mix-hd-mount.result"]
+    assert "STATUS drive=4" in results["wb13mix-dd-status.result"]
+    assert "STATUS drive=6" in results["wb13mix-hd-status.result"]
     assert "FUJINET WRITABLE BASE" in results["wb13mix-hd-copy.result"]
     assert "FUJINET WRITABLE HD BASE" in results["wb13mix-dd-copy.result"]
     assert "Ejected HO0:" in results["wb13mix-hd-eject.result"]

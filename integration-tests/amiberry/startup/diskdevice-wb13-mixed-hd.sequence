@@ -9,6 +9,8 @@ C:FMOUNT >DH0:wb13mix-dd-mount.result 13 DO0: RW
 If NOT WARN
 C:FMOUNT >DH0:wb13mix-hd-mount.result 21 HO0: RW
 If NOT WARN
+C:fujinet-mount >DH0:wb13mix-dd-status.result --status 4
+C:fujinet-mount >DH0:wb13mix-hd-status.result --status 6
 C:Copy >DH0:wb13mix-dd-to-hd.result DO0:BASE.TXT TO HO0:FROMDD.TXT
 If NOT WARN
 C:Copy >DH0:wb13mix-hd-to-dd.result HO0:BASEHD.TXT TO DO0:FROMHD.TXT
