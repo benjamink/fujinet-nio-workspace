@@ -8,7 +8,7 @@ C:Type >DH0:wb13-multi-dn0-type.result DO0:KNOWN.TXT
 If NOT WARN
 C:FMOUNT >DH0:wb13-multi-dn2-mount.result 13 DO1: RW
 If NOT WARN
-C:fujinet-mount >DH0:wb13-multi-dn2-status.result --status 2
+C:fujinet-mount >DH0:wb13-multi-dn2-status.result --status 5
 C:Failat 100
 C:Copy DH0:wb13-persist-source.txt TO DO1:PERSIST.TXT
 C:Echo >DH0:wb13-multi-copy.result "COPY RC=$RC"
