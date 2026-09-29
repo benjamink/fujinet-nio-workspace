@@ -967,6 +967,13 @@ startup = "startup/diskdevice-silent-timeout.sequence"
 completion_mode = "expected_timeout"
 results = ["fmount.result", "stalled-peer-timeout.result"]
 
+[test.environment_variants.wb32]
+# The accelerated WB3.2 control reaches and completes the deliberate timeout
+# well within this bound; expected_timeout is its completion signal because
+# the peer intentionally cannot send an NIO marker.
+timeout = 30
+activity_timeout = 20
+
 [test.environment_variants.wb13]
 startup = "startup/diskdevice-silent-timeout-wb13.sequence"
 startup_target = "S/StartupII"
