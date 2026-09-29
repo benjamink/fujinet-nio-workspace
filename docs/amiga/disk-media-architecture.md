@@ -54,65 +54,31 @@ and retries eject before completing the mapping and DOS-entry removal.
 ### Workbench 1.3 static-unit workflow
 
 Workbench 1.3 uses permanent static entries in the shared `DEVS:MountList`.
-The handler geometry is fixed when it starts, so select one installer profile
-before installation:
-
-| Installer | Concurrent media | Static names |
-| --- | --- | --- |
-| `Install-FujiNet-WB13` | eight 880 KiB DD ADFs | `DN0:`--`DN7:` (units 0--7) |
-| `Install-FujiNet-WB13-Mixed` | four DD plus four 1760 KiB HD ADFs | `DN0:`--`DN3:` (units 0--3), `HD0:`--`HD3:` (units 4--7) |
-| `Install-FujiNet-WB13-FFS` after the standard profile | eight 880 KiB DD FFS aliases | `FF0:`--`FF7:` (same units 0--7 as `DN0:`--`DN7:`) |
-
-Run only one of the default or mixed geometry profiles on a clean MountList;
-both define the primary static device names. The FFS installer is an extension
-to the default profile, not a third geometry profile.
-The startup setup starts the chosen static handlers once; `FMOUNT` only
-changes media in the selected unit. It has the same commands, but a
-deliberately different handler lifecycle. The concurrent secondary-unit
-eject/reinsert investigation remains recorded in
-`docs/amiga/wb13-multidrive-investigation.md`:
+The installed list contains four initially inactive recipes for each physical
+unit: `DNx:` (DD/FFS), `HNx:` (HD/FFS), `DOx:` (DD/OFS), and `HOx:` (HD/OFS).
+`FMOUNT` inspects the selected catalogue ADF, chooses the recipe, starts its
+handler, and reports the resulting name. Users select only catalogue slot and
+unit:
 
 ```text
-FMOUNT 11 DN0: RO
-Dir DN0:
-FUMOUNT DN0:
-FMOUNT 11 DN0: RO
-Type DN0:KNOWN.TXT
-
-FMOUNT 13 DN2: RW
-Copy DH0:REPORT TO DN2:REPORT
-FUMOUNT DN2:
+FMOUNT 11 0 RO
+; reports, for example: Mounted slot 11 on DO0: (DD, OFS)
+Dir DO0:
+FUMOUNT 0
+FMOUNT 11 0 RO
 ```
 
-For mixed media, explicitly choose the matching handler:
+`L:FastFileSystem` is required for the `DNx:` and `HNx:` recipes. The supplied
+WB1.3 environment includes it. `DOS\\0` and `DOS\\1` must remain separate
+recipes: a KS1.3 FastFileSystem handler configured for `DOS\\1` rejects a
+`DOS\\0` image.
 
-```text
-FMOUNT 13 DN0: RW
-FMOUNT 21 HD0: RW
-Copy DN0:BASE.TXT TO HD0:FROMDD.TXT
-Copy HD0:BASEHD.TXT TO DN0:FROMHD.TXT
-FUMOUNT HD0:
-```
-
-The FFS extension requires `L:FastFileSystem` on the boot volume. It is an
-add-on to the standard all-DD profile, not the mixed profile: use an `FFx:`
-name for a `DOS\\1` FFS ADF and its corresponding `DNx:` name for an OFS ADF.
-`FFx:` and `DNx:` address the same FujiNet unit, so never mount both aliases
-for one unit at the same time:
-
-```text
-FMOUNT 11 FF0: RW
-Copy DH0:REPORT TO FF0:REPORT
-FUMOUNT FF0:
-FMOUNT 11 FF0: RO
-Type FF0:REPORT
-```
-
-On WB1.3, `FUMOUNT DN0:` ejects the FujiNet media through `TD_EJECT`; it does
-not remove `DN0:` or retire its OFS handler. Leaving that static handler and
-MountList entry in place is intentional: the final `FMOUNT` supplies new
-media to the same unit. Do not use WB2+ descriptions of `ACTION_DIE`, dynamic
-DOS-node removal, or `FMOUNTRESTORE` as WB1.3 instructions.
+KS1.3 cannot safely retire a live static filesystem handler: `ACTION_DIE` on
+the tested FFS handler produces a task-held software error. After a unit has
+started one recipe, it can eject and remount media of that same type during
+the boot. Switching that unit to a different DD/HD or OFS/FFS type requires a
+reboot; `FMOUNT` reports this instead of creating competing handlers. This is
+the static-handler limitation absent from WB2+ dynamic-node builds.
 
 ### Mounting two images at once
 

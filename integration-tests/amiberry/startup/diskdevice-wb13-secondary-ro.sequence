@@ -1,21 +1,19 @@
 C:Assign T: RAM:
 C:Failat 100
 C:fujinet-load-resident >DH0:w13ro-load.result DEVS:fujinet-disk.device fujinet-disk.device
-C:Mount DN0:
-C:Mount DN2:
-C:FMOUNT >DH0:w13ro-dn0m.result 11 DN0: RO
+C:FMOUNT >DH0:w13ro-dn0m.result 11 0 RO
 If NOT WARN
-C:Type >DH0:w13ro-dn0t.result DN0:KNOWN.TXT
+C:Type >DH0:w13ro-dn0t.result DO0:KNOWN.TXT
 If NOT WARN
-C:FMOUNT >DH0:w13ro-dn2m.result 11 DN2: RO
+C:FMOUNT >DH0:w13ro-dn2m.result 11 2 RO
 If NOT WARN
-C:Type >DH0:w13ro-dn2t.result DN2:KNOWN.TXT
+C:Type >DH0:w13ro-dn2t.result DO2:KNOWN.TXT
 If NOT WARN
-C:FUMOUNT >DH0:w13ro-eject.result DN2:
+C:FUMOUNT >DH0:w13ro-eject.result 2
 If NOT WARN
-C:FMOUNT >DH0:w13ro-remnt.result 11 DN2: RO
+C:FMOUNT >DH0:w13ro-remnt.result 11 2 RO
 If NOT WARN
-C:Type >DH0:w13ro-remntt.result DN2:KNOWN.TXT
+C:Type >DH0:w13ro-remntt.result DO2:KNOWN.TXT
 If NOT WARN
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/diskdevice-wb13-secondary-ro
 EndIf

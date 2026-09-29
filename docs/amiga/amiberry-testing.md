@@ -102,45 +102,18 @@ To install this package permanently into a WB1.3 HDF, boot it and run:
 Execute NIO:Install-FujiNet-WB13
 ```
 
-For a clean image that needs concurrent DD and high-density ADFs, use
-`Execute NIO:Install-FujiNet-WB13-Mixed` instead. It installs `DN0:`--`DN3:`
-for DD and `HD0:`--`HD3:` for HD media; do not install both profiles into the
-same MountList.
-
-To use standard 880 KiB `DOS\\1` FFS ADFs with the normal all-DD profile,
-first run `Execute NIO:Install-FujiNet-WB13`, then run:
-
-```text
-Execute NIO:Install-FujiNet-WB13-FFS
-```
-
-The HDF needs `L:FastFileSystem` (the supplied WB1.3 environment has it).
-Add `C:Mount FF0:` through `C:Mount FF7:` beside the existing `DN` mount
-lines, reboot, then use `FFx:` for FFS media. `FFx:` and `DNx:` are aliases
-for the same FujiNet unit, so choose exactly one of them per unit:
-
-```text
-FMOUNT 11 FF0: RW
-Copy DH0:REPORT TO FF0:REPORT
-FUMOUNT FF0:
-FMOUNT 11 FF0: RO
-Type FF0:REPORT
-```
-
-The FFS extension is not for the mixed DD/HD profile: its `FF0:`--`FF7:`
-entries use DD geometry.
-
 The installer copies the resident drivers and the supported operational CLI
 commands (`FAPP`, `FBOOT`, `FDRIVE`, `FHOST`, `FIN`, `FLS`, `FMOUNT`,
-`FUMOUNT`, and `FOUT`), then appends
-static `DN0:` through `DN7:` definitions to the existing `DEVS:MountList`.
-That preserves system entries such as `NEWCON:`. It prints the resident-loader
-and static `Mount DNn:` lines to add before `Break 1 C` in `S:StartupII`.
-After reboot, mount catalogue slot 11 with:
+`FUMOUNT`, and `FOUT`), then appends inactive DD/HD and OFS/FFS recipes to
+the existing `DEVS:MountList`. That preserves system entries such as
+`NEWCON:`. Add only the resident-loader lines before `Break 1 C` in
+`S:StartupII`; do not add `Mount` lines. After reboot, mount catalogue slot
+11 with:
 
 ```text
-FMOUNT 11 DN0: RO
-Dir DN0:
+FMOUNT 11 0 RO
+; FMOUNT reports DN0:, HN0:, DO0:, or HO0: after inspecting the ADF.
+FUMOUNT 0
 ```
 
 Workbench 1.3 has no supported public dynamic DOS-node API: `FMOUNT` therefore

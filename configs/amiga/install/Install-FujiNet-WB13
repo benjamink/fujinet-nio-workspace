@@ -1,8 +1,10 @@
 ; Run from the versioned NIO: share:
 ;   Execute NIO:Install-FujiNet-WB13
 ;
-; This installs the WB1.3/nix13 FujiNet artifacts. It is safe to run again;
-; the MountList block is written only on the first successful installation.
+; This installs the WB1.3/nix13 FujiNet artifacts.  FMOUNT chooses the
+; appropriate DD/HD and OFS/FFS static endpoint after inspecting each ADF.
+; It is safe to run again; the MountList block is written only on the first
+; successful installation.
 
 ; Always refresh the operational tools, including when upgrading an existing
 ; installation.  Only MountList installation must remain one-time.
@@ -21,28 +23,28 @@ Copy NIO:fmount TO C:
 Copy NIO:fumount TO C:
 Copy NIO:fout TO C:
 
-If EXISTS S:FujiNet-WB13-Installed
-  Echo "FujiNet WB1.3 files refreshed; existing MountList profile retained."
+If EXISTS S:FujiNet-WB13-Static-Installed
+  Echo "FujiNet WB1.3 files refreshed; automatic static MountList retained."
 Else
-  ; WB1.3 Mount only reads the shared list. Keep the existing entries that
-  ; provide NEWCON:, AUX:, PIPE:, etc., and append FujiNet DN0:--DN7:.
-  Copy DEVS:MountList TO RAM:MountList-Existing
-  Join RAM:MountList-Existing NIO:MountList-FujiNet-WB13 AS DEVS:MountList
-  Delete >NIL: RAM:MountList-Existing
+  If EXISTS S:FujiNet-WB13-Installed
+    Echo "Legacy FujiNet WB1.3 MountList detected. Restore a clean DEVS:MountList"
+    Echo "before installing the automatic DD/HD and OFS/FFS configuration."
+  Else
+    ; WB1.3 Mount only reads the shared list. Keep the existing entries that
+    ; provide NEWCON:, AUX:, PIPE:, etc., and append initially-inactive
+    ; DN/HN/DO/HO entries. FMOUNT starts exactly one matching handler per unit.
+    Copy DEVS:MountList TO RAM:MountList-Existing
+    Join RAM:MountList-Existing NIO:MountList-FujiNet-WB13 AS DEVS:MountList
+    Delete >NIL: RAM:MountList-Existing
 
-  Echo >S:FujiNet-WB13-Installed "Installed FujiNet WB1.3 files"
-  Echo "Installed. Add these lines before Break 1 C in S:StartupII:"
-  Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
-  Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
-  Echo "C:Mount DN0:"
-  Echo "C:Mount DN1:"
-  Echo "C:Mount DN2:"
-  Echo "C:Mount DN3:"
-  Echo "C:Mount DN4:"
-  Echo "C:Mount DN5:"
-  Echo "C:Mount DN6:"
-  Echo "C:Mount DN7:"
-  Echo "Then, after the next boot: FMOUNT 11 DN0: RO"
-  Echo "To eject it: FUMOUNT DN0:"
-  Echo "To mount again after ejecting: FMOUNT 11 DN0: RO"
+    Echo >S:FujiNet-WB13-Static-Installed "Installed automatic FujiNet WB1.3 MountList"
+    Echo "Installed. Add these lines before Break 1 C in S:StartupII:"
+    Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
+    Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
+    Echo "Do not add C:Mount lines: FMOUNT starts the matching handler."
+    Echo "Then, after the next boot: FMOUNT 11 0 RO"
+    Echo "It reports DN0:/HN0:/DO0:/HO0: after inspecting the image."
+    Echo "To eject it: FUMOUNT 0"
+    Echo "To mount again after ejecting: FMOUNT 11 0 RO"
+  EndIf
 EndIf

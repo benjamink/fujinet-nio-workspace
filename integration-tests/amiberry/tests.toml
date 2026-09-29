@@ -351,7 +351,6 @@ driver_tools = ["fujinet-nio-exchange"]
 amiga_artifact_profile = "wb13"
 core_tools = ["fin", "fmount", "fumount"]
 wb13_mountlist = true
-wb13_mountlist_source = "configs/amiga/install/MountList-FujiNet-WB13-Mixed"
 no_static_mountlists = true
 environments = ["wb13"]
 timeout = 150
@@ -807,7 +806,6 @@ amiga_artifact_profile = "wb13"
 driver_tools = ["fujinet-nio-exchange"]
 core_tools = ["fhost", "fin", "fmount", "fumount"]
 wb13_mountlist = true
-wb13_mountlist_source = "configs/amiga/install/MountList-FujiNet-WB13-FFS"
 no_static_mountlists = true
 results = [
   "ffs-load.result",
