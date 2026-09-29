@@ -80,7 +80,7 @@ def test_wb13_readonly_media_reports_protection(run_amiga_case):
     results = run_amiga_case("diskdevice-wb13-readonly")
 
     assert "Mounted slot 11 on DO0: (DD, OFS)" in results["w13wp-mount.result"]
-    assert "STATUS drive=0" in results["w13wp-status.result"]
+    assert "STATUS drive=4" in results["w13wp-status.result"]
     assert "protected=1" in results["w13wp-status.result"]
     assert "FUJINET ADF READ PASSED" in results["w13wp-known.result"]
 
@@ -106,7 +106,7 @@ def test_wb13_failed_secondary_mount_preserves_primary_media(run_amiga_case):
     assert "Mounted slot 11 on DO0: (DD, OFS)" in results["w13fail-dn0-mount.result"]
     assert "INVALID REJECTED" in results["w13fail-dn2-invalid.result"]
     assert "FUJINET ADF READ PASSED" in results["w13fail-dn0-type.result"]
-    assert "STATUS drive=0" in results["w13fail-dn0-status.result"]
+    assert "STATUS drive=4" in results["w13fail-dn0-status.result"]
     assert "absent=0" in results["w13fail-dn0-status.result"]
 
 
