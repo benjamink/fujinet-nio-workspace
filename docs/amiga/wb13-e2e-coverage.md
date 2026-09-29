@@ -25,6 +25,8 @@ pass or skip.
   FujiBus reply produces the normal bounded `FMOUNT` failure (`RC=20`), not a
   Guru requester.
 
+The full WB1.3/A500 suite passed 48 tests on 2026-09-29.
+
 ## Current porting findings
 
 ### Stateful CLI (`test_cli_stateful.py`)
@@ -144,8 +146,10 @@ The WB1.3 static MountList is one profile with eight non-overlapping endpoints:
 2--3), `DO0:`--`DO1:` for DD/OFS (units 4--5), and `HO0:`--`HO1:` for HD/OFS
 (units 6--7). FFS entries use `L:FastFileSystem` and `GlobVec = -1`.
 Acceptance cases prove DD/OFS and HD/OFS concurrent copy, HD eject/remount,
-and DD/FFS write/eject/remount persistence. A command must name the endpoint;
-`FMOUNT` verifies the inspected image matches it before mounting.
+and DD/FFS write/eject/remount persistence. `FMOUNT slot 0|1 [RO|RW]`
+inspects the catalogue image and selects the matching endpoint automatically;
+for example it reports `DO0:` for a DD/OFS image. An explicit endpoint is
+still accepted and is validated against the inspected image before mounting.
 
 ### Dynamic-DOS-node and removal tests
 

@@ -6,6 +6,11 @@ end-to-end tests from the selected production design and from future work.
 
 ## Current User Experience
 
+The dynamic-node workflow in this section applies to Workbench 2.0 and newer.
+Workbench 1.3's equivalent static-handler workflow is defined separately
+below; do not apply its `DN`/`HN`/`DO`/`HO` endpoint rules to the dynamic
+workflow.
+
 FujiNet presents each supported image selected in the catalogue as a normal
 AmigaDOS device named `DN0:` through `DN7:`. Users select a catalogue slot and
 a destination drive; media geometry, DOS-node creation, and handler lifecycle
