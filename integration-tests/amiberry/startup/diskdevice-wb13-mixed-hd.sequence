@@ -3,25 +3,25 @@ C:Failat 100
 C:fujinet-load-resident >DH0:wb13mix-load.result DEVS:fujinet-disk.device fujinet-disk.device
 C:FIN 13 host:/writable.adf
 If NOT WARN
-C:FIN 21 host:/hd-writable.adf
+C:FIN 21 host:/hd-ffs-writable.adf
 If NOT WARN
 C:FMOUNT >DH0:wb13mix-dd-mount.result 13 0 RW
 If NOT WARN
 C:FMOUNT >DH0:wb13mix-hd-mount.result 21 1 RW
 If NOT WARN
 C:fujinet-mount >DH0:wb13mix-dd-status.result --status 4
-C:fujinet-mount >DH0:wb13mix-hd-status.result --status 7
-C:Copy >DH0:wb13mix-dd-to-hd.result DO0:BASE.TXT TO HO1:FROMDD.TXT
+C:fujinet-mount >DH0:wb13mix-hd-status.result --status 3
+C:Copy >DH0:wb13mix-dd-to-hd.result DO0:BASE.TXT TO HN1:FROMDD.TXT
 If NOT WARN
-C:Copy >DH0:wb13mix-hd-to-dd.result HO1:BASEHD.TXT TO DO0:FROMHD.TXT
+C:Copy >DH0:wb13mix-hd-to-dd.result HN1:BASEHN.TXT TO DO0:FROMHD.TXT
 If NOT WARN
-C:Type >DH0:wb13mix-hd-copy.result HO1:FROMDD.TXT
+C:Type >DH0:wb13mix-hd-copy.result HN1:FROMDD.TXT
 C:Type >DH0:wb13mix-dd-copy.result DO0:FROMHD.TXT
 C:FUMOUNT >DH0:wb13mix-hd-eject.result 1
 If NOT WARN
 C:FMOUNT >DH0:wb13mix-hd-remount.result 21 1 RW
 If NOT WARN
-C:Type >DH0:wb13mix-hd-persist.result HO1:FROMDD.TXT
+C:Type >DH0:wb13mix-hd-persist.result HN1:FROMDD.TXT
 If NOT WARN
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/diskdevice-wb13-mixed-hd
 EndIf

@@ -599,6 +599,26 @@ def create_hd_adf(environment: dict[str, str], image: Path,
         raise AssertionError("HD ADF is not 1.76 MiB geometry")
 
 
+def create_hd_ffs_adf(environment: dict[str, str], image: Path,
+                      marker_name: str = "BASEHN.TXT",
+                      marker_text: str = "FUJINET WRITABLE HD FFS BASE\n") -> None:
+    """Create a deterministic FFS high-density ADF (1.76 MiB, 3520 sectors)."""
+    image.unlink(missing_ok=True)
+    marker = image.parent / marker_name
+    marker.write_text(marker_text, encoding="ascii")
+    subprocess.run(
+        [*xdf_command(environment), str(image), "create", "type=adf_hd",
+         "+", "format", "NIOHDFFS", "ffs",
+         "+", "boot", "install",
+         "+", "write", str(marker), marker_name],
+        cwd=ROOT,
+        env=environment,
+        check=True,
+    )
+    if image.stat().st_size != 3520 * 512:
+        raise AssertionError("HD FFS ADF is not 1.76 MiB geometry")
+
+
 def pytest_addoption(parser: Any) -> None:
     parser.addoption(
         "--run-amiga",
@@ -1028,6 +1048,9 @@ def run_amiga_case(amiga_environment: dict[str, str],
                           "SECONDHD.TXT", "FUJINET SECOND HD PASSED\n")
             create_hd_adf(amiga_environment, host_root / "hd-writable.adf",
                           "BASEHD.TXT", "FUJINET WRITABLE HD BASE\n")
+            if case.get("hd_ffs_adf"):
+                create_hd_ffs_adf(amiga_environment,
+                                  host_root / "hd-ffs-writable.adf")
             if case.get("inhibit_poc"):
                 create_standard_adf(amiga_environment, host_root / "inhibit-a.adf",
                                     "KNOWN.TXT", "INHIBIT VOLUME A\n", "INHIBIT_A")

@@ -349,6 +349,7 @@ driver_tools = ["fujinet-nio-exchange"]
 amiga_artifact_profile = "wb13"
 core_tools = ["fin", "fmount", "fumount"]
 wb13_mountlist = true
+hd_ffs_adf = true
 no_static_mountlists = true
 environments = ["wb13"]
 timeout = 150
