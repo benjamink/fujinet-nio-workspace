@@ -84,14 +84,15 @@ BOUNCE_WORLD_CLIENT_NIO=repos/bounce-world-client-nio
 Override any of them in `local/config.env`:
 
 ```sh
-export FUJINET_NIO=/home/markf/dev/nio/repos/fujinet-nio
-export FUJINET_NIO_LIB=/home/markf/dev/nio/repos/fujinet-nio-lib
-export NIO_APPS=/home/markf/dev/nio/repos/nio-apps
-export FUJINET_NIO_DRIVER=/home/markf/dev/nio/repos/fujinet-nio-driver
+export FUJINET_NIO=$HOME/dev/nio/repos/fujinet-nio
+export FUJINET_NIO_LIB=$HOME/dev/nio/repos/fujinet-nio-lib
+export NIO_APPS=$HOME/dev/nio/repos/nio-apps
+export FUJINET_NIO_DRIVER=$HOME/dev/nio/repos/fujinet-nio-driver
 ```
 
-`env.sh` also sources `~/.local/bin/add_watcom.sh` when present, so Open Watcom
-builds work from the workspace scripts.
+`env.sh` also sets up Open Watcom for the workspace scripts: it uses an install
+the caller has already configured (`WATCOM`, as the CI setup action does) and
+otherwise `/opt/watcom`.
 
 Amiga builds use `m68k-amigaos-gcc` from `/opt/amiga/bin` by default. Override
 that location with `AMIGA_TOOLCHAIN_BIN` in `local/config.env` if needed.
@@ -224,6 +225,6 @@ important output paths. It is meant to catch stale binaries and image mismatches
 - `nio-docs` currently has no remote configured in its source checkout, so its
   submodule URL is a local relative path. Update `.gitmodules` when it has a
   remote.
-- If you are actively editing the original checkouts under `/home/markf/dev/nio/repos`,
+- If you are actively editing original checkouts outside the workspace,
   set those paths in `local/config.env` so the workspace builds your working
   trees rather than the pinned submodule clones.
