@@ -10,7 +10,7 @@ def _status(result):
     return tuple(int(value) for value in match.groups())
 
 
-def test_fumount_handler_teardown_and_busy(run_amiga_case):
+def test_fumount_handler_teardown_and_busy(run_amiga_case, amiga_environment):
     results = run_amiga_case("diskdevice-fumount-handler")
 
     assert "LOAD RC=0" in results["fumount-load.result"]
@@ -37,9 +37,15 @@ def test_fumount_handler_teardown_and_busy(run_amiga_case):
     assert "FIND name=DN0 flags=00000004 found=0" in dos_list
     assert "DEVICE name=DN0 " not in dos_list
     assert "DEVICE name=DN1 " not in dos_list
-    assert "DEVICE name=fujinet-disk.device found=1 opencnt=0" in results[
-        "fumount-live-opencnt.result"
-    ]
+    # WB3.1's FFS 40.1 has no ACTION_DIE, so FUMOUNT falls back to Inhibit()
+    # for the busy check and eject instead of retiring the handler. The
+    # handler task never exits, so it keeps its fujinet-disk.device handle
+    # open; the media is still ejected and the DOS nodes are still removed.
+    expected_opencnt = 1 if amiga_environment["AMIGA_ENV_ID"] == "wb31" else 0
+    assert (
+        f"DEVICE name=fujinet-disk.device found=1 opencnt={expected_opencnt}"
+        in results["fumount-live-opencnt.result"]
+    )
     assert "OPENCNT RC=0" in results["fumount-live-opencnt.result"]
 
     assert "Usage: FUMOUNT 0|...|7" in results["fumount-bad-argv.result"]

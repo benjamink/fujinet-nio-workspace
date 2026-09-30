@@ -582,6 +582,9 @@ name = "diskdevice-fumount-handler"
 project = "apps"
 app = "wifitest"
 driver = true
+# WB3.1's FFS 40.1 doesn't implement ACTION_DIE (IoErr=209); the busy-refusal
+# path must not misfire on that filesystem during a normal (idle) eject.
+environments = ["wb32", "wb31"]
 timeout = 75
 activity_timeout = 60
 screenshot_quiet = 15
