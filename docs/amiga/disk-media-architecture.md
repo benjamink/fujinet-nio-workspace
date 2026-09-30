@@ -44,7 +44,7 @@ digit). Specify the mode explicitly in scripts; the current command defaults
 to RW when it is omitted. `FMOUNT` may create an absent DOS node dynamically,
 so normal use does not require a static MountList. Mounting another slot on an
 occupied unit replaces its media using the lifecycle appropriate to the old
-and new filesystems. `FUMOUNT drive` unmounts the unit: it retires the
+and new filesystems (WB3.1 differs; see below). `FUMOUNT drive` unmounts the unit: it retires the
 AmigaDOS filesystem handler (`ACTION_DIE`), then ejects the media, and removes
 the persisted mapping and DOS device-list entry. A later `FMOUNT` recreates
 the absent node; a low-level `fujinet-mount` media operation alone does not.
@@ -86,6 +86,32 @@ aliases: `FMOUNT 11 0` chooses `DN0:`, `HN0:`, `DO0:`, or `HO0:` from the
 inspected media; `FUMOUNT 0` ejects that selected endpoint. Use explicit
 endpoint names to keep more than one category with the same suffix mounted.
 This is the static-handler limitation absent from WB2+ dynamic-node builds.
+
+### Workbench 3.1 handler reuse
+
+WB3.1's FastFileSystem 40.1 does not implement `ACTION_DIE`
+(`ERROR_ACTION_NOT_KNOWN`, 209), so its handler can never exit. Removing
+its DOS node would orphan the task, its 32 KiB stack, its buffers and an open
+`fujinet-disk.device` handle: about 40 KiB lost per `FUMOUNT`, until reboot.
+Instead:
+
+- `FUMOUNT` checks the volume is idle (`ACTION_DISK_INFO` `id_InUse`), then
+  inhibits the handler, ejects the media, and *parks* the handler: `DNx:`
+  stays in the device list, inhibited, with no media, and the command
+  reports `DNx: handler parked for reuse`. A parked unit counts as unmounted:
+  a second `FUMOUNT` fails with `DNx: is not mounted`, and because the node
+  still exists, `C:Mount DNx:` cannot recreate it. Use `FMOUNT`.
+- The next `FMOUNT` of that unit inserts the new image and un-inhibits the
+  parked handler (the ordinary Amiga media-change sequence), so repeated
+  mount/eject cycles on a unit use one handler and a constant amount of memory
+  (`integration-tests/amiberry/test_diskdevice_fumount_leak.py`).
+- FFS 40.1 reads the drive geometry and DOS type only when it starts. A unit's
+  handler is therefore fixed to the media type it started with. `FMOUNT` of a
+  different type (DD vs HD, OFS vs FFS) on that unit is refused with
+  `DNx: is fixed to DD OFS media on this system; use another DN unit` before
+  the drive is touched. Mount the other type on another `DNx:` unit.
+- `fujinet-disk.device` cannot be unloaded (`fujinet-unload-resident` reports
+  `Still resident`) once any `DNx:` handler has started. Reboot to unload.
 
 ### Mounting two images at once
 

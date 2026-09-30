@@ -1,4 +1,4 @@
-def test_unload_reload_without_reboot(run_amiga_case):
+def test_unload_reload_without_reboot(run_amiga_case, amiga_environment):
     results = run_amiga_case("diskdevice-unload-reload")
 
     # Initial mount and I/O - DN0:
@@ -20,6 +20,20 @@ def test_unload_reload_without_reboot(run_amiga_case):
     assert "FUMOUNT DN0 RC=0" in results["fumount-dn0.result"]
     assert "Ejected DN1:" in results["fumount-dn1.result"]
     assert "FUMOUNT DN1 RC=0" in results["fumount-dn1.result"]
+
+    if amiga_environment["AMIGA_ENV_ID"] == "wb31":
+        # WB3.1 limitation: FFS 40.1 handlers can't exit, so FUMOUNT parks
+        # them with fujinet-disk.device still open. Unloading must be refused
+        # (reboot to unload), and the parked handler must still serve the
+        # next FMOUNT of the same unit.
+        assert "Still resident: fujinet-disk.device" in results["unload-disk.result"]
+        assert "UNLOAD DISK RC=20" in results["unload-disk.result"]
+        assert "FMOUNT RC=0" in results["post-fmount.result"]
+        assert "DIR RC=0" in results["post-dir.result"]
+        assert "KNOWN.TXT" in results["post-dir.result"].upper()
+        assert "TYPE RC=0" in results["post-type.result"]
+        assert "FUJINET ADF READ PASSED" in results["post-type.result"]
+        return
 
     # Unload disk device
     assert "Unloaded: fujinet-disk.device" in results["unload-disk.result"]

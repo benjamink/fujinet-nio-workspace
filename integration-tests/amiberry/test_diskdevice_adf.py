@@ -26,7 +26,11 @@ def test_standard_adf_mount_info_read_dir_and_type(run_amiga_case, amiga_environ
     assert "UPDATED drive=2 slot=3" in results["disk-update.result"]
     assert "Ejected DN2:" in results["disk-fumount-rw.result"]
     assert "FUMOUNT RW RC=0" in results["disk-fumount-rw.result"]
-    assert "MOUNTED drive=2 slot=3 readonly=0" in results["disk-remount-rw.result"]
+    if amiga_environment["AMIGA_ENV_ID"] == "wb31":
+        # Remounted through FMOUNT, reusing DN2's parked handler.
+        assert "Mounted slot 13 on DN2:" in results["disk-remount-rw.result"]
+    else:
+        assert "MOUNTED drive=2 slot=3 readonly=0" in results["disk-remount-rw.result"]
     assert "DOS REMOUNT RW RC=0" in results["disk-dos-remount-rw.result"]
     assert "FUJINET WRITE PERSISTED" in results["disk-persist.result"]
     assert "STATUS drive=0 change=1 absent=0 protected=1" in results["disk-status-0.result"]
@@ -41,8 +45,9 @@ def test_standard_adf_mount_info_read_dir_and_type(run_amiga_case, amiga_environ
     assert "STATUS drive=3 change=2 absent=1 protected=1" in results["disk-status-3.result"]
 
 
-def test_dynamic_dd_dos_node(run_amiga_case):
+def test_dynamic_dd_dos_node(run_amiga_case, amiga_environment):
     results = run_amiga_case("diskdevice-dynamic-dd")
+    wb31 = amiga_environment["AMIGA_ENV_ID"] == "wb31"
     assert "ADD name=DY0 unit=0 handler=fujinet-disk.device" in results["dynamic-node.result"]
     assert "BEFORE_ADD DEVICE dn_Name=" in results["dynamic-node.result"]
     assert "dn_Name_decoded=DY0" in results["dynamic-node.result"]
@@ -61,6 +66,12 @@ def test_dynamic_dd_dos_node(run_amiga_case):
     assert "FUJINET ADF READ PASSED" in results["dynamic-type.result"]
     assert "DIE pre_present=1 pre_task=00000000" not in results["dynamic-die.result"]
     assert "DIE pre_present=1 pre_task=" in results["dynamic-die.result"]
+    if wb31:
+        # FFS 40.1 doesn't know ACTION_DIE (ERROR_ACTION_NOT_KNOWN) and keeps
+        # running; the probe ends here on WB3.1 (see tests.toml variant).
+        assert "DIE action_result=0 ioerr=209" in results["dynamic-die.result"]
+        assert "DY0 type=0 task=00000000" not in results["dynamic-post-die.result"]
+        return
     assert "DIE action_result=" in results["dynamic-die.result"]
     assert "DIE poll=0 present=1 task=00000000" in results["dynamic-die.result"]
     assert "DY0 type=0 task=00000000" in results["dynamic-post-die.result"]

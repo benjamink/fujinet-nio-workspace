@@ -1,0 +1,144 @@
+C:Assign T: RAM:
+C:FailAt 21
+C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device
+C:Echo "LOAD RC=$RC" >DH0:leak-load.result
+C:Echo "CYCLE 0" >DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C1 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C1 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C1 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 1" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C2 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C2 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C2 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 2" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C3 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C3 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C3 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 3" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C4 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C4 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C4 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 4" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C5 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C5 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C5 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 5" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C6 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C6 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C6 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 6" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C7 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C7 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C7 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 7" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C8 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C8 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C8 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 8" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C9 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C9 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C9 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 9" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C10 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C10 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C10 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 10" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C11 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C11 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C11 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 11" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FMOUNT 11 DN0: RO >>DH0:leak-ops.result
+C:Echo "C12 FMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Dir DN0: >NIL:
+C:Copy DN0:KNOWN.TXT RAM:leak.txt
+C:Echo "C12 COPY RC=$RC" >>DH0:leak-ops.result
+C:Delete RAM:leak.txt QUIET
+C:FUMOUNT DN0: >>DH0:leak-ops.result
+C:Echo "C12 FUMOUNT RC=$RC" >>DH0:leak-ops.result
+C:Echo "CYCLE 12" >>DH0:leak-cycles.result
+C:Avail FLUSH >>DH0:leak-cycles.result
+C:devopencnt >>DH0:leak-cycles.result
+C:FLS host:/amiga-e2e-complete/diskdevice-fumount-leak >NIL:
+C:Type DH0:leak-load.result
+C:Type DH0:leak-ops.result
+C:Type DH0:leak-cycles.result
+C:Echo "E2E COMPLETE"

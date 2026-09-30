@@ -31,17 +31,21 @@ def test_fumount_handler_teardown_and_busy(run_amiga_case, amiga_environment):
     assert live_status[0] == 0
     assert live_status[2] == 1
     dos_list = results["fumount-live-dos.result"]
-    # Successful FUMOUNT removes the DOS nodes so the resident can unload.
-    # Require a real listing before asserting absence.
+    # Require a real listing before asserting on DN0.
     assert "DEVICE name=DH0 type=0" in dos_list
-    assert "FIND name=DN0 flags=00000004 found=0" in dos_list
-    assert "DEVICE name=DN0 " not in dos_list
     assert "DEVICE name=DN1 " not in dos_list
-    # WB3.1's FFS 40.1 has no ACTION_DIE, so FUMOUNT falls back to Inhibit()
-    # for the busy check and eject instead of retiring the handler. The
-    # handler task never exits, so it keeps its fujinet-disk.device handle
-    # open; the media is still ejected and the DOS nodes are still removed.
-    expected_opencnt = 1 if amiga_environment["AMIGA_ENV_ID"] == "wb31" else 0
+    if amiga_environment["AMIGA_ENV_ID"] == "wb31":
+        # WB3.1's FFS 40.1 has no ACTION_DIE, so its handler can never exit.
+        # FUMOUNT parks it (inhibited, node kept, media ejected) for the next
+        # FMOUNT to reuse, rather than orphaning a task per eject.
+        assert "handler parked for reuse" in results["fumount-live-eject.result"]
+        assert "FIND name=DN0 flags=00000004 found=1" in dos_list
+        expected_opencnt = 1
+    else:
+        # Successful FUMOUNT removes the DOS nodes so the resident can unload.
+        assert "FIND name=DN0 flags=00000004 found=0" in dos_list
+        assert "DEVICE name=DN0 " not in dos_list
+        expected_opencnt = 0
     assert (
         f"DEVICE name=fujinet-disk.device found=1 opencnt={expected_opencnt}"
         in results["fumount-live-opencnt.result"]

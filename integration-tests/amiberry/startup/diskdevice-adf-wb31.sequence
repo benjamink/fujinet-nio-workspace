@@ -1,0 +1,89 @@
+C:Assign T: RAM:
+C:Echo "FUJINET WRITE PERSISTED" >DH0:persist-source.txt
+C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device
+C:Echo "LOAD RC=$RC" >DH0:disk-load.result
+C:fujinet-mount --boundary 6 >DH0:disk-exec-boundary.result
+C:fujinet-mount host:/standard.adf >DH0:disk-mount.result
+C:Echo "MOUNT TOOL RC=$RC" >DH0:disk-mount-rc.result
+C:Mount DN0: FROM DEVS:DN0
+C:Echo "DOS MOUNT RC=$RC" >DH0:disk-dos-mount.result
+C:doslistdiag >DH0:disk-dos-envec.result
+C:Run >NIL: C:fujinet-mount --read 0 DH0:disk-read-a.result
+C:Run >NIL: C:fujinet-mount --read 880 DH0:disk-read-b.result
+C:Wait 2 SECS
+C:Dir DN0: >DH0:disk-dir.result
+C:Echo "DIR RC=$RC" >DH0:disk-dir-rc.result
+C:Type DN0:KNOWN.TXT >DH0:disk-type.result
+C:fujinet-mount 12 1 RO >DH0:disk-mount-1.result
+C:Mount DN1: FROM DEVS:DN1
+C:Echo "DOS MOUNT 1 RC=$RC" >DH0:disk-dos-mount-1.result
+C:Type DN1:SECOND.TXT >DH0:disk-type-1.result
+C:fujinet-mount --status 1 >DH0:disk-status-1-early.result
+C:fujinet-mount 13 2 RW >DH0:disk-mount-rw.result
+C:Mount DN2: FROM DEVS:DN2
+C:Echo "COPY-BEGIN"
+C:Copy DH0:persist-source.txt TO DN2:PERSIST.TXT
+C:Echo "COPY-END rc=$RC"
+C:Echo "COPY RC=$RC" >DH0:disk-copy-rw.result
+C:Echo "UPDATE-BEGIN"
+C:fujinet-mount --update 2 >DH0:disk-update.result
+C:Echo "UPDATE-END rc=$RC"
+C:FUMOUNT DN2: >DH0:disk-fumount-rw.result
+C:Echo "FUMOUNT RW RC=$RC" >>DH0:disk-fumount-rw.result
+; WB3.1: FUMOUNT parked DN2's handler (no ACTION_DIE) rather than removing
+; the node, so C:Mount can't recreate it; FMOUNT reuses the parked handler.
+C:FMOUNT 13 DN2: RW >DH0:disk-remount-rw.result
+If $RC EQ 0
+C:Echo "DOS REMOUNT RW RC=0" >DH0:disk-dos-remount-rw.result
+C:Type DN2:PERSIST.TXT >DH0:disk-persist.result
+Else
+C:Echo "DOS REMOUNT RW FAILED" >DH0:disk-dos-remount-rw.result
+C:Echo "PERSIST TYPE SKIPPED" >DH0:disk-persist.result
+EndIf
+C:fujinet-mount --status 0 >DH0:disk-status-0.result
+C:fujinet-mount --status 1 >DH0:disk-status-1.result
+C:fujinet-mount --status 2 >DH0:disk-status-2.result
+C:fujinet-mount --malformed 5 >DH0:disk-malformed.result
+C:fujinet-mount --uri 7 host:/standard.adf RO >DH0:disk-mount-direct.result
+C:Echo "DIRECT MOUNT RC=$RC" >DH0:disk-mount-direct-rc.result
+C:Failat 30
+C:fujinet-mount --uri 7 host:/missing.adf RO >NIL:
+C:Echo "FAILED REPLACEMENT RC=$RC" >DH0:disk-failed-replacement.result
+C:Failat 10
+C:fujinet-mount --status 7 >DH0:disk-status-7.result
+C:fujinet-mount --uri 3 host:/second.adf RO >NIL:
+C:fujinet-mount --eject 3 >DH0:disk-eject.result
+C:fujinet-mount --status 3 >DH0:disk-status-3.result
+C:FLS host:/amiga-e2e-complete/diskdevice-adf >NIL:
+C:Echo "RESULTS-BEGIN"
+C:Type DH0:disk-load.result
+C:Type DH0:disk-mount.result
+C:Type DH0:disk-dos-mount.result
+C:Type DH0:disk-read-a.result
+C:Type DH0:disk-read-b.result
+C:Type DH0:disk-dir.result
+C:Type DH0:disk-dir-rc.result
+C:Type DH0:disk-type.result
+C:Type DH0:disk-mount-1.result
+C:Type DH0:disk-dos-mount-1.result
+C:Type DH0:disk-type-1.result
+C:Type DH0:disk-status-1-early.result
+C:Type DH0:disk-mount-rw.result
+C:Type DH0:disk-copy-rw.result
+C:Type DH0:disk-update.result
+C:Type DH0:disk-fumount-rw.result
+C:Type DH0:disk-remount-rw.result
+C:Type DH0:disk-dos-remount-rw.result
+C:Type DH0:disk-persist.result
+C:Type DH0:disk-eject.result
+C:Type DH0:disk-status-0.result
+C:Type DH0:disk-status-1.result
+C:Type DH0:disk-status-2.result
+C:Type DH0:disk-status-3.result
+C:Type DH0:disk-malformed.result
+C:Type DH0:disk-mount-direct.result
+C:Type DH0:disk-mount-direct-rc.result
+C:Type DH0:disk-failed-replacement.result
+C:Type DH0:disk-status-7.result
+C:Echo "RESULTS-END"
+C:Echo "E2E COMPLETE"

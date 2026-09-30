@@ -12,8 +12,9 @@ def _status(result):
 
 
 @pytest.mark.parametrize("installation", ["serial", "native"])
-def test_fmount_fumount_standard_adf(run_amiga_case, installation):
+def test_fmount_fumount_standard_adf(run_amiga_case, amiga_environment, installation):
     results = run_amiga_case("diskdevice-fmount", installation=installation)
+    wb31 = amiga_environment["AMIGA_ENV_ID"] == "wb31"
 
     assert "LOAD RC=0" in results["fmount-load.result"]
     assert "FMOUNT RC=0" in results["fmount-mount.result"]
@@ -34,14 +35,24 @@ def test_fmount_fumount_standard_adf(run_amiga_case, installation):
     assert back_present[2:] == (0, 1)
     assert "Mounted slot 11 on DN0:" in results["fmount-ba-mount.result"]
     assert "FUJINET ADF READ PASSED" in results["fmount-ba-type.result"]
-    assert "FMOUNT HD RC=0" in results["fmount-hd-mount.result"]
-    assert "Mounted slot 14 on DN0:" in results["fmount-hd-mount.result"]
-    assert "DIR HD RC=0" in results["fmount-hd-dir.result"]
-    assert "HD.TXT" in results["fmount-hd-dir.result"].upper()
-    assert "TYPE HD RC=0" in results["fmount-hd-type.result"]
-    assert "FUJINET HD ADF READ PASSED" in results["fmount-hd-type.result"]
-    assert "DN0 type=0 task=00000000" not in results["fmount-hd-dos.result"]
-    assert "blocksPerTrack=22" in results["fmount-hd-dos.result"]
+    if wb31:
+        # WB3.1's FFS 40.1 can neither exit nor re-read its geometry, so a
+        # DD handler can't serve HD media. FMOUNT refuses before touching the
+        # drive, and DN0 keeps serving the DD image it already had.
+        assert "FMOUNT HD RC=10" in results["fmount-hd-mount.result"]
+        assert "DN0: is fixed to DD" in results["fmount-hd-mount.result"]
+        assert "DIR HD RC=0" in results["fmount-hd-dir.result"]
+        assert "KNOWN.TXT" in results["fmount-hd-dir.result"].upper()
+        assert "blocksPerTrack=11" in results["fmount-hd-dos.result"]
+    else:
+        assert "FMOUNT HD RC=0" in results["fmount-hd-mount.result"]
+        assert "Mounted slot 14 on DN0:" in results["fmount-hd-mount.result"]
+        assert "DIR HD RC=0" in results["fmount-hd-dir.result"]
+        assert "HD.TXT" in results["fmount-hd-dir.result"].upper()
+        assert "TYPE HD RC=0" in results["fmount-hd-type.result"]
+        assert "FUJINET HD ADF READ PASSED" in results["fmount-hd-type.result"]
+        assert "DN0 type=0 task=00000000" not in results["fmount-hd-dos.result"]
+        assert "blocksPerTrack=22" in results["fmount-hd-dos.result"]
     assert "FMOUNT DD RETURN RC=0" in results["fmount-dd-return-mount.result"]
     assert "DIR DD RETURN RC=0" in results["fmount-dd-return-dir.result"]
     assert "KNOWN.TXT" in results["fmount-dd-return-dir.result"].upper()
@@ -106,8 +117,9 @@ def test_fumount_after_dn2_eject_without_remount(run_amiga_case, installation):
 
 
 @pytest.mark.parametrize("installation", ["serial"])
-def test_fumount_after_dn2_remount_without_access(run_amiga_case, installation):
-    """An inactive remounted distinct DN2 volume must not block DN0."""
+def test_fumount_after_dn2_remount_without_access(run_amiga_case, amiga_environment,
+                                                  installation):
+    """A remounted distinct DN2 volume must not block DN0."""
     results = run_amiga_case(
         "diskdevice-fumount-after-dn2-remount", installation=installation
     )
@@ -118,7 +130,13 @@ def test_fumount_after_dn2_remount_without_access(run_amiga_case, installation):
     assert "DN2 COPY RC=0" in results["dn2-remount-dn2-copy.result"]
     assert "DN2 FUMOUNT RC=0" in results["dn2-remount-dn2-fumount.result"]
     assert "DN2 REMOUNT RC=0" in results["dn2-remount-dn2-remount.result"]
-    assert "DEVICE name=DN2 type=0 task=00000000" in results["dn2-remount-dos.result"]
+    if amiga_environment["AMIGA_ENV_ID"] == "wb31":
+        # No ACTION_DIE: FUMOUNT parked DN2's handler and the remount reused
+        # it, so DN2 stays live instead of returning to an inactive node.
+        assert "DEVICE name=DN2 type=0 task=00000000" not in results["dn2-remount-dos.result"]
+        assert "DEVICE name=DN2 type=0 task=" in results["dn2-remount-dos.result"]
+    else:
+        assert "DEVICE name=DN2 type=0 task=00000000" in results["dn2-remount-dos.result"]
     assert "Ejected DN0:" in results["dn2-remount-dn0-fumount.result"]
     assert "DN0 FUMOUNT RC=0" in results["dn2-remount-dn0-fumount.result"]
 

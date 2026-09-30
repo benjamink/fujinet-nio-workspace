@@ -115,6 +115,24 @@ results = [
   "dynamic-dd-post-restart.result",
 ]
 
+[test.environment_variants.wb31]
+# WB3.1's FFS 40.1 has no ACTION_DIE, so the probe ends once it proves the
+# refusal; the geometry-restart steps need a handler that can exit.
+startup = "startup/diskdevice-dynamic-dd-wb31.sequence"
+results = [
+  "dynamic-load.result",
+  "dynamic-static-mount.result",
+  "dynamic-node.result",
+  "dynamic-prestart.result",
+  "dynamic-dir.result",
+  "dynamic-dir-rc.result",
+  "dynamic-post-dir.result",
+  "dynamic-type.result",
+  "dynamic-type-rc.result",
+  "dynamic-die.result",
+  "dynamic-post-die.result",
+]
+
 [[test]]
 name = "diskdevice-adf"
 project = "apps"
@@ -162,6 +180,9 @@ results = [
   "disk-eject.result",
   "disk-status-3.result",
 ]
+
+[test.environment_variants.wb31]
+startup = "startup/diskdevice-adf-wb31.sequence"
 
 [[test]]
 name = "diskdevice-wb13-ofs"
@@ -1529,3 +1550,25 @@ results = ["parity-clock.result", "parity-list.result", "parity-read.result", "p
 startup = "startup/nio-tool-parity-wb13.sequence"
 startup_target = "S/StartupII"
 amiga_artifact_profile = "wb13"
+
+[[test]]
+name = "diskdevice-fumount-leak"
+project = "apps"
+app = "wifitest"
+driver = true
+# Repeated FMOUNT/use/FUMOUNT cycles on one unit, recording free memory and
+# the fujinet-disk.device open count after each, to measure what a handler
+# that cannot be retired (WB3.1 FFS has no ACTION_DIE) costs per cycle.
+timeout = 240
+activity_timeout = 200
+screenshot_quiet = 15
+screenshot_interval = 1.0
+no_activity_timeout = 60
+startup = "startup/diskdevice-fumount-leak.sequence"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-fumount-leak"
+results = [
+  "leak-load.result",
+  "leak-ops.result",
+  "leak-cycles.result",
+]
