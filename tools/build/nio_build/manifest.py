@@ -83,7 +83,7 @@ def write_manifest(ctx: BuildContext) -> None:
         ("nio-config", ctx.path("NIO_CONFIG")),
         ("fujinet-qemu-msdos", ctx.path("FUJINET_QEMU_MSDOS")),
         ("fujinet-nio-driver", ctx.path("FUJINET_NIO_DRIVER")),
-        ("fn-rom", ctx.path("FN_ROM")),
+        ("fn-rom", ctx.path("FN_ROM_HOME")),
         ("cc65-clib", ctx.path("CC65_CLIB")),
         ("bounce-world-client-nio", ctx.path("BOUNCE_WORLD_CLIENT_NIO")),
         ("fujinet-emulator-bridge", ctx.path("FUJINET_EMULATOR_BRIDGE")),

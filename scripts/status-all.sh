@@ -21,7 +21,7 @@ for repo in \
   "$NIO_CORE_APPS" \
   "$NIO_CONFIG" \
   "$FUJINET_QEMU_MSDOS" \
-  "$FN_ROM" \
+  "$FN_ROM_HOME" \
   "$BOUNCE_WORLD" \
   "$FUJINET_EMULATOR_BRIDGE" \
   "$CC65_HOME" \

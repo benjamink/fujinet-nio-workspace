@@ -76,7 +76,7 @@ FUJINET_NIO_DRIVER=repos/fujinet-nio-driver
 NIO_CORE_APPS=repos/nio-core-apps
 NIO_CONFIG=repos/nio-config
 NIO_APPS=repos/nio-apps
-FN_ROM=repos/fn-rom
+FN_ROM_HOME=repos/fn-rom
 FUJINET_QEMU_MSDOS=repos/fujinet-qemu-msdos
 BOUNCE_WORLD_CLIENT_NIO=repos/bounce-world-client-nio
 ```

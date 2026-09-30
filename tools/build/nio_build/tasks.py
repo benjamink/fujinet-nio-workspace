@@ -774,10 +774,10 @@ class Build:
         self.runner.run(
             f"{label}-fn-boot",
             ["./scripts/build_fn_boot.sh"],
-            cwd=self.p("FN_ROM"),
-            extra_env={"BUILD_MACHINE": machine, "FN_BOOT_SSD": str(self.p("FN_ROM") / "build" / ssd_name), "FN_BOOT_EXTRA_STAGE": str(extra_stage)},
+            cwd=self.p("FN_ROM_HOME"),
+            extra_env={"BUILD_MACHINE": machine, "FN_BOOT_SSD": str(self.p("FN_ROM_HOME") / "build" / ssd_name), "FN_BOOT_EXTRA_STAGE": str(extra_stage)},
         )
-        src = self.p("FN_ROM") / "build" / ssd_name
+        src = self.p("FN_ROM_HOME") / "build" / ssd_name
         for out_dir in [self.p("FUJINET_NIO") / "distfiles" / "boot" / "bbc", self.p("FUJINET_NIO") / "distfiles" / "esp32-data" / "boot" / "bbc"]:
             out_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, out_dir / ssd_name)

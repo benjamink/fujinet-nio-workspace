@@ -46,7 +46,9 @@ setup_nio_environment() {
   export FUJINET_QEMU_MSDOS="$NIO_WORKSPACE/repos/fujinet-qemu-msdos"
   export FUJINET_NIO_DRIVER="$NIO_WORKSPACE/repos/fujinet-nio-driver"
   export FUJINET_LIB="$NIO_WORKSPACE/repos/fujinet-lib"
-  export FN_ROM="$NIO_WORKSPACE/repos/fn-rom"
+  # fn-rom checkout. FN_ROM itself is left for the ROM image, which is what
+  # the Beebium test runners (fn-rom, fujinet-nio-lib, nio-config) read it as.
+  export FN_ROM_HOME="${FN_ROM_HOME:-$NIO_WORKSPACE/repos/fn-rom}"
   export BOUNCE_WORLD_CLIENT_NIO="$NIO_WORKSPACE/repos/bounce-world-client-nio"
   export BOUNCE_WORLD="$BOUNCE_WORLD_CLIENT_NIO"
   export CC65_HOME="$NIO_WORKSPACE/repos/cc65"
@@ -59,6 +61,11 @@ setup_nio_environment() {
   if [ -f "$NIO_WORKSPACE/local/config.env" ]; then
     # shellcheck source=/dev/null
     source "$NIO_WORKSPACE/local/config.env"
+  fi
+  # Older local/config.env files set FN_ROM to the fn-rom checkout.
+  if [[ -d ${FN_ROM:-} ]]; then
+    export FN_ROM_HOME="$FN_ROM"
+    unset FN_ROM
   fi
 
   # amiga-gcc is commonly installed by the official cross-toolchain bundle.
