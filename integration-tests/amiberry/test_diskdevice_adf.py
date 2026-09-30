@@ -1,12 +1,18 @@
 import pytest
 @pytest.mark.parametrize("installation", ["serial", "native"])
-def test_standard_adf_mount_info_read_dir_and_type(run_amiga_case, installation):
+def test_standard_adf_mount_info_read_dir_and_type(run_amiga_case, amiga_environment, installation):
     results = run_amiga_case("diskdevice-adf", installation=installation)
+    # DN0 comes from C:Mount here.  WB3.1's Mount builds a DE_CONTROL-sized
+    # (18) envec with no de_BootBlocks; WB3.2's includes it.
+    if amiga_environment["AMIGA_ENV_ID"] == "wb31":
+        table, boot_blocks = 18, "absent"
+    else:
+        table, boot_blocks = 19, "0"
 
     assert "MOUNTED drive=0 slot=1 readonly=1 sectorSize=512 sectorCount=1760" in results["disk-mount.result"]
     assert "EXEC BOUNDARY PASS commands=5 notifications=4 remove=1 queue=1 multi=2 cause=3" in results["disk-exec-boundary.result"]
     assert "KNOWN.TXT" in results["disk-dir.result"].upper()
-    assert "ENV name=DN0 table=19 sizeBlock=128 secOrg=0 surfaces=2 sectorPerBlock=1 blocksPerTrack=11 reserved=2 preAlloc=0 interleave=0 lowCyl=0 highCyl=79 buffers=5 bufMemType=1 maxTransfer=7fffffff mask=fffffffe bootPri=0 dosType=444f5300 baud=1200 control=0 bootBlocks=0 stack=32768 priority=5 globVec=00000000" in results["disk-dos-envec.result"]
+    assert f"ENV name=DN0 table={table} sizeBlock=128 secOrg=0 surfaces=2 sectorPerBlock=1 blocksPerTrack=11 reserved=2 preAlloc=0 interleave=0 lowCyl=0 highCyl=79 buffers=5 bufMemType=1 maxTransfer=7fffffff mask=fffffffe bootPri=0 dosType=444f5300 baud=1200 control=0 bootBlocks={boot_blocks} stack=32768 priority=5 globVec=00000000" in results["disk-dos-envec.result"]
     assert "FUJINET ADF READ PASSED" in results["disk-type.result"]
     assert "READ OK lba=0 actual=512" in results["disk-read-a.result"]
     assert "READ OK lba=880 actual=512" in results["disk-read-b.result"]

@@ -38,10 +38,11 @@ scripts/amiga-tests --amiga-env wb31 --amiga-machine a500-030 -x -v
 `--amiga-env` is required. Without it every test skips with a message
 directing you to build the environment first.
 
-Cases with no `environments` field are WB3.2 cases.  Add an explicit
+Cases with no `environments` field run under both WB3.2 and WB3.1.  Any case
+listing `wb32` must also list `wb31`.  Add an explicit
 `environments = ["wb13"]` only with a WB1.3-specific, validated startup
 sequence; Shell redirection and the static MountList lifecycle differ from
-the WB3.2 defaults.
+the WB3.x defaults.
 
 ## Workbench variants
 

@@ -31,10 +31,11 @@ SUITE = ROOT / "integration-tests" / "amiberry"
 sys.path.insert(0, str(ROOT / "tools" / "build"))
 from nio_build.amiga_config import filesystem2_setting, resolve_fast_file_system
 DEFAULT_EVIDENCE_DIR = ROOT / "test-evidence"
-# Legacy startup sequences target the WB3.2 Shell and dynamic DOS-node
-# lifecycle.  A case must opt into another environment explicitly after its
-# commands, artefacts, and MountList lifecycle have been validated there.
-DEFAULT_CASE_ENVIRONMENTS = ["wb32"]
+# Legacy startup sequences target the WB3.x Shell and dynamic DOS-node
+# lifecycle, so every such case runs under both WB3.2 and WB3.1.  WB1.3 must be
+# opted into explicitly after its commands, artefacts, and MountList lifecycle
+# have been validated there.
+DEFAULT_CASE_ENVIRONMENTS = ["wb32", "wb31"]
 
 # Add tools/ to path so we can call amiga_emulator.ipc directly.
 _TOOLS = ROOT / "tools"
@@ -55,6 +56,11 @@ def resolve_case_for_environment(case_name: str, registered_case: dict[str, Any]
         raise AssertionError(
             f"Amiberry case '{case_name}' has invalid environments: "
             f"{supported_environments!r}"
+        )
+    if "wb32" in supported_environments and "wb31" not in supported_environments:
+        raise AssertionError(
+            f"Amiberry case '{case_name}' lists wb32 without wb31; WB3.x "
+            "cases must run under both releases"
         )
     if active_environment not in supported_environments:
         pytest.skip(
@@ -1011,6 +1017,21 @@ def run_amiga_case(amiga_environment: dict[str, str],
                 app_dir /= artifact_profile
             app_dir /= "bin"
             app = app_dir / case["app"]
+            if case.get("nio_native_test"):
+                # scripts/amiga-artifacts builds only release devices; without
+                # this the case would use whatever native-test device a broker
+                # case last left in this profile, or fail if none has run yet.
+                build_dir_rel = "../build/amiga"
+                if artifact_profile:
+                    build_dir_rel += f"/{artifact_profile}"
+                subprocess.run(
+                    ["make", f"BUILD_DIR={build_dir_rel}",
+                     f"AMIGA_WB13={1 if artifact_profile == 'wb13' else 0}",
+                     f"{build_dir_rel}/fujinet-nio-native-test.device"],
+                    cwd=driver_root / "amiga",
+                    env=amiga_environment,
+                    check=True,
+                )
         if not app.is_file():
             raise AssertionError(f"Amiga test application was not built: {app}")
 
