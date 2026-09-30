@@ -3,8 +3,11 @@
 # avoid zd/zoxide/z interfering with cd functionality via aliases in shell
 CD=cd
 
+# Append an optional tool directory to PATH. A missing directory is not an
+# error: scripts source this file under `set -e`, where a non-zero return
+# would silently abort them on machines without that toolchain (e.g. CI).
 pathadd_end() {
-  [ -d "$1" ] || return 1
+  [ -d "$1" ] || return 0
   [[ ":$PATH:" == *":$1:"* ]] || export PATH="$PATH:$1"
 }
 
@@ -101,11 +104,18 @@ setup_nio_environment() {
   export NIO_CONFIG_ATARI_BIN="${NIO_CONFIG_ATARI_BIN:-$NIO_CONFIG/build/atari/bin}"
   export PDCURSES_MSDOS_LIB="${PDCURSES_MSDOS_LIB:-$NIO_BUILD_DIR/pdcurses/msdos-small/pdcurses.lib}"
 
-  export WATCOM=/opt/watcom
+  # Keep an Open Watcom install the caller already set up (e.g. the CI
+  # setup-watcom action); otherwise use the default location.
+  if [[ -z ${WATCOM:-} ]]; then
+    export WATCOM=/opt/watcom
+    export EDPATH=$WATCOM/eddat
+    export INCLUDE=$WATCOM/h
+  else
+    export EDPATH="${EDPATH:-$WATCOM/eddat}"
+    export INCLUDE="${INCLUDE:-$WATCOM/h}"
+  fi
   pathadd_end "$WATCOM/binl64"
   pathadd_end "$WATCOM/binl"
-  export EDPATH=$WATCOM/eddat
-  export INCLUDE=$WATCOM/h
 
   mkdir -p "$NIO_LOG_DIR" "$NIO_IMAGE_DIR" || return 1
 }
