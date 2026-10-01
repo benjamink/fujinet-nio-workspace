@@ -1,0 +1,17 @@
+# Default FujiNet disk for Workbench 3.1.  It is deliberately FFS/DD.
+label: FNDEFAULT
+output: build/FujiNet-Default-WB31.adf
+
+files:
+  - build/amiga-artifacts/wb31/NIO/config-nio
+  - build/amiga-artifacts/wb31/NIO/config-nio.info
+  - build/amiga-artifacts/wb31/NIO/fapp
+  - build/amiga-artifacts/wb31/NIO/fboot
+  - build/amiga-artifacts/wb31/NIO/fdrive
+  - build/amiga-artifacts/wb31/NIO/fhost
+  - build/amiga-artifacts/wb31/NIO/fin
+  - build/amiga-artifacts/wb31/NIO/fls
+  - build/amiga-artifacts/wb31/NIO/fmount
+  - build/amiga-artifacts/wb31/NIO/fmountrestore
+  - build/amiga-artifacts/wb31/NIO/fout
+  - build/amiga-artifacts/wb31/NIO/fumount

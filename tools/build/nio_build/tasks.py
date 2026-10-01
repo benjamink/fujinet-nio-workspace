@@ -718,10 +718,51 @@ class Build:
         self.lib_atari()
         self.run_make("boot-disk-atari", "NIO_CORE_APPS", "TARGET=atari", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}", f"FUJINET_NIO={self.p('FUJINET_NIO')}", "install-boot-disk")
 
+    def amiga_default_disk(self, profile: str) -> None:
+        """Build and install the profile-specific FujiNet default ADF.
+
+        This is a data/configuration disk that FujiNet exposes on unit zero
+        when no recovered user mount occupies it; it is not an Amiga system
+        boot disk.
+        """
+        names = {
+            "wb13": "FujiNet-Default-WB13.adf",
+            "wb31": "FujiNet-Default-WB31.adf",
+            "wb32": "FujiNet-Default-WB32.adf",
+        }
+        if profile not in names:
+            raise SystemExit(f"Unknown Amiga default-disk profile: {profile}")
+        manifest = self.ctx.root / "configs" / "amiga" / f"default-disk-adf-{profile}.yaml"
+        output = self.ctx.build_dir / names[profile]
+
+        self.runner.run("amiga-artifacts-" + profile,
+                        [self.ctx.root / "scripts" / "amiga-artifacts", profile])
+        self.runner.run("amiga-default-adf-" + profile,
+                        [self.ctx.root / "scripts" / "amiga", "adf", "release",
+                         "--manifest", manifest])
+        for base in (self.p("FUJINET_NIO") / "distfiles" / "boot",
+                     self.p("FUJINET_NIO") / "distfiles" / "esp32-data" / "boot"):
+            target = base / "amiga" / profile
+            target.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(output, target / names[profile])
+            print(f"Installed {target / names[profile]}")
+
+    def amiga_default_disk_wb13(self) -> None:
+        self.amiga_default_disk("wb13")
+
+    def amiga_default_disk_wb31(self) -> None:
+        self.amiga_default_disk("wb31")
+
+    def amiga_default_disk_wb32(self) -> None:
+        self.amiga_default_disk("wb32")
+
     def boot_disks(self) -> None:
         self.boot_disk_msdos()
         self.boot_disk_atari()
         self.boot_disk_bbc()
+        self.amiga_default_disk_wb13()
+        self.amiga_default_disk_wb31()
+        self.amiga_default_disk_wb32()
 
     def confnio_stage_target(self, machine: str, boot: bool = False) -> str:
         if machine == "BBC":
@@ -1091,6 +1132,9 @@ def build_tasks(build: Build) -> dict[str, Task]:
         t("master-boot-disk", "Build/install Master FN-BOOT-M.ssd", Build.boot_disk_master),
         t("msdos-boot-disk", "Build/install MS-DOS boot disk", Build.boot_disk_msdos),
         t("atari-boot-disk", "Build/install Atari boot disk", Build.boot_disk_atari),
+        t("amiga-default-disk-wb13", "Build/install WB1.3 FujiNet default ADF", Build.amiga_default_disk_wb13),
+        t("amiga-default-disk-wb31", "Build/install WB3.1 FujiNet default ADF", Build.amiga_default_disk_wb31),
+        t("amiga-default-disk-wb32", "Build/install WB3.2 FujiNet default ADF", Build.amiga_default_disk_wb32),
         t("confnio-bbc-disk", "Build standalone BBC CONFNIO SSD", lambda b: b.confnio_disk_for_machine("BBC", "bbc")),
         t("confnio-master-disk", "Build standalone Master CONFNIO SSD", lambda b: b.confnio_disk_for_machine("MASTER", "master")),
         t("bbc-pty", "Build BBC boot disk and run fujinet-nio PTY", lambda b: b.run_bbc_pty_for_machine("bbc"), consumes_args=True),

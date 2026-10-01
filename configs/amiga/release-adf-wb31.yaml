@@ -27,3 +27,5 @@ files:
   - build/amiga-artifacts/wb31/NIO/clock
   - build/amiga-artifacts/wb31/NIO/devopencnt
   - build/amiga-artifacts/wb31/NIO/doslistdiag
+  - build/amiga-artifacts/wb31/NIO/config-nio
+  - build/amiga-artifacts/wb31/NIO/config-nio.info

@@ -508,6 +508,33 @@ results = [
 ]
 
 [[test]]
+name = "diskdevice-default-disk"
+project = "core-apps"
+app = "fboot"
+environments = ["wb32", "wb31", "wb13"]
+driver = true
+default_disk = true
+no_static_mountlists = true
+timeout = 45
+activity_timeout = 35
+no_activity_timeout = 25
+startup = "startup/diskdevice-default-disk.sequence"
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/diskdevice-default-disk"
+results = [
+  "default-load.result",
+  "default-fboot.result",
+  "default-dir.result",
+  "default-type.result",
+]
+
+[test.environment_variants.wb13]
+startup = "startup/diskdevice-default-disk-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+wb13_mountlist = true
+
+[[test]]
 name = "diskdevice-loader"
 project = "apps"
 app = "wifitest"

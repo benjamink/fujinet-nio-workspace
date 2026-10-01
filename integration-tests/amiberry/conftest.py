@@ -1069,6 +1069,12 @@ def run_amiga_case(amiga_environment: dict[str, str],
                           "SECONDHD.TXT", "FUJINET SECOND HD PASSED\n")
             create_hd_adf(amiga_environment, host_root / "hd-writable.adf",
                           "BASEHD.TXT", "FUJINET WRITABLE HD BASE\n")
+            if case.get("default_disk"):
+                boot_dir = host_root / "boot"
+                boot_dir.mkdir(exist_ok=True)
+                create_ffs_adf(amiga_environment, boot_dir / "default.adf",
+                               "DEFAULT.TXT", "FUJINET DEFAULT DISK PASSED\n",
+                               "FNDEFAULT")
             if case.get("hd_ffs_adf"):
                 create_hd_ffs_adf(amiga_environment,
                                   host_root / "hd-ffs-writable.adf")
@@ -1234,6 +1240,8 @@ def run_amiga_case(amiga_environment: dict[str, str],
         case_index = list(amiga_cases).index(name)
         test_env["FUJINET_NIO_PORT"] = str(64000 + case_index)
         test_env["AMIBERRY_PORT"] = str(23470 + case_index)
+        if case.get("default_disk"):
+            test_env["AMIBERRY_NIO_BOOT_URI"] = "persist:/boot/default.adf"
         test_env.update(machine_environment(amiga_machine))
 
         # Timing parameters — screen-quiet is for screenshot/evidence cadence only.

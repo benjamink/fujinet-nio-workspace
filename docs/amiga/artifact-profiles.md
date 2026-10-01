@@ -23,6 +23,12 @@ profiles mount that staged directory as the read-only `NIO:` volume and invoke
 the matching build before launch. Consequently a WB1.3 session cannot receive
 a WB3.x executable merely because it was built later.
 
+The profile is also a source compatibility selection, not only a destination:
+the WB1.3 application builds define `__KICK13__` and use `nix13`; WB3.1 and
+WB3.2 builds omit that define and use `clib2`.  Code which genuinely needs a
+later DOS/Exec API must compile an explicit WB1.3 alternative (or exclude that
+utility from `wb13`), rather than relying on a WB3.x binary to work on 1.3.
+
 Create an ADF only by naming its target profile:
 
 ```sh
@@ -35,6 +41,10 @@ Outputs are `build/NIORelease-WB13.adf`, `build/NIORelease-WB31.adf`, and
 `build/NIORelease-WB32.adf`. Add a new Workbench generation by adding a new
 profile to `scripts/amiga-artifacts`, `configs/amiga/workbenches.yaml`, and a
 matching `release-adf-<profile>.yaml`; do not introduce an unversioned output.
+
+The staged profile also contains the matching `config-nio` executable and its
+Workbench icon.  Profile-specific FujiNet default disks are documented in
+[`default-disk.md`](default-disk.md).
 
 `wb13` deliberately excludes utilities that require later DOS APIs. Its
 package includes `Install-FujiNet-WB13`, whose installation steps are covered

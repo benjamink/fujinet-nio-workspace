@@ -1,0 +1,17 @@
+# Default FujiNet disk for Workbench 1.3.  This is an FFS/DD ADF so it is
+# always compatible with the static DN0: endpoint supplied by the installer.
+label: FNDEFAULT
+output: build/FujiNet-Default-WB13.adf
+
+files:
+  - build/amiga-artifacts/wb13/NIO/config-nio
+  - build/amiga-artifacts/wb13/NIO/config-nio.info
+  - build/amiga-artifacts/wb13/NIO/fapp
+  - build/amiga-artifacts/wb13/NIO/fboot
+  - build/amiga-artifacts/wb13/NIO/fdrive
+  - build/amiga-artifacts/wb13/NIO/fhost
+  - build/amiga-artifacts/wb13/NIO/fin
+  - build/amiga-artifacts/wb13/NIO/fls
+  - build/amiga-artifacts/wb13/NIO/fmount
+  - build/amiga-artifacts/wb13/NIO/fumount
+  - build/amiga-artifacts/wb13/NIO/fout

@@ -1,0 +1,16 @@
+C:Assign T: RAM:
+C:FailAt 21
+C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device >DH0:default-load.result
+C:Echo "LOAD RC=$RC" >>DH0:default-load.result
+C:FBOOT >DH0:default-fboot.result
+C:Echo "FBOOT RC=$RC" >>DH0:default-fboot.result
+C:Dir DN0: >DH0:default-dir.result
+C:Echo "DIR RC=$RC" >>DH0:default-dir.result
+C:Type DN0:DEFAULT.TXT >DH0:default-type.result
+C:Echo "TYPE RC=$RC" >>DH0:default-type.result
+C:FLS host:/amiga-e2e-complete/diskdevice-default-disk >NIL:
+C:Type DH0:default-load.result
+C:Type DH0:default-fboot.result
+C:Type DH0:default-dir.result
+C:Type DH0:default-type.result
+C:Echo "E2E COMPLETE"

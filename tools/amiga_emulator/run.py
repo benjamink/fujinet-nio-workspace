@@ -207,12 +207,13 @@ class AmigaRunner:
     def write_nio_config(self) -> None:
         self.config_dir.mkdir(parents=True, exist_ok=True)
         config = self.config_dir / "fujinet.yaml"
+        boot_uri = os.environ.get("AMIBERRY_NIO_BOOT_URI", "persist:/boot/autorun.img")
         config.write_text(
             "fujinet:\n"
             "  device_name: \"amiga-test\"\n"
             "boot:\n"
             "  mode: config\n"
-            "  config_uri: \"persist:/boot/autorun.img\"\n"
+            f"  config_uri: \"{boot_uri}\"\n"
             "  readonly: true\n"
             "wifi:\n"
             "  enabled: false\n"

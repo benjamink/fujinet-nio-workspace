@@ -22,6 +22,7 @@ DRIVER_BUILD="$ROOT/repos/fujinet-nio-driver/build/amiga/$PROFILE"
 DRIVER_BUILD_REL="../build/amiga/$PROFILE"
 CORE_BUILD="$ROOT/repos/nio-core-apps/build/amiga/$PROFILE"
 APPS_BUILD="$ROOT/repos/nio-apps/build/amiga/$PROFILE"
+CONFIG_BUILD="$ROOT/repos/nio-config/build/amiga/$PROFILE"
 STAGE="$ROOT/build/amiga-artifacts/$PROFILE/NIO"
 
 make -C "$ROOT/repos/fujinet-nio-driver/amiga" \
@@ -43,11 +44,14 @@ if [[ "$PROFILE" != wb13 ]]; then
     "$DRIVER_BUILD_REL/fujinet-nio-baud" \
     "$DRIVER_BUILD_REL/fujinet-nio-serial"
 fi
+
+make -C "$ROOT/repos/nio-config" amiga "AMIGA_PROFILE=$PROFILE" "AMIGA_WB13=$WB13"
 if [[ "$PROFILE" == wb13 ]]; then
   # These commands use only the WB1.3-compatible command/device contract.
   # FMOUNTRESTORE remains a WB2+ utility because it uses SystemTags().
   make -C "$ROOT/repos/nio-core-apps" -f makefiles/build.mk TARGET=amiga \
     "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+    "AMIGA_WB13=$WB13" \
     "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD" \
     build/amiga/$PROFILE/bin/fapp build/amiga/$PROFILE/bin/fboot \
     build/amiga/$PROFILE/bin/fdrive build/amiga/$PROFILE/bin/fhost \
@@ -57,6 +61,7 @@ if [[ "$PROFILE" == wb13 ]]; then
 else
   make -C "$ROOT/repos/nio-core-apps" TARGET=amiga \
     "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+    "AMIGA_WB13=$WB13" \
     "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
 fi
 
@@ -66,6 +71,7 @@ if [[ "$PROFILE" == wb13 ]]; then
   # once they have an equivalent KS1.3 implementation.
   make -C "$ROOT/repos/nio-apps" -f makefiles/build.mk TARGET=amiga \
     "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+    "AMIGA_WB13=$WB13" \
     "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD" \
     build/amiga/$PROFILE/bin/checksumbench \
     build/amiga/$PROFILE/bin/wificonfigtest \
@@ -73,6 +79,7 @@ if [[ "$PROFILE" == wb13 ]]; then
 else
   make -C "$ROOT/repos/nio-apps" TARGET=amiga \
     "TARGET_BUILD_DIR=build/amiga/$PROFILE" "AMIGA_CRT=$CRT" \
+    "AMIGA_WB13=$WB13" \
     "FUJINET_NIO_DRIVER_BUILD=$DRIVER_BUILD"
 fi
 
@@ -95,6 +102,10 @@ for bin_dir in "$CORE_BUILD/bin" "$APPS_BUILD/bin"; do
     install -m 0644 "$artifact" "$STAGE/$(basename "$artifact")"
   done
 done
+
+install -m 0644 "$CONFIG_BUILD/bin/config-nio" "$STAGE/config-nio"
+install -m 0644 "$ROOT/repos/nio-config/amiga/icons/config-nio.info" \
+  "$STAGE/config-nio.info"
 
 if [[ "$PROFILE" == wb13 ]]; then
   install -m 0644 "$ROOT/configs/amiga/install/Install-FujiNet-WB13" \
