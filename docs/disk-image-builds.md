@@ -18,6 +18,12 @@ repositories are workspace artifacts.
 | `./scripts/build.sh qemu-msdos-image` | Build the bootable QEMU MS-DOS qcow2 image |
 | `./scripts/build.sh bounce-world-disk` | Build the standalone Bounce World MS-DOS image |
 
+`boot-disks` installs every platform's images into `distfiles/esp32-data/boot`,
+more than an ESP32 storage partition holds. Choose the ones a board needs with
+`boot_images` in the `[fujinet]` section of `repos/fujinet-nio/platformio.local.ini`
+(for example `boot_images = amiga/wb32`); see
+`repos/fujinet-nio/distfiles/esp32-data/boot/README.md`.
+
 Use `./scripts/build.sh --explain TARGET` for the authoritative dependency and
 output description. Exact output paths are also written to
 `build/manifest.txt`.
