@@ -1046,12 +1046,9 @@ def run_amiga_case(amiga_environment: dict[str, str],
         if completion_mode == "nio_marker":
             (host_root / "amiga-e2e-complete" / name).mkdir(parents=True, exist_ok=True)
         if case.get("driver") and not case.get("nio_broker"):
-            subprocess.run(
-                ["make", "amiga"],
-                cwd=driver_root,
-                env=amiga_environment,
-                check=True,
-            )
+            # scripts/amiga-artifacts above has already built this case's
+            # profile.  Rebuilding the driver's historical generic output
+            # here would make the test depend on a last-built artefact.
             create_standard_adf(amiga_environment, host_root / "standard.adf")
             create_standard_adf(amiga_environment, host_root / "second.adf",
                                 "SECOND.TXT", "FUJINET SECOND DRIVE PASSED\n")
