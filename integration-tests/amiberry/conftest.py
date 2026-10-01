@@ -692,12 +692,8 @@ def amiga_environment(pytestconfig: Any) -> dict[str, str]:
     if missing:
         pytest.skip("Amiga E2E prerequisites unavailable: " + ", ".join(missing))
 
-    subprocess.run(
-        [str(ROOT / "scripts/build.sh"), "lib-amiga", "apps-amiga", "core-apps-amiga"],
-        cwd=ROOT,
-        env=environment,
-        check=True,
-    )
+    # Each case builds its declared artifact profile below.  Do not populate
+    # the legacy build/amiga/bin tree as a session-level side effect.
     build_nio_binary(environment)
     return environment
 
@@ -1151,12 +1147,16 @@ def run_amiga_case(amiga_environment: dict[str, str],
         if case.get("startup_target"):
             build_cmd.extend(["--startup-target", case["startup_target"]])
         if not case.get("nio_broker"):
+            if not artifact_profile:
+                raise AssertionError(
+                    f"Amiberry case '{name}' needs an amiga_artifact_profile for guest tools"
+                )
             core_app_dir = ROOT / "repos/nio-core-apps/build/amiga"
-            if artifact_profile:
-                core_app_dir /= artifact_profile
+            core_app_dir /= artifact_profile
             core_app_dir /= "bin"
             build_cmd.extend([
-                "--extra-app-dir", ROOT / "repos/nio-apps/build/amiga/bin",
+                "--extra-app-dir", ROOT / "repos/nio-apps/build/amiga" /
+                artifact_profile / "bin",
                 "--extra-app-dir", core_app_dir,
             ])
         if case.get("nio_broker"):

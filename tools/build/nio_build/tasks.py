@@ -288,19 +288,25 @@ class Build:
         self.run_make("apps-atari", "NIO_APPS", "TARGET=atari", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}")
 
     def apps_amiga(self) -> None:
-        self.lib_amiga()
-        self.amiga_driver_sdk()
-        self.run_make("apps-amiga", "NIO_APPS", "TARGET=amiga", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}")
+        raise SystemExit(
+            "Unprofiled Amiga application builds are disabled. "
+            "Run: scripts/build.sh amiga-artifacts-wb13|amiga-artifacts-wb31|amiga-artifacts-wb32"
+        )
 
     def amiga_test_app(self) -> tuple[str, Path]:
         app_name = self.ctx.env.get("AMIGA_TEST_APP", "wifitest")
         project = self.ctx.env.get("AMIGA_TEST_PROJECT", "apps").lower()
+        profile = self.ctx.env.get("AMIGA_ARTIFACT_PROFILE", "")
+        if profile not in {"wb13", "wb31", "wb32"}:
+            raise SystemExit(
+                "AMIGA_ARTIFACT_PROFILE must be wb13, wb31, or wb32; "
+                "unprofiled Amiga test applications are disabled"
+            )
+        self.amiga_artifacts(profile)
         if project == "core":
-            self.core_apps_amiga()
-            app = self.p("NIO_CORE_APPS") / "build" / "amiga" / "bin" / app_name
+            app = self.p("NIO_CORE_APPS") / "build" / "amiga" / profile / "bin" / app_name
         elif project == "apps":
-            self.apps_amiga()
-            app = self.p("NIO_APPS") / "build" / "amiga" / "bin" / app_name
+            app = self.p("NIO_APPS") / "build" / "amiga" / profile / "bin" / app_name
         else:
             raise SystemExit("AMIGA_TEST_PROJECT must be 'apps' or 'core'")
         if not app.is_file():
@@ -653,16 +659,13 @@ class Build:
     def amiga_tests(self, args: list[str]) -> None:
         """Build all Amiga artefacts then run the integration-test suite.
 
-        Builds lib-amiga, apps-amiga, core-apps-amiga, and the POSIX NIO
-        binary so the suite always runs against the latest of everything.
+        Each case builds its explicit Workbench artifact profile, plus the
+        POSIX NIO binary.  The suite never consumes an unprofiled Amiga app.
         Additional arguments (including --amiga-env / --amiga-machine) are
         forwarded verbatim to scripts/amiga-tests → pytest.
         """
         if args[:1] == ["--"]:
             args = args[1:]
-        self.lib_amiga()
-        self.apps_amiga()
-        self.core_apps_amiga()
         self.fujinet_tcp_debug()
         self.runner.run(
             "amiga-e2e-tests",
@@ -686,9 +689,10 @@ class Build:
         self.run_make("core-apps-atari", "NIO_CORE_APPS", "TARGET=atari", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}")
 
     def core_apps_amiga(self) -> None:
-        self.lib_amiga()
-        self.amiga_driver_sdk()
-        self.run_make("core-apps-amiga", "NIO_CORE_APPS", "TARGET=amiga", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}")
+        raise SystemExit(
+            "Unprofiled Amiga core-app builds are disabled. "
+            "Run: scripts/build.sh amiga-artifacts-wb13|amiga-artifacts-wb31|amiga-artifacts-wb32"
+        )
 
     def core_apps_all(self) -> None:
         self.pdcurses_msdos()
@@ -718,6 +722,21 @@ class Build:
         self.lib_atari()
         self.run_make("boot-disk-atari", "NIO_CORE_APPS", "TARGET=atari", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}", f"FUJINET_NIO={self.p('FUJINET_NIO')}", "install-boot-disk")
 
+    def amiga_artifacts(self, profile: str) -> None:
+        if profile not in {"wb13", "wb31", "wb32"}:
+            raise SystemExit(f"Unknown Amiga artifact profile: {profile}")
+        self.runner.run("amiga-artifacts-" + profile,
+                        [self.ctx.root / "scripts" / "amiga-artifacts", profile])
+
+    def amiga_artifacts_wb13(self) -> None:
+        self.amiga_artifacts("wb13")
+
+    def amiga_artifacts_wb31(self) -> None:
+        self.amiga_artifacts("wb31")
+
+    def amiga_artifacts_wb32(self) -> None:
+        self.amiga_artifacts("wb32")
+
     def amiga_default_disk(self, profile: str) -> None:
         """Build and install the profile-specific FujiNet default ADF.
 
@@ -735,8 +754,7 @@ class Build:
         manifest = self.ctx.root / "configs" / "amiga" / f"default-disk-adf-{profile}.yaml"
         output = self.ctx.build_dir / names[profile]
 
-        self.runner.run("amiga-artifacts-" + profile,
-                        [self.ctx.root / "scripts" / "amiga-artifacts", profile])
+        self.amiga_artifacts(profile)
         self.runner.run("amiga-default-adf-" + profile,
                         [self.ctx.root / "scripts" / "amiga", "adf", "release",
                          "--manifest", manifest])
@@ -1114,14 +1132,14 @@ def build_tasks(build: Build) -> dict[str, Task]:
         t("apps-clean", "Clean nio-apps, nio-core-apps, and nio-config builds", Build.clean_apps_all),
         t("apps-msdos", "Build nio-apps MS-DOS test apps", Build.apps_msdos),
         t("apps-atari", "Build nio-apps Atari test apps", Build.apps_atari),
-        t("apps-amiga", "Build nio-apps Amiga test apps", Build.apps_amiga),
+        t("apps-amiga", "Deprecated: unprofiled Amiga apps are disabled", Build.apps_amiga),
         t("amiga-test-adf", "Build an AmigaOS test ADF containing the selected nio-apps test app", lambda b: b.amiga_test_adf([]), consumes_args=True, help_text=Build.amiga_test_adf_help),
         t("amiga-test-disk", "Build an AmigaOS HDF containing the selected nio-apps test app", Build.amiga_test_disk),
         t("apps-bbc", "Build nio-apps BBC test apps", Build.apps_bbc),
         t("core-apps-all", "Build all nio-core-apps targets", Build.core_apps_all),
         t("core-apps-msdos", "Build nio-core-apps MS-DOS utilities", Build.core_apps_msdos),
         t("core-apps-atari", "Build nio-core-apps Atari utilities", Build.core_apps_atari),
-        t("core-apps-amiga", "Build nio-core-apps Amiga utilities", Build.core_apps_amiga),
+        t("core-apps-amiga", "Deprecated: unprofiled Amiga core apps are disabled", Build.core_apps_amiga),
         t("config-all", "Build all nio-config targets", Build.config_all),
         t("config-msdos", "Build nio-config MS-DOS app", Build.config_msdos),
         t("config-atari", "Build nio-config Atari app", Build.config_atari),
@@ -1132,6 +1150,9 @@ def build_tasks(build: Build) -> dict[str, Task]:
         t("master-boot-disk", "Build/install Master FN-BOOT-M.ssd", Build.boot_disk_master),
         t("msdos-boot-disk", "Build/install MS-DOS boot disk", Build.boot_disk_msdos),
         t("atari-boot-disk", "Build/install Atari boot disk", Build.boot_disk_atari),
+        t("amiga-artifacts-wb13", "Build/stage WB1.3 Amiga artifacts", Build.amiga_artifacts_wb13),
+        t("amiga-artifacts-wb31", "Build/stage WB3.1 Amiga artifacts", Build.amiga_artifacts_wb31),
+        t("amiga-artifacts-wb32", "Build/stage WB3.2 Amiga artifacts", Build.amiga_artifacts_wb32),
         t("amiga-default-disk-wb13", "Build/install WB1.3 FujiNet default ADF", Build.amiga_default_disk_wb13),
         t("amiga-default-disk-wb31", "Build/install WB3.1 FujiNet default ADF", Build.amiga_default_disk_wb31),
         t("amiga-default-disk-wb32", "Build/install WB3.2 FujiNet default ADF", Build.amiga_default_disk_wb32),
