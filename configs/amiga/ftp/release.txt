@@ -37,4 +37,7 @@ put repos/nio-apps/build/amiga/bin/doslistdiag                   -o /dev/NIO/C/
 # Bounce World client
 put repos/bounce-world-client-nio/build/bwcn.amiga               -o /dev/NIO/C/bouncy-world
 
+# nio-config
+put repos/nio-config/build/amiga/wb32/bin/config-nio             -o /dev/NIO/C/
+
 bye

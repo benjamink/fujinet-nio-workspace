@@ -49,7 +49,7 @@ Keep these unless the spec is updated:
 
 - `amiga/Makefile` native target `fujinet-serial.device`
 - `configs/amiga/ftp/release.txt` → `/dev/NIO/Devs/fujinet-serial.device` and `C:fujinet-nio-serial`
-- `configs/amiga/release-adf.yaml`, `tools/build/nio_build/amiga_config.py` development share
+- `configs/amiga/release-adf-wbXX.yaml`, `tools/build/nio_build/amiga_config.py` development share
 - `scripts/build-amiga-test-disk --devs-file`
 - Amiberry `tests.toml` case `nio-paula-serial` with `nio_broker = true` and `fujinet_serial = true`
 - `docs/amiga/amiberry-testing.md` NIO: copy lines for `fujinet-serial.device`
