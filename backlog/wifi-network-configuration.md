@@ -31,6 +31,12 @@ service without duplicating protocol logic or exposing stored passwords.
       responses, BSSID formatting, and hidden passwords.
 - [ ] Integrate Wi-Fi status, scanning, selection, password entry, save/apply,
       and reconnect state into `nio-config` without duplicating wire codecs.
+      - Amiga: implemented (Network page, Join picker, `wifi` SCRIPT
+        commands) over `fn_wifi_*`, plus Wi-Fi `GET_ADAPTER_INFO` (station
+        MAC, firmware version) in `fujinet-nio` and `fujinet-nio-lib`.
+        Host tests, wb13/wb31/wb32 builds and a POSIX-firmware end-to-end
+        script run pass; Amiberry guest coverage not yet run. Pending push:
+        see `patches/amiga-network-page/`. BBC, MS-DOS and Linux remain.
 - [ ] Add platform-appropriate `nio-config` UI coverage, including BBC layout
       constraints and Linux/MS-DOS host tests where those targets remain
       supported.
