@@ -363,11 +363,11 @@ class AmigaRunner:
         return settings
 
     def stage_rom_files(self) -> None:
-        shutil.copy2(self.kickstart, self.rom_dir / "kickstart.rom")
+        shutil.copyfile(self.kickstart, self.rom_dir / "kickstart.rom")
         if self.rom_key is not None:
-            shutil.copy2(self.rom_key, self.rom_dir / "rom.key")
+            shutil.copyfile(self.rom_key, self.rom_dir / "rom.key")
         if self.disk_kind == "harddrive":
-            shutil.copy2(self.fast_file_system, self.rom_dir / "FastFileSystem")
+            shutil.copyfile(self.fast_file_system, self.rom_dir / "FastFileSystem")
 
     def start_amiberry(self, serial_device: str | None) -> None:
         self.stage_rom_files()
