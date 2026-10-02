@@ -1,9 +1,9 @@
 [submodule "repos/fujinet-nio"]
 	path = repos/fujinet-nio
-	url = git@github.com:markjfisher/fujinet-nio.git
+	url = git@github.com:benjamink/fujinet-nio.git
 [submodule "repos/fujinet-nio-lib"]
 	path = repos/fujinet-nio-lib
-	url = git@github.com:markjfisher/fujinet-nio-lib.git
+	url = git@github.com:benjamink/fujinet-nio-lib.git
 [submodule "repos/nio-apps"]
 	path = repos/nio-apps
 	url = git@github.com:markjfisher/nio-apps.git
@@ -40,7 +40,7 @@
 	url = git@github.com:markjfisher/nio-core-apps.git
 [submodule "repos/nio-config"]
 	path = repos/nio-config
-	url = git@github.com:markjfisher/nio-config.git
+	url = git@github.com:benjamink/nio-config.git
 [submodule "repos/fujinet-nio-hardware"]
 	path = repos/fujinet-nio-hardware
 	url = git@github.com:markjfisher/fujinet-nio-hardware.git

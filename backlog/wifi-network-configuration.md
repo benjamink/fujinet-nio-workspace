@@ -35,8 +35,9 @@ service without duplicating protocol logic or exposing stored passwords.
         commands) over `fn_wifi_*`, plus Wi-Fi `GET_ADAPTER_INFO` (station
         MAC, firmware version) in `fujinet-nio` and `fujinet-nio-lib`.
         Host tests, wb13/wb31/wb32 builds and a POSIX-firmware end-to-end
-        script run pass; Amiberry guest coverage not yet run. Pending push:
-        see `patches/amiga-network-page/`. BBC, MS-DOS and Linux remain.
+        script run pass; Amiberry guest coverage not yet run. Submodules
+        track the `benjamink` forks until merged upstream. BBC, MS-DOS and
+        Linux remain.
 - [ ] Add platform-appropriate `nio-config` UI coverage, including BBC layout
       constraints and Linux/MS-DOS host tests where those targets remain
       supported.
