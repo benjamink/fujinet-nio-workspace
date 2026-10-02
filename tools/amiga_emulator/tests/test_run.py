@@ -101,6 +101,29 @@ class AmigaRunnerTests(unittest.TestCase):
                 runner.stage_rom_files()
                 runner.stage_rom_files()
 
+    def test_read_only_copy_from_an_earlier_run_is_replaced(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            disk = root / "test.adf"
+            rom = root / "kickstart.rom"
+            for path in (disk, rom):
+                path.write_bytes(b"new")
+            environment = {
+                "AMIGA_RUN_DIR": str(root / "run"),
+                "AMIBERRY_KICKSTART": str(rom),
+            }
+            with patch.dict(os.environ, environment, clear=False):
+                runner = AmigaRunner(parse_args(["--disk", str(disk)]))
+                # Releases before the copyfile fix left read-only copies.
+                runner.rom_dir.mkdir(parents=True, exist_ok=True)
+                staged = runner.rom_dir / "kickstart.rom"
+                staged.write_bytes(b"old")
+                staged.chmod(0o444)
+                runner.stage_rom_files()
+                self.assertEqual(staged.read_bytes(), b"new")
+                # Writable again, so the next launch can replace it too.
+                self.assertTrue(staged.stat().st_mode & 0o200)
+
     def test_uae_config_is_loaded_before_profile_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
