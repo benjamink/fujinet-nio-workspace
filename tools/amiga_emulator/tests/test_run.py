@@ -84,6 +84,23 @@ class AmigaRunnerTests(unittest.TestCase):
                     (runner.rom_dir / "rom.key").read_bytes(), b"test"
                 )
 
+    def test_read_only_kickstart_can_be_staged_again(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            disk = root / "test.adf"
+            rom = root / "kickstart.rom"
+            for path in (disk, rom):
+                path.write_bytes(b"test")
+            rom.chmod(0o444)  # Amiga Forever ships its ROMs read-only.
+            environment = {
+                "AMIGA_RUN_DIR": str(root / "run"),
+                "AMIBERRY_KICKSTART": str(rom),
+            }
+            with patch.dict(os.environ, environment, clear=False):
+                runner = AmigaRunner(parse_args(["--disk", str(disk)]))
+                runner.stage_rom_files()
+                runner.stage_rom_files()
+
     def test_uae_config_is_loaded_before_profile_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
