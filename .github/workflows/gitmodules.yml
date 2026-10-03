@@ -1,0 +1,14 @@
+name: Submodule URLs
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  gitmodules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Submodules point at markjfisher/
+        run: ./scripts/check-gitmodules.sh

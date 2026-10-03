@@ -127,6 +127,14 @@ and relevant verification. Never push changes.
 
 Never add a `Co-authored-by` (or `Co-Authored-By`) trailer to any commit.
 Do not attribute Cursor, Copilot, Claude, or any other agent as a co-author.
+Commit as the person doing the work, not as an agent identity, and leave out
+agent session links (such as `Claude-Session:` lines).
+
+Never commit changes to submodule URLs in `.gitmodules`: they must stay on
+`github.com/markjfisher/`. To work against a fork, override the URL in local
+git config (`git config submodule.<path>.url <fork>`, then
+`git submodule sync <path>`), which is never committed.
+`scripts/check-gitmodules.sh` checks this, and CI runs it on every pull request.
 
 ## Verification (FujiNet NIO product)
 
