@@ -32,6 +32,13 @@ target and toolchain in the task review.
 
 ## Cross-repository work
 
+A firmware protocol change or new setting isn't finished in `repos/fujinet-nio`
+alone: its Python client (`py/fujinet_tools`) is always updated with it, and
+diagnostics console support is offered to the user (expected for
+configurable values). See "Changing a device protocol or adding a setting" in
+`repos/fujinet-nio/AGENTS.md`. C clients get the matching
+`repos/fujinet-nio-lib` call.
+
 Use `backlog/` for active workspace-level goals and move completed goal files
 to `completed/`. Keep repository-specific implementation details in the
 owning repository's documentation. Active BMad spec folders live in
