@@ -118,3 +118,6 @@ if [[ "$PROFILE" == wb13 ]]; then
 fi
 
 printf 'Amiga %s artifacts: %s\n' "$PROFILE" "$STAGE"
+# Staging doesn't touch the FujiNet's default disk; say what does.
+printf 'The FujiNet default disk (DN0:) is built from these and installed for\n'
+printf 'the next firmware flash by: scripts/build.sh amiga-default-disk-%s\n' "$PROFILE"
