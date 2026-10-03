@@ -49,6 +49,9 @@ For an existing clone:
 scripts/update-all.sh
 ```
 
+To work on your own forks of the submodules, and for what a workspace pull
+request may contain, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 To move submodules to their configured remote branches:
 
 ```sh

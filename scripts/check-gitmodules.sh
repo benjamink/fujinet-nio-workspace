@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Every submodule URL in .gitmodules must point at the project's repositories
-# (github.com/markjfisher/...). To test against a fork, override the URL in
-# your local git config instead of committing it:
+# (github.com/markjfisher/...). To work on forks, see CONTRIBUTING.md: add a
+# `fork` remote inside the submodule, or override the URL in local git config
+# instead of committing it:
 #   git config submodule.repos/fujinet-nio.url git@github.com:<you>/fujinet-nio.git
 #   git submodule sync repos/fujinet-nio
 set -euo pipefail

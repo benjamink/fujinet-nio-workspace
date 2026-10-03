@@ -136,6 +136,11 @@ git config (`git config submodule.<path>.url <fork>`, then
 `git submodule sync <path>`), which is never committed.
 `scripts/check-gitmodules.sh` checks this, and CI runs it on every pull request.
 
+Workspace pull requests never carry submodule pin changes: pins move only to
+commits already merged into the submodule's repository, after its PR is
+merged. CI checks this with `scripts/check-submodule-pins.sh`. Work against
+forks as `CONTRIBUTING.md` describes (a `fork` remote inside each submodule).
+
 ## Verification (FujiNet NIO product)
 
 Follow `docs/agent-test-policy.md`. Every repo you touch needs the cheapest

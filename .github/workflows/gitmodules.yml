@@ -1,4 +1,4 @@
-name: Submodule URLs
+name: Submodules
 
 on:
   pull_request:
@@ -6,9 +6,31 @@ on:
     branches: [master]
 
 jobs:
-  gitmodules:
+  urls:
+    name: Submodule URLs point at markjfisher/
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Submodules point at markjfisher/
-        run: ./scripts/check-gitmodules.sh
+      - run: ./scripts/check-gitmodules.sh
+
+  pins:
+    name: Submodule pins are merged upstream
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # history to find the pins this change moves
+      - name: Pins changed by this pull request
+        if: github.event_name == 'pull_request'
+        run: ./scripts/check-submodule-pins.sh "origin/${{ github.base_ref }}"
+      - name: Pins changed by this push
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = 0000000000000000000000000000000000000000 ] ||
+             ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            ./scripts/check-submodule-pins.sh --all
+          else
+            ./scripts/check-submodule-pins.sh "$BEFORE"
+          fi
