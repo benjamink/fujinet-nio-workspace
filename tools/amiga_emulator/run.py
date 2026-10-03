@@ -362,12 +362,20 @@ class AmigaRunner:
             settings.append(f"filesystem2={mode},{device}:{volume}:{path},{bootpri}")
         return settings
 
+    @staticmethod
+    def _stage_file(source: Path, target: Path) -> None:
+        # Copy contents only (Amiga Forever ROMs are read-only), and replace
+        # rather than overwrite: copies staged by older releases kept that
+        # read-only mode and cannot be opened for writing.
+        target.unlink(missing_ok=True)
+        shutil.copyfile(source, target)
+
     def stage_rom_files(self) -> None:
-        shutil.copyfile(self.kickstart, self.rom_dir / "kickstart.rom")
+        self._stage_file(self.kickstart, self.rom_dir / "kickstart.rom")
         if self.rom_key is not None:
-            shutil.copyfile(self.rom_key, self.rom_dir / "rom.key")
+            self._stage_file(self.rom_key, self.rom_dir / "rom.key")
         if self.disk_kind == "harddrive":
-            shutil.copyfile(self.fast_file_system, self.rom_dir / "FastFileSystem")
+            self._stage_file(self.fast_file_system, self.rom_dir / "FastFileSystem")
 
     def start_amiberry(self, serial_device: str | None) -> None:
         self.stage_rom_files()
