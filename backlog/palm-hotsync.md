@@ -1,6 +1,6 @@
 # Palm OS support (HotSync and Palm apps)
 
-Status: `TODO`
+Status: `IN PROGRESS` (phases 1 and 2 done on POSIX; hardware proof pending)
 
 ## Goal
 
@@ -12,18 +12,19 @@ Spec: [`_bmad-output/specs/spec-palm-hotsync/SPEC.md`](../_bmad-output/specs/spe
 
 ## Phase 0: design agreement
 
-- [ ] Maintainer review of the spec. Settle its open questions: session task model, "sync now" command, owner of new commands, calendar sources, Palm app repo home.
+- [x] Maintainer review of the spec. Mark delegated the open questions to dillera; decisions recorded in the spec.
 - [ ] Break the agreed spec into stories (`stories.yaml`).
 
 ## Phase 1: protocol core (`fujinet-nio`), CAP-1
 
-- [ ] Port the capture-based tests first, then implement SLP, PADP/CMP, NetSync, DLP, PDB/PRC and the session behind injected link, storage and clock interfaces.
-- [ ] palm-sync Apache-2.0 notice in place.
+- [x] Port the capture-based tests first, then implement SLP, PADP/CMP, NetSync, DLP, PDB/PRC and the session behind injected link, storage and clock interfaces. (`fujinet-nio` `feat/palm-hotsync`, `tests/test_hotsync.cpp`)
+- [x] palm-sync Apache-2.0 notice in place (`docs/hotsync.md`).
 
 ## Phase 2: NetSync service, CAP-2 and CAP-5
 
-- [ ] HotSync platform service on POSIX and ESP32, a `hotsync:` YAML block, and a diagnostics provider.
-- [ ] Prove on POSIX with `fake_palm.py`, then on an FN-RS232 board with a real Palm's Network HotSync.
+- [x] HotSync platform service on POSIX and ESP32, a `hotsync:` YAML block, and a diagnostics provider.
+- [x] Prove on POSIX with `fake_palm.py` (install and backup).
+- [ ] Prove on an FN-RS232 board with a real Palm's Network HotSync.
 
 ## Phase 3: Palm client (`fujinet-nio-lib`, Palm apps), CAP-3
 

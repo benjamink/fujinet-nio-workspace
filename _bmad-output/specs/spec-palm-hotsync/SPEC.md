@@ -89,10 +89,12 @@ The same flows pass on POSIX NIO with CloudpilotEmu and `fake_palm.py`.
 - CloudpilotEmu through a socat pty does not model baud mismatch, so baud-switch behaviour is proven only on the real cradle.
 - A HotSync session and FujiBus app traffic never overlap. A Palm cannot run an app and HotSync at the same time.
 
-## Open Questions
+## Decisions (formerly open questions)
 
-- **Session model.** NIO has no long-lived service-task abstraction; `run_with_large_stack` waits for completion. Should we add a platform service-task API, or write the session as a poll-driven state machine? See `brownfield.md`.
-- **"Sync now" command.** Should the FN HotSync app be able to send a FujiBus command that opens a HotSync window at once, shortening or replacing the 9600-baud listening windows? The cradle button would still need windows.
-- **Ownership of new commands.** Which wire ID owns any FujiBus commands this adds (HotSync status, install queue)? A new `VirtualService`, or existing FileDevice/AppStore paths only?
-- **Calendar sources.** Is ICS over HTTP(S) enough for CAP-6, or is there a planned home for Google OAuth in NIO?
-- **Repository home.** Should the Palm apps move into `nio-apps`/`nio-core-apps` or a new workspace submodule, or stay in `dillera/fujinet-palm` and consume `fujinet-nio-lib`?
+Mark delegated these to dillera, who accepted the proposals on 2026-10-18.
+
+- **Session model.** A long-lived platform task API, `platform::start_service_task()` (POSIX: detached pthread; ESP32: FreeRTOS task with an internal-RAM stack). The session stays blocking request/reply code; no poll-driven state machine.
+- **"Sync now" command.** Not in v1. The cradle uses listening windows; revisit once CAP-4 runs on hardware.
+- **Ownership of new commands.** No new FujiBus commands in v1. The install queue is filled through existing FileDevice writes to the persistent filesystem; status is diagnostics-only (`hotsync.status`).
+- **Calendar sources.** ICS over HTTP(S) only for CAP-6. Google OAuth stays a non-goal.
+- **Repository home.** Palm apps stay in `dillera/fujinet-palm` and consume `fujinet-nio-lib`.
