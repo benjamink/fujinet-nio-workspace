@@ -81,8 +81,20 @@ C:Echo >>RAM:fill.script "dump hosts"
 C:Echo >>RAM:fill.script "quit"
 C:Echo >RAM:reload.script "dump hosts"
 C:Echo >>RAM:reload.script "quit"
+C:Echo >RAM:big.script "page hosts"
+C:Echo >>RAM:big.script "host select 3"
+C:Echo >>RAM:big.script "browse"
+C:Echo >>RAM:big.script "select big"
+C:Echo >>RAM:big.script "enter"
+C:Echo >>RAM:big.script "dump entries"
+C:Echo >>RAM:big.script "select f299.txt"
+C:Echo >>RAM:big.script "select f000.txt"
+C:Echo >>RAM:big.script "select f150.txt"
+C:Echo >>RAM:big.script "dump status"
+C:Echo >>RAM:big.script "quit"
 C:config-nio SCRIPT=RAM:accept.script RESULT=DH0:cfg-accept.result
 C:config-nio SCRIPT=RAM:fill.script RESULT=DH0:cfg-fill.result
 C:config-nio SCRIPT=RAM:reload.script RESULT=DH0:cfg-reload.result
+C:config-nio SCRIPT=RAM:big.script RESULT=DH0:cfg-big.result
 C:fujinet-nio-exchange --type file-list --backend cold --baud 38400 --size 256 --trials 1 --uri host:/amiga-e2e-complete/config-nio
 EndIf

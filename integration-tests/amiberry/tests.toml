@@ -1606,6 +1606,7 @@ project = "config"
 app = "config-nio"
 environments = ["wb32", "wb31", "wb13"]
 driver = true
+big_dir = true
 no_static_mountlists = true
 timeout = 180
 activity_timeout = 120
@@ -1619,6 +1620,7 @@ results = [
   "cfg-accept.result",
   "cfg-fill.result",
   "cfg-reload.result",
+  "cfg-big.result",
 ]
 
 [test.environment_variants.wb13]

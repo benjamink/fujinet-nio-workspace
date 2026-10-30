@@ -22,3 +22,12 @@ def test_config_nio_hosts_mount_and_64_host_limit(run_amiga_case,
     assert "HOST 0 " in reload
     assert "HOST 63 tnfs://h59" in reload
     assert "HOST 64" not in reload
+
+    # A folder of 300 entries (more than the 200-entry table): ListPages
+    # reaches all of them, and the device sorts directories first.
+    big = results["cfg-big.result"]
+    assert "ENTRY D zdir" in big
+    assert big.index("ENTRY D zdir") < big.index("ENTRY F f000.txt")
+    for name in ("f299.txt", "f000.txt", "f150.txt"):
+        assert f"> select {name}\nOK" in big
+    assert "SCRIPT DONE ok=" in big and "err=0" in big
