@@ -1604,17 +1604,14 @@ results = [
 name = "config-nio"
 project = "config"
 app = "config-nio"
-environments = ["wb13"]
+environments = ["wb32", "wb31", "wb13"]
 driver = true
 no_static_mountlists = true
 timeout = 180
 activity_timeout = 120
 no_activity_timeout = 90
-startup = "startup/config-nio-wb13.sequence"
-startup_target = "S/StartupII"
-amiga_artifact_profile = "wb13"
+startup = "startup/config-nio.sequence"
 driver_tools = ["fujinet-nio-exchange"]
-wb13_mountlist = true
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/config-nio"
 results = [
@@ -1623,3 +1620,9 @@ results = [
   "cfg-fill.result",
   "cfg-reload.result",
 ]
+
+[test.environment_variants.wb13]
+startup = "startup/config-nio-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+wb13_mountlist = true

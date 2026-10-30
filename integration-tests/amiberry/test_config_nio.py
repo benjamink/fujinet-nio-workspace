@@ -1,4 +1,5 @@
-def test_config_nio_hosts_mount_and_64_host_limit(run_amiga_case):
+def test_config_nio_hosts_mount_and_64_host_limit(run_amiga_case,
+                                                  amiga_environment):
     results = run_amiga_case("config-nio")
 
     assert "LOAD RC=0" in results["cfg-load.result"]
@@ -6,6 +7,8 @@ def test_config_nio_hosts_mount_and_64_host_limit(run_amiga_case):
     accept = results["cfg-accept.result"]
     assert "HOST 3 host:/" in accept
     assert "ERR" not in accept
+    drive = "DO0:" if amiga_environment["AMIGA_ENV_ID"] == "wb13" else "DN0:"
+    assert f"DRIVE {drive} 11 RO" in accept
 
     fill = results["cfg-fill.result"]
     assert "HOST 63 tnfs://h59" in fill
