@@ -1,0 +1,21 @@
+def test_config_nio_hosts_mount_and_64_host_limit(run_amiga_case):
+    results = run_amiga_case("config-nio")
+
+    assert "LOAD RC=0" in results["cfg-load.result"]
+
+    accept = results["cfg-accept.result"]
+    assert "HOST 3 host:/" in accept
+    assert "ERR" not in accept
+
+    fill = results["cfg-fill.result"]
+    assert "HOST 63 tnfs://h59" in fill
+    assert "HOST 64" not in fill
+    # The 65th add is refused; every other command succeeded.
+    assert fill.count("ERR") == 1
+    assert "Host list is full" in fill
+
+    # A second run reads the 64 hosts back from the app store.
+    reload = results["cfg-reload.result"]
+    assert "HOST 0 " in reload
+    assert "HOST 63 tnfs://h59" in reload
+    assert "HOST 64" not in reload

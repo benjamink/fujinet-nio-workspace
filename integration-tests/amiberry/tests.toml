@@ -1599,3 +1599,27 @@ results = [
   "leak-ops.result",
   "leak-cycles.result",
 ]
+
+[[test]]
+name = "config-nio"
+project = "config"
+app = "config-nio"
+environments = ["wb13"]
+driver = true
+no_static_mountlists = true
+timeout = 180
+activity_timeout = 120
+no_activity_timeout = 90
+startup = "startup/config-nio-wb13.sequence"
+startup_target = "S/StartupII"
+amiga_artifact_profile = "wb13"
+driver_tools = ["fujinet-nio-exchange"]
+wb13_mountlist = true
+completion_mode = "nio_marker"
+completion_log = "host:/amiga-e2e-complete/config-nio"
+results = [
+  "cfg-load.result",
+  "cfg-accept.result",
+  "cfg-fill.result",
+  "cfg-reload.result",
+]

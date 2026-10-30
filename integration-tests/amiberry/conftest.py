@@ -1008,9 +1008,10 @@ def run_amiga_case(amiga_environment: dict[str, str],
             )
             app = driver_build_dir / case["app"]
         else:
-            app_dir = ROOT / "repos" / (
-                "nio-apps" if case["project"] == "apps" else "nio-core-apps"
-            ) / "build" / "amiga"
+            app_dir = ROOT / "repos" / {
+                "apps": "nio-apps",
+                "config": "nio-config",
+            }.get(case["project"], "nio-core-apps") / "build" / "amiga"
             if artifact_profile:
                 app_dir /= artifact_profile
             app_dir /= "bin"
