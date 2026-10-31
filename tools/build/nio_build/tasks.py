@@ -725,7 +725,8 @@ class Build:
         self.run_make("boot-disk-msdos", "NIO_CORE_APPS", "TARGET=msdos", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}", f"FUJINET_NIO={self.p('FUJINET_NIO')}", "install-boot-disk")
 
     def boot_disk_atari(self) -> None:
-        self.lib_atari()
+        self.config_atari()
+        self.run_make("config-atari-banked", "NIO_CONFIG", "atari-banked", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}")
         self.run_make("boot-disk-atari", "NIO_CORE_APPS", "TARGET=atari", f"FUJINET_NIO_LIB={self.p('FUJINET_NIO_LIB')}", f"FUJINET_NIO={self.p('FUJINET_NIO')}", "install-boot-disk")
 
     def amiga_artifacts(self, profile: str) -> None:
@@ -1093,7 +1094,6 @@ class Build:
         self.lib_atari()
         self.apps_atari()
         self.core_apps_atari()
-        self.config_atari()
         self.boot_disk_atari()
 
     def workflow_linux(self) -> None:
@@ -1175,7 +1175,7 @@ def build_tasks(build: Build) -> dict[str, Task]:
         t("bbc-boot-disk", "Build/install BBC FN-BOOT.ssd", Build.boot_disk_bbc),
         t("master-boot-disk", "Build/install Master FN-BOOT-M.ssd", Build.boot_disk_master),
         t("msdos-boot-disk", "Build/install MS-DOS boot disk", Build.boot_disk_msdos),
-        t("atari-boot-disk", "Build/install Atari boot disk", Build.boot_disk_atari),
+        t("atari-boot-disk", "Build both Atari config apps and build/stage the boot disk", Build.boot_disk_atari),
         t("amiga-artifacts-wb13", "Build/stage WB1.3 Amiga artifacts", Build.amiga_artifacts_wb13),
         t("amiga-artifacts-wb31", "Build/stage WB3.1 Amiga artifacts", Build.amiga_artifacts_wb31),
         t("amiga-artifacts-wb32", "Build/stage WB3.2 Amiga artifacts", Build.amiga_artifacts_wb32),

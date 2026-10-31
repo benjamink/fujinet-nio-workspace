@@ -18,6 +18,12 @@ Use `./scripts/build.sh --list` for the public workflows and common artifact
 targets, `--list --all` for compatibility/internal targets, and
 `--explain TARGET` to inspect a target before running it.
 
+To rebuild and stage the Atari config boot disk for firmware flashing, run
+`./scripts/build.sh atari-boot-disk`. This builds the Atari library, standard
+and banked config applications, and the ATR, then installs it into the POSIX
+and ESP32 firmware distfiles. It does not flash the device; use
+`./build.sh -f` from `repos/fujinet-nio` when ready.
+
 ## Target layers
 
 | Layer | Examples | Purpose |
