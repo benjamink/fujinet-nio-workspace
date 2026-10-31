@@ -1,5 +1,22 @@
 # Atari SIO v1 conformance fixtures
 
+The optional SYN-ACK WIRE game integration accepts an independently cloned,
+clean checkout and records its exact commit in the output directory. It starts
+a loopback-only server, boots the Atari client headlessly, joins a game, logs
+off and rejoins; no public lobby is contacted. A clean checkout is exported
+from its commit so untracked and generated files cannot affect the build.
+Source the workspace environment
+and build the NetSIO firmware and AltirraSDL first:
+
+```sh
+source scripts/env.sh
+python3 integration-tests/atari-sio/run_syn_ack_wire.py \
+  --checkout /path/to/syn-ack-wire --output /tmp/synack-nio-evidence
+```
+
+For local development `--allow-dirty` accepts tracked modifications and marks
+the evidence accordingly. Release evidence should use a clean checkout.
+
 This directory holds the workspace-level acceptance tooling for the standard
 Atari disk surface and native NIO application channel. The implementation-
 independent contract itself, the fixtures below, is owned by fujinet-nio, which
