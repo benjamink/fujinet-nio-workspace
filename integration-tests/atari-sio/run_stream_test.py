@@ -11,6 +11,8 @@ import time
 root = Path(os.environ['NIO_WORKSPACE'])
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--refuse-connection', action='store_true',
+               help='Verify the displayed error count when the TCP peer is unavailable')
 a = p.parse_args()
 a.output.mkdir(parents=True, exist_ok=False)
 sys.path.insert(0, str(root/'repos/nio-config/scripts'))
@@ -26,6 +28,9 @@ with (a.output/'echo.log').open('w') as log:
     try:
         time.sleep(.5)
         assert server.poll() is None
+        if a.refuse_connection:
+            server.terminate()
+            server.wait(timeout=5)
         def inspect(view):
             def wait(check, timeout=90):
                 until = time.monotonic()+timeout
@@ -36,6 +41,14 @@ with (a.output/'echo.log').open('w') as log:
             wait(lambda: any('Echo server URL' in row for row in read_os_screen(view.bridge)))
             view.type(f'tcp://127.0.0.1:{port}')
             view.key('RETURN')
+            if a.refuse_connection:
+                wait(lambda: any('Stopped: error 5' in row for row in read_os_screen(view.bridge)))
+                assert view.bridge.peek16(labels['_stream_passes']) == 0
+                assert view.bridge.peek16(labels['_stream_errors']) == 1
+                assert any('Errors     1' in row for row in read_os_screen(view.bridge))
+                view.screenshot(a.output/'refused.png')
+                (a.output/'result.txt').write_text('Refused TCP peer: status 5, zero echoes, displayed errors 1\n')
+                return
             count = lambda: view.bridge.peek16(labels['_stream_passes'])
             errors = lambda: view.bridge.peek16(labels['_stream_errors'])
             wait(lambda: count()>=20)
