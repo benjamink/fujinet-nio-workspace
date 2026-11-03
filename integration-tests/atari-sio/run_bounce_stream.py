@@ -14,8 +14,8 @@ import time
 
 root = Path(os.environ['NIO_WORKSPACE'])
 p = argparse.ArgumentParser(description=__doc__)
-p.add_argument('--response-delay-ms', type=int, default=0, help='Delay x-w replies to exercise diagnostics')
-p.add_argument('--backend', choices=('stream', 'stream-diag', 'packet'), default='stream')
+p.add_argument('--response-delay-ms', type=int, default=0, help='Delay x-w replies to exercise network backpressure')
+p.add_argument('--backend', choices=('stream', 'packet'), default='stream')
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--server', help='Use an already running real server, host:port, with moving objects')
 a = p.parse_args()
@@ -111,12 +111,6 @@ with Server(('127.0.0.1',0), Peer) as server:
             samples=[t for t,n in state['samples'][begin+3:] if n==count]
             report[str(count)]={'fetches_per_second':(len(samples)-1)/(samples[-1]-samples[0]),'samples':len(samples)}
             assert view.bridge.peek(labels['_is_running_sim'],1)[0] == 1
-            if '_bwc_diag_fetch' in labels:
-                wait(lambda:any(row.startswith('U') and ' N' in row and ' P:' in row for row in rows()))
-                report[str(count)]['max_fetch_ticks']=view.bridge.peek16(labels['_bwc_diag_max'])
-                if a.response_delay_ms >= 400:
-                    assert report[str(count)]['max_fetch_ticks'] >= 15
-                    wait(lambda:view.bridge.peek(labels['_bwc_diag_notready'],1)[0] > 0)
             view.screenshot(a.output/f'objects-{count}.png')
         before=view.bridge.peek(labels['_is_showing_info'],1)[0]
         view.key('I');wait(lambda:view.bridge.peek(labels['_is_showing_info'],1)[0]!=before,10)

@@ -1,6 +1,6 @@
 # Bounce World Atari small-stream acceptance
 
-Status: implementation and automated validation complete; user hardware trial pending.
+Status: accepted for normal Atari use after user hardware testing; production cleanup complete.
 
 - [x] Opt-in Atari TCP adapter; default packet backend and AppStore retained.
 - [x] Separate executable/object/ATR outputs; no U1MB/HSIO configuration changes.
@@ -10,12 +10,15 @@ Status: implementation and automated validation complete; user hardware trial pe
   fragmented 4/80-object responses, client list drain, input, quit and rejoin.
 - [x] Actual server-3.0.0.jar: moving object, input, quit and re-registration.
 - [x] Size/rate comparison and limitations in owning repository docs/atari-small-stream.md.
-- [ ] Hardware acceptance: user tests disk with U1MB/HSIO, colour/sound, short key
-  presses, dense world and quit/rejoin. Keep packet backend available.
+- [x] User hardware acceptance: sustained normal small-world animation, colour,
+  sound and input; no major recurring pauses after firmware capture fixes.
+  Dense-world and all-expansion coverage remain limits, not claimed hardware passes.
+  Packet backend remains available.
 
 Candidate: scratch/bounce-world-small-stream-readahead-20261103/bwcn-stream.atr;
 comparison disk bwcn-packet.atr and evidence/checksums alongside it.
-Use the previously installed small-stream firmware; no firmware changes needed.
+Historical candidate above predates capture fixes. Production use requires current
+Atari firmware (capture fixes through ffaf8954); upload with ./build.sh -u.
 No new release or push was performed. Repository implementation is committed
 locally; workspace submodule pin remains unchanged pending publication.
 
@@ -40,11 +43,27 @@ and writes, defer EOF until drained, reset on init/open/close. Host tests prove 
 4/80-object, quit/rejoin checks pass. Additional cost versus initial stream:
 270 executable bytes and 123 BSS bytes. No new library/firmware changes.
 
-Hardware choppiness investigation: separate `disk-atari-stream-diag` variant
+Historical hardware choppiness investigation (now closed): separate `disk-atari-stream-diag` variant
 shows rate, last/max fetch, wire write/read time, Busy/NotReady count, read calls
 and live phase on row zero. Candidate:
 `scratch/bounce-world-stream-diagnostic-20261103/bwcn-stream-diag.atr`.
 No new IRQ/NMI instrumentation; normal stream disk remains uninstrumented.
 Host accounting/clock-wrap tests and headless normal/injected-400ms traffic pass;
-await user row captures during/after a pause with sio.status. Do not attribute
+This was followed by user row captures and firmware fixes. Do not attribute
 hardware stalls to the server or SIO until the observations distinguish them.
+
+
+Production cleanup (2026-11-03):
+- Removed the temporary timing overlay, hooks, diagnostic build and its tests.
+- Normal disk: repos/bounce-world-client-nio/disk-images/atari-stream/bwcn.atr.
+- Retained firmware recovery tests and flight recording; consolidated durable
+  contract in repos/fujinet-nio/docs/atari/sio-capture.md.
+- Hardware evidence: scratch/min-001 through min-014; user accepted final build
+  after sustained running. PC sleep/network outages and console printing can
+  still interrupt application updates; those are not promises of uninterrupted IO.
+- Verified host tests, 11 soft65c02 keyboard checks, Atari stream/packet and Linux
+  builds; headless stream/packet integration checks cover fragmented 4/80-object
+  worlds, input, quit and rejoin. Screenshots confirm the timing row is absent.
+- Firmware CTest 4/4 and Atari v1 16MB ESP32 build passed.
+- No library API or protocol changes in cleanup. No release, push or workspace
+  submodule pin change; repository commits remain local pending publication.
