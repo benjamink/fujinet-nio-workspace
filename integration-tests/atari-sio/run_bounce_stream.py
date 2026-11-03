@@ -14,7 +14,8 @@ import time
 
 root = Path(os.environ['NIO_WORKSPACE'])
 p = argparse.ArgumentParser(description=__doc__)
-p.add_argument('--backend', choices=('stream', 'packet'), default='stream')
+p.add_argument('--response-delay-ms', type=int, default=0, help='Delay x-w replies to exercise diagnostics')
+p.add_argument('--backend', choices=('stream', 'stream-diag', 'packet'), default='stream')
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--server', help='Use an already running real server, host:port, with moving objects')
 a = p.parse_args()
@@ -23,8 +24,8 @@ sys.path.insert(0, str(root/'repos/nio-config/scripts'))
 from atari_shot_netsio import boot
 from atari_ui import read_os_screen, symbols
 repo = root/'repos/bounce-world-client-nio'
-variant = 'atari-stream' if a.backend == 'stream' else 'atari'
-build = repo/'build/atari-stream' if a.backend == 'stream' else repo/'build'
+variant = 'atari-' + a.backend if a.backend != 'packet' else 'atari'
+build = repo/'build'/variant if a.backend != 'packet' else repo/'build'
 labels = symbols(build/'bwcn.atari.lbl')
 state = dict(count=4, registrations=0, closed=0, samples=[], commands=[], failures=[])
 
@@ -44,6 +45,7 @@ class Peer(socketserver.StreamRequestHandler):
                 elif op == 'x-who':
                     payload = b'player  '*30  # exercise prefix + drain (>160)
                 elif op == 'x-w':
+                    if a.response_delay_ms: time.sleep(a.response_delay_ms/1000)
                     n = state['count']
                     state['samples'].append((time.monotonic(),n))
                     step = len(state['samples']) % 255 + 1
@@ -109,6 +111,12 @@ with Server(('127.0.0.1',0), Peer) as server:
             samples=[t for t,n in state['samples'][begin+3:] if n==count]
             report[str(count)]={'fetches_per_second':(len(samples)-1)/(samples[-1]-samples[0]),'samples':len(samples)}
             assert view.bridge.peek(labels['_is_running_sim'],1)[0] == 1
+            if '_bwc_diag_fetch' in labels:
+                wait(lambda:any(row.startswith('U') and ' N' in row and ' P:' in row for row in rows()))
+                report[str(count)]['max_fetch_ticks']=view.bridge.peek16(labels['_bwc_diag_max'])
+                if a.response_delay_ms >= 400:
+                    assert report[str(count)]['max_fetch_ticks'] >= 15
+                    wait(lambda:view.bridge.peek(labels['_bwc_diag_notready'],1)[0] > 0)
             view.screenshot(a.output/f'objects-{count}.png')
         before=view.bridge.peek(labels['_is_showing_info'],1)[0]
         view.key('I');wait(lambda:view.bridge.peek(labels['_is_showing_info'],1)[0]!=before,10)

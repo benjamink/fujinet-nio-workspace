@@ -39,3 +39,12 @@ and writes, defer EOF until drained, reset on init/open/close. Host tests prove 
 35-byte world update uses one wire read; full host/keyboard tests and headless
 4/80-object, quit/rejoin checks pass. Additional cost versus initial stream:
 270 executable bytes and 123 BSS bytes. No new library/firmware changes.
+
+Hardware choppiness investigation: separate `disk-atari-stream-diag` variant
+shows rate, last/max fetch, wire write/read time, Busy/NotReady count, read calls
+and live phase on row zero. Candidate:
+`scratch/bounce-world-stream-diagnostic-20261103/bwcn-stream-diag.atr`.
+No new IRQ/NMI instrumentation; normal stream disk remains uninstrumented.
+Host accounting/clock-wrap tests and headless normal/injected-400ms traffic pass;
+await user row captures during/after a pause with sio.status. Do not attribute
+hardware stalls to the server or SIO until the observations distinguish them.
