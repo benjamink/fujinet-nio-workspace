@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--checkout', type=Path, required=True, help='SYN-ACK WIRE repository')
 parser.add_argument('--output', type=Path, help='new directory for test logs')
 parser.add_argument('--allow-dirty', action='store_true', help='allow tracked changes for development')
+parser.add_argument('--stream', action='store_true', help='experimental small stream backend and workspace library')
 args = parser.parse_args()
 checkout = args.checkout.resolve()
 revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=checkout, text=True).strip()
@@ -23,7 +24,7 @@ if dirty and not args.allow_dirty:
     raise SystemExit('SYN-ACK WIRE checkout has tracked changes; commit them or use --allow-dirty')
 sys.path.insert(0, str(workspace / 'repos/nio-config/scripts'))
 from atari_shot_netsio import boot
-from atari_ui import read_os_screen
+from atari_ui import read_os_screen, screen_code_to_char
 
 with socket.socket() as probe:
     probe.bind(('127.0.0.1', 0))  # choose an unused local port
@@ -52,7 +53,8 @@ with tempfile.TemporaryDirectory(prefix='synack-nio-test-') as temporary:
     # The deliberately unusable built-in URL makes reaching the server proof
     # that the lobby AppKey was read and used.
     subprocess.run(['make', f'B={build}', 'NIO=1', 'LOBBY_KEY=11',
-                    'URL=N:TCP://127.0.0.1:1/', 'atr'], cwd=client, check=True)
+                    'URL=N:TCP://127.0.0.1:1/', 'atr'] + ([
+                        'NIO_STREAM=1', f'NIO_LIB={workspace / "repos/fujinet-nio-lib"}'] if args.stream else []), cwd=client, check=True)
     linkmap = (build / 'synack.map').read_text().split('Segment list:', 1)[0]
     for unused in ('fn_packet_parse_info.o', 'fn_legacy_appkey_'):
         if unused in linkmap:
@@ -106,6 +108,21 @@ with tempfile.TemporaryDirectory(prefix='synack-nio-test-') as temporary:
                     raise AssertionError('Server did not receive the seat-count answer:\n' + trace)
                 time.sleep(2)
                 view.screenshot(output / 'game.png')
+                if args.stream:
+                    view.key('HELP')
+                    for _ in range(30):
+                        dl = view.bridge.peek16(0x230)
+                        base = view.bridge.peek16(dl + 4)
+                        text = ''.join(screen_code_to_char(c) for c in view.bridge.peek(base, 960))
+                        if 'Crime syndicates' in text:
+                            break
+                        time.sleep(.5)
+                    else:
+                        raise AssertionError('Disk help did not open')
+                    view.screenshot(output / 'help.png')
+                    view.key('ESC')
+                    time.sleep(2)
+
                 view.key('ESC')
                 for _ in range(20):
                     if any('Y/N' in row for row in read_os_screen(view.bridge)):

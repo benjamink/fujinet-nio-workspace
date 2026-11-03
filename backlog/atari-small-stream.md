@@ -1,6 +1,7 @@
 # Optional small Atari stream client
 
-Status: implementation started; not a release or a replacement for the existing client.
+Status: hardware candidate built and emulator-tested; awaiting user hardware acceptance.
+Not a release or a replacement for the existing client.
 
 ## Accepted scope
 
@@ -16,42 +17,58 @@ Measured baseline (library package 0.1.2): legacy XEX 12,718 bytes, NIO XEX
 Target, not a promise: small network path about 2 KiB CODE, no hidden 1 KiB
 packet workspace. Count lobby/AppKey support and runtime helpers in comparisons.
 
-## Work and acceptance
+## Implementation and acceptance
 
-- [x] Prototype bounded, transport-independent exact-request replay with tests
-  for lost read/write replies, partial writes, altered retries, would-block,
-  stale/gapped sequences, capacity limits and sequence exhaustion.
-- [ ] Finalize versioned wire contract, session token lifecycle, asynchronous
-  open and reset/close semantics. The replay prototype is not a published API.
-- [ ] Implement stream operations through existing routed network services;
-  bound per-session RAM and describe memory costs.
-- [ ] Add optional Atari SIO projection with fixed receive-length policy;
-  measure padding vs an extra status exchange for realistic game packets.
-- [ ] Matching Python builders/parsers, CLI and wire tests; console diagnostics.
-- [ ] Library public block-pointer API, isolated archive members, polled 19200
-  backend and client-owned storage. Document registers, ZP, IRQ/NMI and lifetime.
-- [ ] Independent soft65c02 tests including byte/checksum errors, timeout,
-  duplicate replay, partial progress, register restoration and buffer guards;
-  report size and cycles. Full library `make check`.
-- [ ] Experimental game build; do not remove the current NIO backend. Include
-  lobby AppKey support without accidentally linking the old generic stack.
-- [ ] Headless AltirraSDL tests through actual firmware and a local TCP peer:
-  registration, game traffic, idle notification, retry injection, help disk,
-  sound/DLI/VBI and logoff/reconnect. No public server traffic.
-- [ ] Firmware doctests/Python tests, original game tests and comparative build
-  sizes pass. Prepare clearly identified experimental firmware and ATR.
-- [ ] User hardware feedback: startup from HSIO, fallback, help transitions,
-  sound, DLIs/VBI, keyboard, reconnect and sustained gameplay. Emulator passes
-  do not establish hardware timing correctness.
+- [x] Bounded exact-request replay; malformed retries, partial writes, NotReady,
+  stale/gapped sequences, capacity checks and exhaustion tested.
+- [x] Experimental s/S/T projection, versioned capabilities, token and 32-bit
+  sequence. Two exchanges per operation with bounded result padding.
+- [x] Routed NetworkDevice/FileDevice session adapter. TCP cursors live in
+  firmware. No new socket implementation, tasks or core platform conditionals.
+- [x] Python payload builders/parsers, codec CLI, independent vectors/doctests.
+- [x] Atari block-pointer ASM API, polled 19200 carrier, caller-owned 262-byte
+  context. 875 code bytes, 17 scratch BSS bytes and 4 private ZP bytes.
+- [x] soft65c02 transaction/guard/retry tests and active-low POKEY regression;
+  complete all-target library `make check` passes.
+- [x] Dedicated nio-apps STREAMTEST boot disk with fragmented echo server,
+  immediate-VBI sound, colour-band DLIs, keyboard toggles and results display.
+- [x] Headless AltirraSDL diagnostic: 126 echoes spanning all 120 block sizes,
+  zero mismatches, VBI progression, D/S toggles and clean close.
+- [x] Optional experimental game backend. Existing backend unchanged. Headless
+  real-firmware/local-server lobby AppKey, join, seat choice, disk help, logoff
+  and rejoin passed. Original host and 28-check soft65c02 game tests passed.
+- [x] Firmware CTest (four tests), Python tests and configured Atari ESP32 build.
+- [ ] User hardware testing: stock speed and U1MB HSIO startup/fallback, help
+  transitions, sound, DLI/VBI, keyboard and sustained traffic. Do not remove the
+  established workaround from the standard backend before this acceptance.
 
-## Current evidence
+## Scope/limitations of this hardware candidate
 
-`source scripts/env.sh && cmake --build repos/fujinet-nio/build/fujibus-pty-debug -j4`
-then `repos/fujinet-nio/build/fujibus-pty-debug/tests/fujinet-nio-tests --test-case='stream*'`
-passed six replay primitive cases. No new SIO or 6502 implementation exists yet;
-soft65c02 and AltirraSDL validation of the experimental path remain outstanding.
+The experimental library only supports one TCP stream per ingress, up to 120
+bytes per call, plus the title's creator=1/app=1 AppKey lookup. No HTTP/TLS,
+zero-length half-close or multi-client sharing. Reply padding trades bandwidth
+for simple framing; the candidate does not claim optimal wire utilization.
+Tokens/replay do not survive firmware restart. Sequence is 32-bit and stops on
+exhaustion rather than wrapping. Socket open/progress uses the existing backend;
+DNS scheduling is not redesigned. The Python CLI is a codec, not a new SIO host.
 
-The first primitive retains one exact request and result in fixed arrays. It
-requires a separately validated session token and never silently wraps its
-16-bit sequence. Session renewal without losing a live TCP connection must be
-specified before this sequence policy is used in the wire implementation.
+Game XEX: 13,941 bytes versus 19,719 existing NIO and 12,718 legacy. The 5,778
+byte saving is measured; no hardware timing or electrical correctness is claimed.
+
+Durable implementation docs:
+- repos/fujinet-nio/docs/atari/small-stream.md
+- repos/fujinet-nio-lib/docs/atari-small-stream.md
+- repos/nio-apps/docs/atari-small-stream.md
+
+Verification commands (source scripts/env.sh first):
+- make -C repos/fujinet-nio-lib check
+- ctest --test-dir repos/fujinet-nio/build/fujibus-pty-debug --output-on-failure
+- repos/fujinet-nio/scripts/run-python-tests (from its owning repository)
+- ./build.sh -b (from repos/fujinet-nio, Atari v1 16MB profile)
+- make -C repos/nio-apps atari-stream-disk
+- python3 integration-tests/atari-sio/run_stream_test.py --output <new directory>
+- python3 integration-tests/atari-sio/run_syn_ack_wire.py --checkout repos/syn-ack-wire --allow-dirty --stream --output <new directory>
+
+Hardware package: `scratch/atari-small-stream-20261103/` (primary disk
+`streamtest.atr`, matching ESP32 firmware, instructions, source revisions and
+SHA256 checksums). Final diagnostic run: 126 echoes, zero errors, 3474 VBI frames.
