@@ -10,8 +10,8 @@ measure linked CODE/BSS and soft65c02 cycles; use Beebium for MOS integration.
 - [x] Wi-Fi archive granularity. Library commit be299285; status-only CODE
   5421 -> 2514, join-only 5421 -> 1969, BSS stays 19 bytes. BBC wire vectors
   added and a null reply-length pointer bug in set-config corrected.
-- [x] Bulk network read contract and measured cycle benefit, with fallback for
-  existing ROMs and tests for partial/NotReady/EOF/buffer boundaries.
+- [x] Bulk network read contract and measured cycle benefit, requiring the current ROM
+  and tests for partial/NotReady/EOF/buffer boundaries.
 - [x] Ready/read-available, preserving MOS handle ownership and ROM-buffered data.
 - [x] HTTP headers, bounded caller-owned memory and safe old-ROM behavior.
 
@@ -33,8 +33,9 @@ Evidence before/after map files: scratch/bbc-improvements/.
 - Library `integration-tests/beebium/./run_pytest.sh -q -rs`: 11 passed,
   2 pre-existing scaffold skips. Covers ListPages, Ready, HTTP headers,
   ordinary TCP/HTTP and cleanup after header opens.
-- Five TCP/HTTP Beebium tests also passed against the old ROM, exercising
-  OSBGET fallback. Unsupported new calls are covered by host/mock vectors.
+- The initially tested old-ROM OSBGET fallback was subsequently removed at
+  user request. The library requires the current ROM; Ready no longer performs
+  a redundant compatibility probe. Normal failure checks remain.
 - `make sizes`: BBC 15926 used / 458 free; Master 15979 / 405. Total resident
   growth 500 bytes; no additional persistent ROM workspace.
 - soft65c02 prebuffered 120-byte read: 76215 -> 3644 cycles. This excludes
