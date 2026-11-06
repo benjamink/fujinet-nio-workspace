@@ -2,6 +2,11 @@
 
 Status: `TODO`
 
+Current Zorro implementation path:
+[Amiga Zorro USB bring up](amiga-zorro-usb-bringup.md). This direct checklist
+owns the shared-USB POC and first hardware exchange outside BMad; the older
+story references below preserve software acceptance and design context.
+
 ## Goal
 
 Add packet-native and faster physical transports without changing the
@@ -33,14 +38,17 @@ isolation across close/open. Historical 1.5 completion is preserved.
 The reviewed driver is `e6f9686797f6bae256342d362795c4b3fc5b3da1`; the
 accepted firmware contract is `cf2ab541c95d8769e67cb41541ca627db455e541`.
 Pin the workspace commit containing the linked acceptance decision as well.
-This satisfies the 1.5/1.6 software prerequisites; every other story prerequisite
-still applies. Known-completion application replay remains documented existing
-policy; physical quiescence is not proven by these software tests.
+This satisfies the 1.5/1.6 software prerequisites. Known-completion application
+replay remains documented existing policy; physical quiescence is not proven
+by these software tests.
 
-Story 2.4 requires accepted 1.6, positive relevant 2.2/2.3 feasibility evidence
-and explicit ABI approval. Setup/feasibility may proceed independently;
-physical implementation also requires accepted 1.14. None of this audit's
-software checks establishes hardware readiness or closes the exit criteria.
+The original BMad plan gated Story 2.4 on accepted 1.6, positive relevant
+2.2/2.3 feasibility evidence and explicit ABI approval, and physical
+implementation on accepted 1.14. The current USB checklist carries forward
+the substantive contract, electrical and integration requirements through
+focused evidence and a recorded design decision, without requiring the old
+story workflow. Software acceptance alone does not establish hardware
+readiness or close the exit criteria.
 
 ## Work
 
