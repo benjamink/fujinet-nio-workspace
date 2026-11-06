@@ -1,6 +1,6 @@
 # Amiga Zorro USB bring up
 
-Status: ready for isolated POC implementation; hardware results pending.
+Status: deliverable 1 implementation in progress; hardware results pending.
 Direction agreed: 2026-11-06.
 
 ## Goal and working method
@@ -88,11 +88,18 @@ isolated RP experiment under `bridges/rp2350-zorro/`. Circuit and fixture
 owner: `repos/fujinet-nio-hardware/amiga/`. Put reproducible build, wiring and
 run instructions beside those implementations.
 
+Implementation entry point: [USB host bench probe](../repos/fujinet-nio/bridges/rp2350-zorro/lab/usb-host/README.md).
+Confirmed bench inventory: Waveshare Core2350B with RP Tiny Adapter B
+(USB-C, BOOT and RESET), and an ESP32-S3-WROOM-1 N16R8 on a 44-pin carrier
+with two USB-C sockets and BOOT/RST. Exact carrier USB/power routing still
+needs confirmation. The boards share ground; physical acceptance is open.
+
 - [ ] Identify the two boards and USB connectors; document the three-mode
   data/power circuit and controls. Check isolation and power paths before
   connecting the fixture to the PC.
-- [ ] Build the smallest RP USB-host harness and the matching ESP PacketLink
+- [x] Build the smallest RP USB-host harness and the matching ESP PacketLink
   profile, reusing existing protocol code. Record exact build/flash commands.
+  Software checks: [initial verification](../repos/fujinet-nio/bridges/rp2350-zorro/lab/usb-host/VERIFICATION.md).
 - [ ] Flash each processor through the same external connector using physical
   boot controls, including with nonfunctional application firmware. Verify
   that neither processor needs its peer's application to recover.
