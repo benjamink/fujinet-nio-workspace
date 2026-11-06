@@ -343,9 +343,16 @@ def load_profile(path: Path, name: str, root: Path, environment: dict[str, str] 
     # reference to an unset or empty variable means "no key", not a path.
     rom_key = result.get("rom_key")
     if isinstance(rom_key, str):
-        substituted = string.Template(rom_key).safe_substitute(
-            {**os.environ, **environment}).strip()
-        if not substituted or "$" in substituted:
+        variables = dict(os.environ)
+        variables.setdefault("NIO_WORKSPACE", str(root))
+        variables.update(environment)
+        template = string.Template(rom_key)
+        missing = any(
+            (name := match.group("named") or match.group("braced")) is not None
+            and name not in variables
+            for match in template.pattern.finditer(rom_key)
+        )
+        if missing or not template.safe_substitute(variables).strip():
             del result["rom_key"]
     for key in ("disk", "harddrive", "kickstart", "rom_key",
                 "fast_file_system", "uae_config"):

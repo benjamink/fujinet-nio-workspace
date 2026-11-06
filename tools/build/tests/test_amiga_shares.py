@@ -72,6 +72,38 @@ class DevelopmentShareTests(unittest.TestCase):
                         self.assertNotIn("rom_key", profile)
                         self.assertEqual(profile["kickstart"], "/media/kick13.rom")
 
+    def test_rom_key_preserves_literal_dollars_and_expanded_values(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / "workbenches.yaml"
+            cases = [
+                ("/media/rom$1.key", {}, "/media/rom$1.key"),
+                ("/media/rom$$name.key", {}, "/media/rom$name.key"),
+                ("${KEY_PATH}", {"KEY_PATH": "/media/rom$name.key"}, "/media/rom$name.key"),
+                ("${NIO_WORKSPACE}/rom.key", {}, str(root / "rom.key")),
+            ]
+            for value, environment, expected in cases:
+                with self.subTest(value=value):
+                    config.write_text(
+                        f"profiles:\n  test:\n    kickstart: /media/kick.rom\n    rom_key: '{value}'\n",
+                        encoding="utf-8",
+                    )
+                    profile = load_profile(config, "test", root, environment)
+                    self.assertEqual(profile["rom_key"], expected)
+
+    def test_rom_key_omits_unset_embedded_variable(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / "workbenches.yaml"
+            config.write_text(
+                "profiles:\n  test:\n    kickstart: /media/kick.rom\n"
+                "    rom_key: '/media/${UNSET_ROM_KEY}/rom.key'\n",
+                encoding="utf-8",
+            )
+            with mock.patch.dict(os.environ):
+                os.environ.pop("UNSET_ROM_KEY", None)
+                self.assertNotIn("rom_key", load_profile(config, "test", root, {}))
+
     def test_profile_without_shares_is_unchanged(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
