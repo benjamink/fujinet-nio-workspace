@@ -2,6 +2,10 @@
 
 Status: `IN PROGRESS` (phases 1, 2 and 4 done; cradle HotSync proven on an FN-RS232 with a real Palm; phases 3 and 5 open)
 
+Since this was last updated (2026-10-18), merged: HotSync in fujinet-nio #19, and the Palm OS
+library targets in fujinet-nio-lib #6 (Springboard CS1) and #7 (cradle serial). The phase
+checkboxes below have not been reviewed against them.
+
 ## Goal
 
 A Palm in a serial cradle on an FN-RS232 board running NIO can HotSync (install apps, back up, receive a calendar) and run Palm apps that use FujiNet over the same cradle. NetSync over Wi-Fi works too.
