@@ -1,6 +1,6 @@
 # Amiga Zorro USB bring up
 
-Status: deliverable 1 implementation in progress; hardware results pending.
+Status: deliverable 1 in progress; manual USB link and shared-connector flashing demonstrated.
 Direction agreed: 2026-11-06.
 
 ## Goal and working method
@@ -60,26 +60,10 @@ fixture limit is not a production requirement. The ESP already has the
 board and flash/PSRAM configuration before using it. Keep protocol data and
 logs on their separate CDC interfaces.
 
-Use manual mode selection initially, with USB-rated switching and a defined
-disconnect state. Flashing is sequential and suspends normal communication.
-
-| Mode | USB data connection | Entry and recovery |
-| --- | --- | --- |
-| Run | RP host to ESP device; external PC data isolated | Normal firmware |
-| Flash RP | PC to RP; internal ESP data path isolated | Physical BOOTSEL and reset |
-| Flash ESP | PC to ESP; internal RP data path isolated | Physical BOOT and reset |
-
-The circuit must define VBUS supply, sensing and backfeed prevention in every
-mode, USB-C connection requirements, and switching without connecting two
-hosts. Keep RP SWD/RUN and ESP boot/reset service access. Recovery must not
-depend on either application firmware or consume unbudgeted bus GPIOs.
-
-RP supports [USB host/device operation and ROM programming](https://www.raspberrypi.com/documentation/microcontrollers/microcontroller-chips.html).
-ESP supports [direct USB flashing](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/get-started/establish-serial-connection.html),
-but its OTG and Serial/JTAG controllers
-[share the internal PHY](https://docs.espressif.com/projects/esp-usb/en/latest/esp32s3/usb_device.html).
-Treat runtime and bootloader enumeration as distinct modes. A plain hub alone
-does not solve this host-routing problem.
+The authoritative hardware mode, power and user-serviceable recovery contract
+is [USB connector strategy](../repos/fujinet-nio-hardware/amiga/docs/eventual-board-considerations.md#usb-connector-strategy).
+The [bench guide](../repos/fujinet-nio/bridges/rp2350-zorro/lab/usb-host/README.md)
+documents the manually rewired fixture and its practical precautions.
 
 ## Deliverable 1 Shared USB flashing and link POC
 
@@ -103,9 +87,9 @@ needs confirmation. The boards share ground; physical acceptance is open.
 - [ ] Flash each processor through the same external connector using physical
   boot controls, including with nonfunctional application firmware. Verify
   that neither processor needs its peer's application to recover.
-- [ ] Return to Run mode, enumerate the correct CDC interface, synchronize and
+- [x] Return to Run mode, enumerate the correct CDC interface, synchronize and
   complete a real `Clock.GetTime`. Verify known binary data across multiple
-  USB transfers up to capacity, plus explicit capacity-plus-one rejection.
+  USB transfers up to capacity, plus explicit local capacity-plus-one rejection.
 - [ ] Reset either endpoint and disconnect the link during pending exchanges.
   Observe bounded failure, unknown completion where appropriate, fresh
   synchronization and a successful new request, without stale completion or
