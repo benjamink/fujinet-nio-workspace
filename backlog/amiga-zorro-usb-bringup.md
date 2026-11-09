@@ -189,7 +189,10 @@ unconnected items); critical power/USB layout, stackup, final BOM and
 mechanical qualification remain open. The RP pin budget and independent
 recovery allocation are complete as a design decision. No fabrication release,
 new bench experiment or workspace submodule-pin change is implied. Hardware
-placement milestone is committed locally as `30123379`.
+placement milestone is committed locally as `30123379`. Subsequent owner
+measurements refine the current R4 envelope to 111 × 117 mm with an 18 mm
+component-free band at the A500 edge; the historical first-placement dimensions
+above are superseded. Socket geometry and circuit connections are unchanged.
 
 - [x] Complete the actual board's signal-by-signal budget, including Zorro,
   USB switch controls, VBUS sensing/control, debug, boot and reset. Record the
