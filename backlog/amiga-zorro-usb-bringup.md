@@ -1,7 +1,19 @@
 # Amiga Zorro USB bring up
 
-Status: deliverable 1 in progress; manual USB link and shared-connector flashing demonstrated.
+Status: deliverable 1 feasibility accepted for design; deliverable 2 tooling selected and locally verified.
 Direction agreed: 2026-11-06.
+
+2026-11-09 scope decision: the demonstrated USB link, capacity exchange,
+reset/recovery and manual shared-connector flashing are sufficient to proceed.
+Do not require corrupted application images, more reset repetitions or a
+standalone throughput campaign before circuit design. Physical BOOT at power-on
+already exercised application-independent ROM entry with the peer isolated.
+This accepts feasibility, not a finished switch circuit or production layout.
+
+Next: use the hardware repository's
+[tooling guide](../repos/fujinet-nio-hardware/tools/kicad/README.md) and
+[agent instructions](../repos/fujinet-nio-hardware/AGENTS.md), then resolve the
+USB/power circuit and Zorro pin budget. No new BMad workflow.
 
 ## Goal and working method
 
@@ -76,37 +88,43 @@ Implementation entry point: [USB host bench probe](../repos/fujinet-nio/bridges/
 Confirmed bench inventory: Waveshare Core2350B with RP Tiny Adapter B
 (USB-C, BOOT and RESET), and an ESP32-S3-WROOM-1 N16R8 on a 44-pin carrier
 with two USB-C sockets and BOOT/RST. Exact carrier USB/power routing still
-needs confirmation. The boards share ground; physical acceptance is open.
+needs confirmation only if that carrier routing is relied upon in a new fixture.
+The final integrated circuit must establish its own explicit power paths.
 
-- [ ] Identify the two boards and USB connectors; document the three-mode
-  data/power circuit and controls. Check isolation and power paths before
-  connecting the fixture to the PC.
+- [x] Identify the boards and demonstrate the manually rewired three-mode
+  fixture with isolated power/data paths. Integrated switching belongs to
+  deliverable 2; it was not tested by manually moving the wires.
 - [x] Build the smallest RP USB-host harness and the matching ESP PacketLink
   profile, reusing existing protocol code. Record exact build/flash commands.
   Software checks: [initial verification](../repos/fujinet-nio/bridges/rp2350-zorro/lab/usb-host/VERIFICATION.md).
-- [ ] Flash each processor through the same external connector using physical
-  boot controls, including with nonfunctional application firmware. Verify
-  that neither processor needs its peer's application to recover.
+- [x] Flash each processor through the same external connector using physical
+  ROM boot controls at power-on, with its peer isolated. Return to Run and
+  complete status/clock. Deliberately corrupted application images were not
+  tested and are not a design-entry prerequisite.
 - [x] Return to Run mode, enumerate the correct CDC interface, synchronize and
   complete a real `Clock.GetTime`. Verify known binary data across multiple
   USB transfers up to capacity, plus explicit local capacity-plus-one rejection.
-- [ ] Reset either endpoint and disconnect the link during pending exchanges.
-  Observe bounded failure, unknown completion where appropriate, fresh
-  synchronization and a successful new request, without stale completion or
-  replay of the uncertain request. Include a stalled receiver/partial record.
-- [ ] Record repeatable latency and useful payload throughput, firmware
-  revisions, fixture identity and recovery results. Check both cold startup
-  and repeated Run/Flash/Run cycles.
+- [x] Demonstrate ESP reset with pending=0 and pending=1, retained fault for
+  unknown completion, explicit resync and a new successful request. Demonstrate
+  RP reset during streaming and return to communication. RP pending-at-reset
+  was not observable; do not claim it was proven.
+- [x] Record fixture and functional results in the bench verification ledger.
+  Recorded exchange timings are observations, not a sustained-throughput claim.
 
-Exit: both chips can be recovered through the shared connector independently,
-and the same fixture carries real NIO requests with bounded fault recovery.
-Record measured performance; do not infer it from USB signalling speed.
+Carry forward only when relevant: stalled receiver/partial-record handling to
+bridge integration verification; cold-start service readiness to firmware
+integration; throughput to the real Amiga slice. Verify actual mode selection,
+isolation and Run/Flash/Run transitions when the selected switch circuit exists.
+
+Accepted exit for design: both chips entered ROM and were flashed independently
+through the same connector, and the restored fixture carries real NIO requests
+with the fault recovery recorded above. Do not infer performance from USB speed.
 Stop this deliverable here: no custom PCB, automatic updater, vendor USB class,
 Zorro driver, service redesign or accelerator work.
 
 ## Deliverable 2 Resolve the integrated design
 
-Begin after the POC establishes the chosen topology. Hardware details belong
+Proceed now using the accepted POC evidence. Hardware details belong
 in the hardware repo; link semantics belong in the bridge ABI and PacketLink
 docs. Preserve the existing BMad artifacts as history and reference material.
 
