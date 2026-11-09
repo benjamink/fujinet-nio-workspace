@@ -128,6 +128,17 @@ Proceed now using the accepted POC evidence. Hardware details belong
 in the hardware repo; link semantics belong in the bridge ABI and PacketLink
 docs. Preserve the existing BMad artifacts as history and reference material.
 
+2026-11-09 candidate progress: live configured KiCad MCP calls succeeded and
+the passive breakout was inspected without saving it. The separate
+[integrated R0 proposal](../repos/fujinet-nio-hardware/amiga/integrated-r0/proposal.md)
+contains a revised complete RP allocation and an implemented USB/power/recovery
+subcircuit (170 independently checked pin assignments, four USB selector states,
+zero KiCad ERC findings). Processor/Zorro sheets, final power sign-off and PCB
+are unfinished; the checkboxes below remain open. Existing synthetic captures
+were located, but the referenced 32-channel Amiga captures and earlier active
+schematic were not found in the inspected trees. Locate that existing evidence
+before claiming real-bus timing closure; do not repeat USB feasibility tests.
+
 - [ ] Complete the actual board's signal-by-signal budget, including Zorro,
   USB switch controls, VBUS sensing/control, debug, boot and reset. Record the
   chosen routing/power design and independent recovery access before layout.
