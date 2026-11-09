@@ -98,3 +98,4 @@ Mark delegated these to dillera, who accepted the proposals on 2026-10-18.
 - **Ownership of new commands.** No new FujiBus commands in v1. The install queue is filled through existing FileDevice writes to the persistent filesystem; status is diagnostics-only (`hotsync.status`).
 - **Calendar sources.** ICS over HTTP(S) only for CAP-6. Google OAuth stays a non-goal.
 - **Repository home.** Palm apps stay in `dillera/fujinet-palm` and consume `fujinet-nio-lib`.
+  That repository is outside NIO. No NIO repository (this workspace, `fujinet-nio`, `fujinet-nio-lib`, `nio-config`, `nio-core-apps`) may depend on it: no build step, script, test, document or CI job here requires, builds from or links to it. Anything NIO needs from it (the HotSync harness and its traces, `fake_palm.py`, a toolchain recipe) lives in an NIO repository, or is described only as an optional external reference.

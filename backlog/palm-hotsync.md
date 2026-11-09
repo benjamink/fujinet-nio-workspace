@@ -14,6 +14,8 @@ This is a clean re-implementation to NIO standards of dillera's classic fujinet-
 
 Spec: [`_bmad-output/specs/spec-palm-hotsync/SPEC.md`](../_bmad-output/specs/spec-palm-hotsync/SPEC.md)
 
+The Palm apps live in `dillera/fujinet-palm`, which is outside NIO. NIO repositories must not depend on it (see "Repository home" in the spec): what NIO needs from it moves into an NIO repository.
+
 ## Phase 0: design agreement
 
 - [x] Maintainer review of the spec. Mark delegated the open questions to dillera; decisions recorded in the spec.
