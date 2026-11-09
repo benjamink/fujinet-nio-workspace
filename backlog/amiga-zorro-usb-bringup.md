@@ -134,10 +134,24 @@ the passive breakout was inspected without saving it. The separate
 contains a revised complete RP allocation and an implemented USB/power/recovery
 subcircuit (170 independently checked pin assignments, four USB selector states,
 zero KiCad ERC findings). Processor/Zorro sheets, final power sign-off and PCB
-are unfinished; the checkboxes below remain open. Existing synthetic captures
-were located, but the referenced 32-channel Amiga captures and earlier active
-schematic were not found in the inspected trees. Locate that existing evidence
-before claiming real-bus timing closure; do not repeat USB feasibility tests.
+are unfinished; the checkboxes below remain open. The user has since clarified that the real Amiga captures were not committed.
+The supplied screenshots and two-analyzer/32-channel observation are accepted
+bring-up evidence; no CSV conversion tool is needed before design. They do not
+qualify timing of the new active buffers. Do not repeat USB feasibility tests.
+
+2026-11-09 next-stage decision: primary hardware plugs directly into the A500
+86-contact edge through a female socket; the manufactured passive breakout and
+purchased adapter remain bench infrastructure. A2000 is a separate future
+100-contact card variant. The new
+[A500 R1 candidate](../repos/fujinet-nio-hardware/amiga/integrated-a500-r1/README.md)
+contains seven functional circuit sheets plus overview, both processors,
+SD storage and implemented bus interlocks. Native verification checks 803 pad
+assignments/183 complete nets, 81 RP pads, 32,768 static interlock cases and
+USB selections. Thirty external-host ERC model findings remain visible.
+Power protection/current behaviour, A500 timing, socket mechanics, final BOM
+and PCB layout remain open; this is a circuit-review milestone, not electrical
+or fabrication approval. Hardware candidate committed locally as `6278f8cb`; no workspace submodule pin
+is advanced.
 
 - [ ] Complete the actual board's signal-by-signal budget, including Zorro,
   USB switch controls, VBUS sensing/control, debug, boot and reset. Record the
