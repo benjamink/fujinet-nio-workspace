@@ -153,6 +153,20 @@ and PCB layout remain open; this is a circuit-review milestone, not electrical
 or fabrication approval. Hardware candidate committed locally as `6278f8cb`; no workspace submodule pin
 is advanced.
 
+2026-11-09 electrical-review continuation: the
+[A500 R2 candidate](../repos/fujinet-nio-hardware/amiga/integrated-a500-r2/README.md)
+corrects R1's local-DTACK handshake. Commodore documents motherboard-generated
+DTACK and an XRDY holdoff deadline of 60ns; R2 implements that holdoff, per-cycle
+completion/read-drive latches and BERR output inhibition without extra RP GPIO.
+Native checks cover 831 pin assignments on 189 nets, 65,536 static cases and
+65,536 latch sequences. Thirty-two external-host ERC findings remain visible.
+The provisional timing allocation is documented, not physical qualification.
+Power protection/CC behaviour, socket mechanics, BOM and layout remain open;
+PIO sequencing and watchdog recovery must precede active attachment. Existing
+USB demonstrations and passive captures remain accepted; no repeat experiment
+is requested. R1 and the released passive hardware are preserved.
+Hardware milestone: local commit `658eb316`; workspace submodule pin unchanged.
+
 - [ ] Complete the actual board's signal-by-signal budget, including Zorro,
   USB switch controls, VBUS sensing/control, debug, boot and reset. Record the
   chosen routing/power design and independent recovery access before layout.
