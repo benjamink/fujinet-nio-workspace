@@ -179,7 +179,19 @@ contact orientation/case fit, final BOM, fault transients and PCB layout remain
 open. R0–R2 and released hardware are preserved. Hardware milestone: local
 commit `0e686501`; no workspace pin is advanced.
 
-- [ ] Complete the actual board's signal-by-signal budget, including Zorro,
+2026-11-09 physical-design continuation: the separate
+[A500 R4 candidate](../repos/fujinet-nio-hardware/amiga/integrated-a500-r4/README.md)
+contains the first horizontal 105 × 124 mm PCB placement, all 188 physical
+components, a reference-derived 86-contact socket footprint and four mounting
+holes. Native checks verify all 864 functional pin assignments and zero
+schematic/PCB parity findings. The saved board remains unrouted (499
+unconnected items); critical power/USB layout, stackup, final BOM and
+mechanical qualification remain open. The RP pin budget and independent
+recovery allocation are complete as a design decision. No fabrication release,
+new bench experiment or workspace submodule-pin change is implied. Hardware
+placement milestone is committed locally as `30123379`.
+
+- [x] Complete the actual board's signal-by-signal budget, including Zorro,
   USB switch controls, VBUS sensing/control, debug, boot and reset. Record the
   chosen routing/power design and independent recovery access before layout.
 - [ ] Update the draft ABI to use the USB PacketLink profile, replacing SPI
