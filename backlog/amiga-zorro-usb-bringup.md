@@ -167,6 +167,18 @@ USB demonstrations and passive captures remain accepted; no repeat experiment
 is requested. R1 and the released passive hardware are preserved.
 Hardware milestone: local commit `658eb316`; workspace submodule pin unchanged.
 
+2026-11-09 input-power continuation: the
+[A500 R3 candidate](../repos/fujinet-nio-hardware/amiga/integrated-a500-r3/README.md)
+adds TPS259630 current/voltage protection, LM66100 reverse blocking and CC ESD,
+without changing the RP GPIO allocation or R2 bus handshake. Native checks
+cover 188 physical components, 864 pin assignments and 195 complete nets;
+33 explicitly reviewed ERC findings remain. The conditional 1.166A input
+budget fits the calculated 1.197A minimum limit with a small margin.
+Manufacturer socket dimensions and component candidates are recorded, but
+contact orientation/case fit, final BOM, fault transients and PCB layout remain
+open. R0–R2 and released hardware are preserved. Hardware milestone: local
+commit `0e686501`; no workspace pin is advanced.
+
 - [ ] Complete the actual board's signal-by-signal budget, including Zorro,
   USB switch controls, VBUS sensing/control, debug, boot and reset. Record the
   chosen routing/power design and independent recovery access before layout.
