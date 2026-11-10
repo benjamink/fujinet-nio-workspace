@@ -16,14 +16,13 @@ __pycache__/
 __init__.py
 __main__.py
 
-/repos/PDCurses/
 /repos/bounce-world/
-/repos/8n1
 /repos/core2350-test
-/repos/DIEGO-500
-/repos/fujinet-xkcd
 /repos/fujinet-config-ng
 /repos/syn-ack-wire
+
+# local reference checkouts: look-at-only, not part of NIO, never tracked
+/reference/
 
 /scratch
 /images/

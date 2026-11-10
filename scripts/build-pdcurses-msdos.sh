@@ -5,12 +5,14 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=env.sh
 source "$SCRIPT_DIR/env.sh"
 
-PDCURSES_DIR="${PDCURSES_DIR:-$NIO_WORKSPACE/repos/PDCurses}"
+PDCURSES_DIR="${PDCURSES_DIR:-$NIO_WORKSPACE/external/PDCurses}"
 PDCURSES_BUILD_DIR="${PDCURSES_BUILD_DIR:-$NIO_WORKSPACE/build/pdcurses/msdos-small}"
 PDCURSES_MSDOS_LIB="${PDCURSES_MSDOS_LIB:-$PDCURSES_BUILD_DIR/pdcurses.lib}"
 
-if [ ! -d "$PDCURSES_DIR" ]; then
-  git clone --depth 1 https://github.com/wmcbrine/PDCurses.git "$PDCURSES_DIR"
+if [ ! -f "$PDCURSES_DIR/curses.h" ]; then
+  echo "PDCurses not found at $PDCURSES_DIR." >&2
+  echo "Get the pinned copy: git submodule update --init external/PDCurses" >&2
+  exit 1
 fi
 
 mkdir -p "$PDCURSES_BUILD_DIR"

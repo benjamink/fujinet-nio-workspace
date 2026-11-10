@@ -28,6 +28,7 @@ fujinet-nio-workspace/
     AltirraSDL/  fujinet-emulator-bridge/  qemu-msdos-init/
   external/
     palmdev-toolchain/           # Palm OS toolchain by another project; opt-in, see below
+    PDCurses/                    # curses library for the MS-DOS nio-config; opt-in, see below
   scripts/
   docs/
   backlog/
@@ -69,6 +70,21 @@ cd repos/fujinet-nio-lib && make check-palmos
 
 `make check` does not need any of this. The SDKs are not part of NIO; the toolchain's
 installer asks for them. Docker (or native prc-tools) is required.
+
+### PDCurses (MS-DOS nio-config)
+
+The MS-DOS `nio-config` links PDCurses, which `scripts/build-pdcurses-msdos.sh` builds
+(Open Watcom required) into `build/pdcurses/`:
+
+```sh
+git submodule update --init external/PDCurses
+scripts/build-pdcurses-msdos.sh
+```
+
+### Reference checkouts
+
+`reference/` is gitignored and holds look-at-only repositories that are not part of
+NIO. Put anything you want to read beside the code there; nothing in the build uses it.
 
 To work on your own forks of the submodules, and for what a workspace pull
 request may contain, see [CONTRIBUTING.md](CONTRIBUTING.md).

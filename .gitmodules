@@ -52,3 +52,7 @@
 	path = external/palmdev-toolchain
 	url = https://github.com/mozzwald/palmdev-toolchain.git
 	update = none
+[submodule "external/PDCurses"]
+	path = external/PDCurses
+	url = https://github.com/wmcbrine/PDCurses.git
+	update = none
