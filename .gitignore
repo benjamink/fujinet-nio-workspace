@@ -16,9 +16,7 @@ __pycache__/
 __init__.py
 __main__.py
 
-/repos/bounce-world/
 /repos/core2350-test
-/repos/fujinet-config-ng
 /repos/syn-ack-wire
 
 # local reference checkouts: look-at-only, not part of NIO, never tracked

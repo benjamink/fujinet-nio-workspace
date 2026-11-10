@@ -40,7 +40,7 @@ from the directory like the C64 does.
       anything addressed by a fixed number in `atari_dli.s`, `atari_scr_fast.s` and the bank
       switch, and zero-page use by the library's SIO code, the loader and PicoBoot.
 - [ ] Check the Atari memory-boundary rules against the layout, in case something now straddles
-      one. From `repos/fujinet-config-ng/cfg/atari.full.cfg`: display lists must sit on a 1K
+      one. From `fujinet-config-ng/cfg/atari.full.cfg` (a local reference checkout, `reference/` in the workspace): display lists must sit on a 1K
       boundary and must not cross one; player/missile graphics need a 1K-aligned area (this
       launcher does not use them, but a future screen might); screen memory that crosses a 4K
       boundary needs a jump in the display list at it (`atari_scr.c` already nudges row bases
