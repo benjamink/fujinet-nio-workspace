@@ -1621,6 +1621,7 @@ results = [
   "cfg-fill.result",
   "cfg-reload.result",
   "cfg-big.result",
+  "cfg-media.result",
 ]
 
 [test.environment_variants.wb13]
