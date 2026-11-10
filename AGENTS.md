@@ -30,6 +30,11 @@ host-side wire tests and public archive-link test. A partial build is not an
 all-target pass; if a toolchain is genuinely unavailable, record the exact
 target and toolchain in the task review.
 
+Palm OS is not part of `make check`. For changes to the Palm targets
+(`palmos-*`, `src/platform/palmos/`, `include/palmos/`), also run
+`make check-palmos`; it needs the opt-in `external/palmdev-toolchain` submodule
+(see README, "Palm OS toolchain").
+
 ## Cross-repository work
 
 A firmware protocol change or new setting isn't finished in `repos/fujinet-nio`

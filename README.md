@@ -26,6 +26,8 @@ fujinet-nio-workspace/
     bounce-world-client-nio/
     cc65/  cc65-clib/            # toolchains
     AltirraSDL/  fujinet-emulator-bridge/  qemu-msdos-init/
+  external/
+    palmdev-toolchain/           # Palm OS toolchain by another project; opt-in, see below
   scripts/
   docs/
   backlog/
@@ -48,6 +50,25 @@ For an existing clone:
 ```sh
 scripts/update-all.sh
 ```
+
+### Palm OS toolchain (optional)
+
+Everything under `repos/` is NIO's own. `external/` holds other people's tools
+that NIO uses but does not control. They are pinned like any submodule, cloned
+over https with no fork, and opt-in: a normal `--recurse-submodules` clone and
+`scripts/update-all.sh` skip them, so nobody downloads a toolchain they do not need.
+
+To build the Palm OS targets of `fujinet-nio-lib`:
+
+```sh
+git submodule update --init external/palmdev-toolchain
+cd external/palmdev-toolchain && ./setup.sh   # interactive: you supply the Palm and Handspring SDKs
+cd ../.. && source scripts/env.sh             # exports PALMDEV_TOOLCHAIN
+cd repos/fujinet-nio-lib && make check-palmos
+```
+
+`make check` does not need any of this. The SDKs are not part of NIO; the toolchain's
+installer asks for them. Docker (or native prc-tools) is required.
 
 To work on your own forks of the submodules, and for what a workspace pull
 request may contain, see [CONTRIBUTING.md](CONTRIBUTING.md).

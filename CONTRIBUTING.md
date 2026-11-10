@@ -4,6 +4,10 @@ The workspace pins every product repository as a submodule. Most changes
 belong in those repositories; the workspace itself carries docs, scripts,
 tools and the pinned commits.
 
+Third-party tools NIO uses but does not control live under `external/` as opt-in
+submodules (https, no fork, `update = none`); `scripts/check-gitmodules.sh` enforces
+this. Bump their pins like any other, to a commit on the tool's own default branch.
+
 ## Working on your own forks
 
 Clone the workspace as usual (from your fork of it, if you have one):

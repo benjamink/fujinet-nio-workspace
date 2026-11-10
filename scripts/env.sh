@@ -56,6 +56,8 @@ setup_nio_environment() {
   export CC65_SRC="${CC65_SRC:-$CC65_ROOT}"
   export CC65_CLIB="$NIO_WORKSPACE/repos/cc65-clib"
   export QEMU_MSDOS_INIT="$NIO_WORKSPACE/repos/qemu-msdos-init"
+  # Opt-in third-party tool: git submodule update --init external/palmdev-toolchain
+  export PALMDEV_TOOLCHAIN="${PALMDEV_TOOLCHAIN:-$NIO_WORKSPACE/external/palmdev-toolchain}"
   export PDCURSES_DIR="${PDCURSES_DIR:-$NIO_WORKSPACE/repos/PDCurses}"
 
   if [ -f "$NIO_WORKSPACE/local/config.env" ]; then

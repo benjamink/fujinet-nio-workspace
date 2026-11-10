@@ -14,7 +14,7 @@ documented differently, and some of the instructions point outside the NIO repos
 
 | Target | Toolchain | How it is obtained today |
 |---|---|---|
-| Palm OS (`fujinet-nio-lib` `palmos-*`, `palmos-shared`; `nio-config` Palm) | prc-tools-remix 2.3.6 (GCC 2.95.3), PilRC, build-prc, Palm OS 3.5 SDK, and for USB the Handspring SDK headers | A Dockerfile in `mozzwald/fujinet-palm`, which is not an NIO repository. `fujinet-nio-lib#9` was asked to add its own pinned Dockerfile and drop the references |
+| Palm OS (`fujinet-nio-lib` `palmos-*`, `palmos-shared`; `nio-config` Palm) | prc-tools-remix 2.3.6 (GCC 2.95.3), PilRC, build-prc, Palm OS 3.5 SDK, and for USB the Handspring SDK headers | `palmdev-toolchain` (`mozzwald/palmdev-toolchain`, MIT), accepted as an external tool NIO uses but does not control (decided with `fujinet-nio-lib#9`). The workspace carries it as the opt-in submodule `external/palmdev-toolchain`; `make check-palmos` in the library uses it |
 | Classic Mac (`mac68k`, `fujinet-nio-lib#10`) | Retro68 (`m68k-apple-macos-gcc`) | Build it from source, or the prebuilt `ghcr.io/autc04/retro68` image. Verified: `docker run --rm -u $(id -u):$(id -g) -e HOME=/tmp --entrypoint /bin/bash -v "$PWD":/work -w /work ghcr.io/autc04/retro68 -c 'export PATH=/Retro68-build/toolchain/bin:$PATH; make mac68k'` builds with no warnings (image 5.59 GB, GCC 16.1.0) |
 | Amiga | amiga-gcc, NDK, clib2 | A local install under `/opt/amiga`, readable headers needed |
 | MS-DOS | Open Watcom | A local install under `/opt/watcom` |
@@ -28,6 +28,8 @@ Findings from the reviews that this must respect:
 - The Handspring SDK (`Include/UsbMgr.h`, from palmdb.net's Palm OS SDK page) has an EULA that
   restricts redistribution. It stays an input the user supplies, never baked into an image or
   committed.
+- The Handspring SDK mirror that `palmdev-toolchain` fetches from is a known, accepted
+  licence risk (the publisher no longer exists); NioLib's docs say so in one line.
 - Running a container as root leaves root-owned files in the tree. `-u $(id -u):$(id -g)` with
   `-e HOME=/tmp` and `--entrypoint /bin/bash` worked for Retro68.
 - A worktree outside the workspace layout breaks sibling lookups (`../fujinet-nio`,
@@ -48,13 +50,13 @@ Findings from the reviews that this must respect:
       stop referring to another project's repository.
 - [ ] Say where the images live (a registry, or built from the Dockerfiles) and how CI gets
       them.
-- [ ] `make check` in `fujinet-nio-lib` needs several of these toolchains; make that
+- [x] Palm is split out of `make check` into `make check-palmos`. `make check` still needs the other toolchains; make that
       explicit in `docs/agent-test-policy.md` (an unavailable toolchain is an environment
       blocker, not a skip).
 
 ## Dependencies
 
-`fujinet-nio-lib#9` (Palm: its own Dockerfile), `fujinet-nio-lib#10` (Mac: documentation of the
+`fujinet-nio-lib#9` (Palm: external `palmdev-toolchain`, done; see `external/`), `fujinet-nio-lib#10` (Mac: documentation of the
 Retro68 image), and the build orchestration in `build-orchestration-followups.md`.
 
 ## Acceptance

@@ -48,3 +48,7 @@
 	path = repos/MyPicoDOS
 	url = https://github.com/markjfisher/MyPicoDOS.git
 	branch = bootq
+[submodule "external/palmdev-toolchain"]
+	path = external/palmdev-toolchain
+	url = https://github.com/mozzwald/palmdev-toolchain.git
+	update = none
