@@ -12,7 +12,7 @@
 	url = git@github.com:markjfisher/fujinet-qemu-msdos.git
 [submodule "repos/fn-rom"]
 	path = repos/fn-rom
-	url = git@github.com:markjfisher/fn-rom.git
+	url = git@github.com:fujinet-nio/fn-rom.git
 [submodule "repos/bounce-world-client-nio"]
 	path = repos/bounce-world-client-nio
 	url = git@github.com:markjfisher/bounce-world-client-nio.git
