@@ -31,7 +31,7 @@
 	url = git@github.com:markjfisher/qemu-msdos-init.git
 [submodule "repos/fujinet-nio-driver"]
 	path = repos/fujinet-nio-driver
-	url = git@github.com:markjfisher/fujinet-nio-driver.git
+	url = git@github.com:fujinet-nio/fujinet-nio-driver.git
 [submodule "repos/cc65-clib"]
 	path = repos/cc65-clib
 	url = git@github.com:markjfisher/cc65-clib.git
