@@ -1626,6 +1626,10 @@ results = [
 
 [test.environment_variants.wb13]
 startup = "startup/config-nio-wb13.sequence"
+# The WB1.3 guest takes about 155 s to reach its marker on a slower machine;
+# these limits only bound the local harness wait, so leave headroom.
+activity_timeout = 240
+timeout = 300
 startup_target = "S/StartupII"
 amiga_artifact_profile = "wb13"
 wb13_mountlist = true
