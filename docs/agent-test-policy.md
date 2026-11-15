@@ -45,7 +45,7 @@ ESP32 in `fujinet-nio`; Amiga vs MS-DOS in the driver; BBC vs Atari in apps.
 | `repos/nio-apps` | The example/diagnostic you changed, on that platform. | — | All examples on all machines |
 | `repos/fn-rom` | `./run_unit_tests.sh` or the focused YAML under `unit-tests/tests/` that covers the command/FS path. | `./run_tests.sh` if unit tests are not enough. Beebium only when the ticket is E2E. | Every `BUILD_MACHINE` × `BUILD_INTERFACE` |
 | Workspace `integration-tests/amiberry` | One pytest node (see Amiga section). | `-k` subset. | Full `scripts/amiga-tests` (~6 min) |
-| Workspace `tools/build`, `tools/amiga_emulator` | That package’s pytest (e.g. `tools/amiga_emulator/tests`). | — | Amiberry guest suite for a Python-only harness change, unless the harness itself is under test |
+| Workspace `tools/build`, `tools/amiga_emulator`, `tools/c64_emulator` | That package’s pytest (e.g. `tools/amiga_emulator/tests`, `python3 -m pytest tools/c64_emulator/tests`). | — | Amiberry guest suite for a Python-only harness change, unless the harness itself is under test |
 
 Workspace platform workflows (`scripts/build.sh linux`, `amiga`, `bbc`, …) are for
 human/CI composition, not the default inner agent loop.
