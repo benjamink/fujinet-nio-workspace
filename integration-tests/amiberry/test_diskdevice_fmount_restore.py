@@ -30,9 +30,13 @@ def test_fmount_fumount_persisted_dd_hd_restore(run_amiga_case, installation):
     assert "HD TYPE AFTER RC=0" in results["restore-hd-after-type.result"]
 
     assert "DD FUMOUNT RC=0" in results["restore-dd-fumount.result"]
-    assert "DD SECOND FUMOUNT RC=0" not in results["restore-dd-absent.result"]
+    # FUMOUNT treats a missing DOS entry as already removed (nio-core-apps
+    # 94bf0d85): the second one succeeds and says there was nothing to remove.
+    assert "DD SECOND FUMOUNT RC=0" in results["restore-dd-absent.result"]
+    assert "DN0: no DOS entry to remove" in results["restore-dd-absent.result"]
     assert "HD FUMOUNT RC=0" in results["restore-hd-fumount.result"]
-    assert "HD SECOND FUMOUNT RC=0" not in results["restore-hd-absent.result"]
+    assert "HD SECOND FUMOUNT RC=0" in results["restore-hd-absent.result"]
+    assert "DN1: no DOS entry to remove" in results["restore-hd-absent.result"]
     assert results["_mappings"] == "01" + "00" * 16
 
 
