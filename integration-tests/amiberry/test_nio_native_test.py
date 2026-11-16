@@ -8,7 +8,7 @@ from conftest import native_test_map_omits_serial_session_slip
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_native_test_clock_exchange(run_amiga_case):
+def test_native_test_clock_exchange(run_amiga_case, pytestconfig):
     results = run_amiga_case("nio-native-test")
 
     assert "LOAD RC=0" in results["nio-load.result"].splitlines()
@@ -19,8 +19,9 @@ def test_native_test_clock_exchange(run_amiga_case):
     assert "CLOCK cmd=1" in probe
     assert "PASS native-test-clock" in probe
     assert "TOOL RC=0" in results["nio-tool-rc.result"].splitlines()
+    profile = pytestconfig.getoption("--amiga-env")
     map_path = ROOT / (
-        "repos/fujinet-nio-driver/build/amiga/"
+        f"repos/fujinet-nio-driver/build/amiga/{profile}/"
         "fujinet-nio-native-test.device.map"
     )
     assert map_path.is_file()

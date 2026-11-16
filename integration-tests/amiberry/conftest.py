@@ -1111,8 +1111,17 @@ def run_amiga_case(amiga_environment: dict[str, str],
                 catalog_dir.chmod(0o555)
                 readonly_catalog_dir = catalog_dir
         elif not case.get("nio_broker"):
+            # The driver Makefile rejects an unprofiled build, so build the
+            # native device into the profile this case runs under.
+            native_make = ["make"]
+            if artifact_profile:
+                native_make += [
+                    f"BUILD_DIR=../build/amiga/{artifact_profile}",
+                    f"AMIGA_WB13={1 if artifact_profile == 'wb13' else 0}",
+                ]
+            native_make.append("native")
             subprocess.run(
-                ["make", "native"],
+                native_make,
                 cwd=driver_root / "amiga",
                 env=amiga_environment,
                 check=True,

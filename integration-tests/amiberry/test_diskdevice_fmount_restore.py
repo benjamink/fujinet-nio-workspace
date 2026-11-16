@@ -1,6 +1,25 @@
 import pytest
+
+
+def second_fumount_absent(kind, unit, result, pytestconfig):
+    """A second FUMOUNT of a unit the first already unmounted.
+
+    Where handlers can exit (WB3.2) the first FUMOUNT removes the DOS node, so
+    the second finds none and, since nio-core-apps 94bf0d85, treats that as
+    already removed: RC=0 and a note. Earlier Workbenches park the handler
+    instead (the node stays), so the second FUMOUNT reports the unit is not
+    mounted and fails with RC=10.
+    """
+    if pytestconfig.getoption("--amiga-env").startswith("wb32"):
+        assert f"{kind} SECOND FUMOUNT RC=0" in result
+        assert f"{unit} no DOS entry to remove" in result
+    else:
+        assert f"{kind} SECOND FUMOUNT RC=0" not in result
+        assert f"{unit} is not mounted" in result
+
+
 @pytest.mark.parametrize("installation", ["serial", "native"])
-def test_fmount_fumount_persisted_dd_hd_restore(run_amiga_case, installation):
+def test_fmount_fumount_persisted_dd_hd_restore(run_amiga_case, installation, pytestconfig):
     results = run_amiga_case("diskdevice-fmount-restore", installation=installation)
 
     assert "DD FMOUNT RC=0" in results["restore-dd-mount.result"]
@@ -30,9 +49,9 @@ def test_fmount_fumount_persisted_dd_hd_restore(run_amiga_case, installation):
     assert "HD TYPE AFTER RC=0" in results["restore-hd-after-type.result"]
 
     assert "DD FUMOUNT RC=0" in results["restore-dd-fumount.result"]
-    assert "DD SECOND FUMOUNT RC=0" not in results["restore-dd-absent.result"]
+    second_fumount_absent("DD", "DN0:", results["restore-dd-absent.result"], pytestconfig)
     assert "HD FUMOUNT RC=0" in results["restore-hd-fumount.result"]
-    assert "HD SECOND FUMOUNT RC=0" not in results["restore-hd-absent.result"]
+    second_fumount_absent("HD", "DN1:", results["restore-hd-absent.result"], pytestconfig)
     assert results["_mappings"] == "01" + "00" * 16
 
 

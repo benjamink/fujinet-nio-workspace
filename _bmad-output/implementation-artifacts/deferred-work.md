@@ -95,3 +95,7 @@
 - source_spec: `_bmad-output/specs/spec-amiga-zorro-ii-packet-native-backend/stories/2-1-create-an-isolated-reproducible-bridge-project-skeleton.md`
   summary: Reconcile the firmware source generator/templates with checked-in POSIX/ESP build-profile selection.
   evidence: At fujinet-nio baseline 2365fbce15391ae445f38962909ab8c8f172d84e, scripts/update_cmake_sources.py changes CMakeLists_posix.cmake and src/CMakeLists.txt without any bridge changes. Story 2.1 generated both files from baseline-only and bridge-added temporary trees and verified byte-identical outputs; original checked-in lists were preserved. Exact hashes are in the story verification record.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-pico2w-dual-core.md`
+  summary: FujiBus framing does not discard partial or queued frames on channel session changes.
+  evidence: FujiBusTransport delegates poll/receive directly to its framer without observing Channel::connection_epoch; only NetIecIngress currently consumes that signal. This predates the dual-core USB change and needs a platform-neutral framing/session design with reconnect tests.
