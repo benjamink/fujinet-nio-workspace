@@ -62,6 +62,13 @@ setup_nio_environment() {
   # vice-fn, the VICE the C64 tests use; scripts/build-vice-fn.sh builds it into VICE_FN_BUILD.
   export VICE_FN_ROOT="${VICE_FN_ROOT:-$NIO_WORKSPACE/external/vice-fn}"
 
+  # Raspberry Pi Pico SDK (RP2040/RP2350). Arch AUR `pico-sdk` installs here;
+  # override in local/config.env. Left unset when absent so other machines and
+  # CI are unaffected.
+  if [[ -z ${PICO_SDK_PATH:-} && -d /usr/share/pico-sdk ]]; then
+    export PICO_SDK_PATH=/usr/share/pico-sdk
+  fi
+
   if [ -f "$NIO_WORKSPACE/local/config.env" ]; then
     # shellcheck source=/dev/null
     source "$NIO_WORKSPACE/local/config.env"
