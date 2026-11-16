@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -282,20 +283,17 @@ class FtpCliTests(unittest.TestCase):
 class ReleaseScriptTests(unittest.TestCase):
     def test_release_script_splits_devs_and_c(self) -> None:
         text = RELEASE_SCRIPT.read_text(encoding="utf-8")
-        self.assertIn(
-            "put repos/fujinet-nio-driver/build/amiga/fujinet-nio.device "
-            "-o /dev/NIO/Devs/fujinet-nio.device",
-            text,
+        # "put <local> -o <remote>"; the script aligns its columns, so parse it.
+        puts = dict(re.findall(r"^put (\S+)\s+-o (\S+)$", text, re.MULTILINE))
+        driver = "repos/fujinet-nio-driver/build/amiga/wb32"
+        self.assertEqual(puts[f"{driver}/fujinet-nio.device"], "/dev/NIO/Devs/")
+        self.assertEqual(puts[f"{driver}/fujinet-disk.device"], "/dev/NIO/Devs/")
+        self.assertEqual(
+            puts["repos/nio-core-apps/build/amiga/wb32/bin/fmount"], "/dev/NIO/C/"
         )
-        self.assertIn(
-            "put repos/fujinet-nio-driver/build/amiga/fujinet-disk.device "
-            "-o /dev/NIO/Devs/fujinet-disk.device",
-            text,
-        )
-        self.assertIn(
-            "put repos/nio-core-apps/build/amiga/bin/fmount -o /dev/NIO/C/fmount",
-            text,
-        )
-        self.assertNotIn("/dev/NIO/C/fujinet-nio.device", text)
-        self.assertNotIn("/dev/NIO/Devs/fapp", text)
+        for local, remote in puts.items():
+            if local.endswith(".device"):
+                self.assertTrue(remote.startswith("/dev/NIO/Devs/"), local)
+            else:
+                self.assertTrue(remote.startswith("/dev/NIO/C/"), local)
         self.assertTrue(text.strip().endswith("bye"))
