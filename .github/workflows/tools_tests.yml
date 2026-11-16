@@ -24,9 +24,13 @@ jobs:
       - name: Install test dependencies
         run: python3 -m pip install pytest pyyaml pillow
 
-      # tools/build is a package named "build", which tools/ on PYTHONPATH
-      # would shadow, so it runs on its own.
+      # nio_build lives in tools/build. A developer's checkout finds it through
+      # tools/build/tests/__init__.py, which .gitignore excludes, so a fresh
+      # clone needs the path. tools/ itself must not be on PYTHONPATH here: it
+      # would make "build" resolve to tools/build.
       - name: Build tasks
+        env:
+          PYTHONPATH: tools/build
         run: python3 -m pytest tools/build/tests -q
 
       - name: Emulator drivers and BBC image writer
