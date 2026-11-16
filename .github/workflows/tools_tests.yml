@@ -1,0 +1,39 @@
+name: Tool tests
+
+# The workspace's own Python tools (tools/): the Amiga and C64 emulator drivers,
+# the BBC disc image writer and the build tasks. Pure Python; no emulator.
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install test dependencies
+        run: python3 -m pip install pytest pyyaml pillow
+
+      # nio_build lives in tools/build. A developer's checkout finds it through
+      # tools/build/tests/__init__.py, which .gitignore excludes, so a fresh
+      # clone needs the path. tools/ itself must not be on PYTHONPATH here: it
+      # would make "build" resolve to tools/build.
+      - name: Build tasks
+        env:
+          PYTHONPATH: tools/build
+        run: python3 -m pytest tools/build/tests -q
+
+      - name: Emulator drivers and BBC image writer
+        env:
+          PYTHONPATH: tools
+        run: python3 -m pytest tools/amiga_emulator/tests tools/c64_emulator/tests tools/bbc_image/tests -q
