@@ -99,3 +99,22 @@ the next six bytes never entered the instrumented raw TCP send path. Server EOF
 followed its 30-second idle timeout. Root cause remains open; next observation
 should cover host/Pico USB, framing and dispatch. Detailed frame evidence:
 `repos/fujinet-nio/pico2w/bounce-soak-2026-11-17.md`.
+
+### USB evidence and Linux mitigation
+
+Filtered USB capture shows the failed Write stopped after sixteen one-byte
+submissions (header only); the six-byte body and closing delimiter were never
+submitted. A pending header transfer completed when Close began one second
+later. This narrows the failure to incomplete host-side serial submission,
+without proving why USB completion/readiness was delayed.
+
+The Linux library now uses its existing complete-frame bulk-write callback,
+handles partial writes without replay, and bounds interrupted/backpressured
+writes with a monotonic deadline and periodic readiness rechecks. Both Linux
+clients were rebuilt; no firmware reflash or application timeout change.
+Library make test and client text/network/gfx checks passed. Full make check
+was attempted: main targets and amiga-driver built, but mac68k is blocked by
+missing Retro68 m68k-apple-macos-gcc. It is not an all-target pass.
+
+- [ ] Repeat hardware soak with the rebuilt Linux client; verify complete
+  frame submissions and investigate any remaining failure before claiming a fix.
