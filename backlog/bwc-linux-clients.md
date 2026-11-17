@@ -118,3 +118,12 @@ missing Retro68 m68k-apple-macos-gcc. It is not an all-target pass.
 
 - [ ] Repeat hardware soak with the rebuilt Linux client; verify complete
   frame submissions and investigate any remaining failure before claiming a fix.
+
+### Authored vector shapes
+
+User superseded the earlier instruction to leave Amiga outlines unchanged:
+both Amiga and Linux now render all 19 fixed original shapes from one authored
+vector table, including distinct single-cell symbols. The example Amiga
+overrides and runtime cell-tracing render path were replaced. Linux SDL tests,
+host vectors/bounds tests, both Amiga builds and Linux gallery inspection pass.
+Amiga live presentation and user gallery acceptance remain pending.
