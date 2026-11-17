@@ -89,3 +89,13 @@ bounded close queue and global output rate limiting. The Pico 2 W UF2 built with
 the current default Mozilla bundle. Artifact:
 `/tmp/nio-pico2w-build/fujinet_nio_pico2w.uf2`. Not flashed or hardware-tested.
 Workspace documentation checked with `git diff --check`; no submodule pin moved.
+
+### First diagnostic soak evidence
+
+The 2026-11-17 run failed after approximately 36 minutes with a host-side
+fn_write transport timeout, not the prior application reply deadline. Packet
+capture and Pico counters agree that the last successful request/reply completed;
+the next six bytes never entered the instrumented raw TCP send path. Server EOF
+followed its 30-second idle timeout. Root cause remains open; next observation
+should cover host/Pico USB, framing and dispatch. Detailed frame evidence:
+`repos/fujinet-nio/pico2w/bounce-soak-2026-11-17.md`.
