@@ -57,3 +57,35 @@ was used. Build/run instructions, controls and shape limitations are in
 
 Workspace submodule pins were not changed: the implementation commits have not
 been merged upstream. The pre-existing firmware changes were left untouched.
+
+
+## Pico soak investigation — 2026-11-17
+
+The live linux-gfx capture completed 695 replies for 696 writes, then hit the
+client's five-second reply deadline while NIO reads returned NOT_READY. It recorded
+no NIO timeout, malformed frame or EOF. Some earlier replies took over one second.
+This is evidence of missing/delayed data, not yet proof of a Pico defect.
+
+- [x] Add bounded Pico raw-TCP diagnostics without enabling FN_DEBUG, preserving
+  the SD-testing branch. Track accepted/acknowledged/received/consumed bytes,
+  output/callback errors, queue/window/retransmission state and close evidence.
+- [ ] Capture a failing live soak with the diagnostic firmware and linux-gfx
+  stderr; identify where progress stops and fix the demonstrated cause.
+- [ ] Consider shared-client stale-snapshot recovery after the baseline capture.
+  Do not blindly resend on the same TCP stream: replies have no request ID.
+  Safe options require draining the outstanding framed reply before another
+  request, or reconnecting and registering again. Count soft deadlines and
+  recovery attempts separately so recovery cannot conceal soak failures.
+
+Firmware implementation and capture-field documentation belong in
+`repos/fujinet-nio/pico2w/README.md`. No library or protocol change is required
+for this instrumentation. Hardware root-cause verification remains pending.
+
+Instrumentation committed locally as firmware commit `3764fe0c` on `pico/sd-spi`.
+Verification: all seven native Pico CTest checks pass, including silent normal
+traffic, stall/recovery, deferred reset/output errors, callback detachment,
+bounded close queue and global output rate limiting. The Pico 2 W UF2 built with
+`FN_DEBUG=OFF`; the old build cache's removed ISRG certificate path was reset to
+the current default Mozilla bundle. Artifact:
+`/tmp/nio-pico2w-build/fujinet_nio_pico2w.uf2`. Not flashed or hardware-tested.
+Workspace documentation checked with `git diff --check`; no submodule pin moved.
