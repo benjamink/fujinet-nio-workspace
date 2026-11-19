@@ -150,10 +150,31 @@ acceptance is insufficient for playability; stock A500 acceptance remains open.
 - [x] Add a selectable accelerated 68030 profile and `run.sh` launcher alias.
 - [x] Remove per-pixel software division in the Amiga renderer; rerun live
   movement/bomb/reconnect/results acceptance and host tests.
-- [ ] Decouple input/movement/render cadence from blocking NIO exchanges and
+- [x] Decouple input/movement/render cadence from blocking NIO exchanges and
   demonstrate responsive held-key movement and bomb latency on stock A500.
 
 Measurements, commands, limitations, and evidence directories are recorded in
 `external/fujinet-fujiblast/docs/amiga-playing.md`. The 030 comparison shows
 network waits dominate after rendering cost becomes small; do not call a
 50 Hz emulator refresh measurement 50 game FPS.
+
+
+### Implemented performance follow-up
+
+The network worker, ordered/coalescing bounded queues, cached planar blitter
+sprites/tiles, foreground scheduling, and late-frame pacing are implemented.
+PAL stalled-NIO keyboard acceptance measured 65 foreground passes in 120
+logical ticks, all 120 movement steps applied, no discarded steps, and an
+100 ms maximum input-poll gap. Real Space input predicted the bomb during the
+stall. The busy four-player case measured 15.6 FPS with 59.8 movement UPS in a
+steady sample; do not claim 30/50 FPS for every scene.
+
+Seven host test groups, PAL/NTSC live networking, PAL/NTSC held-key/stall tests,
+screen captures, a pixel-by-pixel blitter oracle, and missing-broker cleanup
+passed. One final NTSC run exceeded the input-gap target at 133 ms; the repeat
+passed at 100 ms. The bound is not guaranteed across runs. Exact commands and evidence are in
+`external/fujinet-fujiblast/docs/amiga-performance.md`.
+
+Implementation and emulator acceptance are complete for this follow-up.
+Retain the goal here pending the user's playability review. Physical hardware
+is not represented by these emulator measurements.
