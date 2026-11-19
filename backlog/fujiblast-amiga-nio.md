@@ -140,3 +140,20 @@ Implemented and committed in the game repository on `amiga-nio`:
 
 No changes were pushed. The implementation is ready for user review; retain
 this record in `backlog/` until acceptance, then move it to `completed/`.
+
+## User review: performance follow-up (2026-11-19)
+
+User reports unplayably sluggish keyboard movement on stock A500. Functional
+acceptance is insufficient for playability; stock A500 acceptance remains open.
+
+- [x] Add opt-in game FPS, movement UPS, render and blocking-I/O timings.
+- [x] Add a selectable accelerated 68030 profile and `run.sh` launcher alias.
+- [x] Remove per-pixel software division in the Amiga renderer; rerun live
+  movement/bomb/reconnect/results acceptance and host tests.
+- [ ] Decouple input/movement/render cadence from blocking NIO exchanges and
+  demonstrate responsive held-key movement and bomb latency on stock A500.
+
+Measurements, commands, limitations, and evidence directories are recorded in
+`external/fujinet-fujiblast/docs/amiga-playing.md`. The 030 comparison shows
+network waits dominate after rendering cost becomes small; do not call a
+50 Hz emulator refresh measurement 50 game FPS.
