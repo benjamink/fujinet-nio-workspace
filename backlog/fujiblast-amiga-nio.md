@@ -178,3 +178,11 @@ passed at 100 ms. The bound is not guaranteed across runs. Exact commands and ev
 Implementation and emulator acceptance are complete for this follow-up.
 Retain the goal here pending the user's playability review. Physical hardware
 is not represented by these emulator measurements.
+
+### Scoreboard follow-up
+
+- [x] Replace the Amiga's crowded 20-character HUD with 40 narrow glyphs:
+  six-character names, separated scores, central timer, and seat colours.
+  Keep the 320×200 bitmap and existing chip-RAM budget.
+- [x] Select the four-player animated scene for visual verification with
+  BOT1/BOT2/BOT3/PLAYER and distinct scores; retain the pixel-oracle check.
