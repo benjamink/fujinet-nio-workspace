@@ -18,6 +18,7 @@ __main__.py
 
 /repos/core2350-test
 /repos/syn-ack-wire
+/external/fujinet-fujiblast
 
 # local reference checkouts: look-at-only, not part of NIO, never tracked
 /reference/
