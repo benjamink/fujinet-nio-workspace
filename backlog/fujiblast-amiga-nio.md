@@ -383,3 +383,17 @@ size-growth figures above record the pre-isolation audit.
 Acceptance: fourteen host groups, including non-Amiga `FB_NIO`, and live guest
 `20261120-142209-pal` pass. Guest checks include a >255-byte URL and chunked
 1,240-byte history. Non-NIO build products remain byte-identical to base.
+
+
+### F1 history regression
+
+- [x] Reproduce older native FBS1 history being rejected after the FBS2 change.
+- [x] Accept both native formats; preserve strict malformed-record checks and
+  save FBS2 on the next explicit setup save. No legacy AppKey access.
+- [x] Move large menu buffers off the default Amiga stack; distinguish read
+  failure from invalid data; run history and actual menu-path regressions.
+- [x] Confirm first-use history through the real NIO service in Amiberry.
+
+Fourteen host groups and live guest `20261120-142546-pal` pass, including
+empty history after name entry, large-value persistence and gameplay. The
+production executable is rebuilt with the public server default.
