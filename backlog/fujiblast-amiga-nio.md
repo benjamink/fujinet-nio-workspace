@@ -221,3 +221,46 @@ failure open separately; no live-wire pass is claimed for this cornering fix.
 
 Offline A500 scene 5 and its pixel oracle passed (`20261120-112521-pal`);
 the dedicated host regression covers the actual corner-input sequence.
+
+### Connection resilience and physical diagnostics (2026-11-20)
+
+User reports frequent reconnect prompts at 38400 despite stable file transfers
+and other apps at 57600. A single non-busy read failure previously dropped the
+stream immediately; the protocol silence threshold is already 900 polls.
+
+- [x] Add bounded read recovery using unchanged offset/size and NIO replay.
+- [x] Retry only provably zero-progress write backpressure; never blindly replay
+  uncertain writes with released library 0.2.0.
+- [x] Back off empty reads and add bounded RAM logging in the normal binary:
+  broker/native error details, retry/recovery/EOF/queue/idle reasons and counters.
+- [x] Run focused failure-injection tests with sanitizers (nine groups).
+- [ ] Collect a physical-machine log to identify the remaining drop cause.
+
+The new log identified the emulator's preceding persistence failure as broker
+backend-open failure (cause 1). Explicitly preloading serial drivers did not
+resolve it; that attempted launcher change was removed.
+Detailed log instructions and recovery limitations are in `docs/amiga-playing.md`
+in the game repository. Firmware, driver and library sources remain untouched.
+
+The emulator backend-open failure was traced to memory exhaustion: the launcher
+used `bogomem_size=1`, and the Amiberry log says "Unsupported bogomem size
+262144". Historical purported 512+512 KB runs actually had only 512 KB chip RAM.
+The launcher now requests `bogomem_size=2` (512 KB slow), and NIO appkeys initialize
+the backend before graphics/audio allocation. Prior timing evidence is annotated
+rather than represented as measurements of the corrected profile.
+
+The logging/live test also exposed control messages sharing the worker's DOS
+process port. Control RPCs now use their own worker-owned port, separating them
+from Delay and file-I/O replies. This is a correctness fix required before using
+the new diagnostics, not proof of the physical serial failure's root cause.
+
+Final live acceptance with logging passed (`20261120-114522-pal`): persistence,
+room list/join, movement/bomb, deliberate TCP cut and same-seat reconnect,
+results, leave/reopen and shutdown. The diagnostic recorded the cut as `tcp-eof`;
+no corrupt frames or queue overflows were reported. Nine host groups pass and
+the production 68000 binary is rebuilt against released library 0.2.0.
+
+The logging-enabled stalled-network run (`20261120-114638-pal`) retained the
+connection, applied 120/120 movement ticks, predicted the keyboard bomb and
+ran 73 foreground passes. It failed the strict input-gap assertion at 140 ms
+(target 100 ms); do not record it as a full responsiveness pass.
