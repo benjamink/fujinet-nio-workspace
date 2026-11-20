@@ -347,3 +347,13 @@ are in the game's `docs/amiga-playing.md`.
 Full review, measured deltas and exact blockers:
 `external/fujinet-fujiblast/docs/amiga-shared-code-review.md`. No shared-code
 fix was made during the review; the recorded source baseline is `518d2a9a`.
+
+
+CoCo follow-up after user installed CMOC/lwtools: CMOC 0.1.101 and lwtools
+4.25 compile/link both CoCo 1/2 and CoCo 3 for base `53f41889` and reviewed
+head `518d2a9a`. All repository region checks pass. Each branch low binary
+grows 193 bytes (+191 code, +2 constants); BSS size is unchanged. Remaining
+low-memory room is 2,330 bytes (CoCo 1/2) and 5,075 bytes (CoCo 3), excluding
+the reserved 1 KB stack. No new warnings. Full disk packaging still needs
+Toolshed `decb`; no CoCo runtime acceptance is claimed. The review document
+and `scratch/fujiblast/review-checks/coco-comparison.json` record the evidence.
