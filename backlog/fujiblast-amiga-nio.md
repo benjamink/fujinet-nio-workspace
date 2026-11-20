@@ -199,3 +199,25 @@ is not represented by these emulator measurements.
 
 Setup implementation and evidence are documented in the game's
 `docs/amiga-playing.md`. The physical binary remains `r2r/amiga/fujiblast-nio`.
+
+### Joystick cornering follow-up (2026-11-20)
+
+User reports passage-entry wobble and uses 38400 baud to avoid connection drops.
+Reproduced a local diagonal-axis priority oscillation in the actual play-loop
+selector. Amiga now retains the chosen turn priority until the stick changes,
+with the existing blocked-turn fallback and unchanged collision rules.
+
+- [x] Reproduce before fixing and cover all orientations/speeds, batched ticks,
+  early/near-entry turns, walls/bombs, and cardinal alignment limits.
+- [x] Build the physical executable; eight sanitizer host test groups pass.
+- [ ] User confirms passage-entry improvement on the physical Amiga at 38400.
+
+This input correction is not a serial-drop diagnosis or a claim that all possible
+server position corrections have been eliminated.
+
+The live emulator retest failed twice at NIO name persistence before gameplay
+(evidence `20261120-112347-pal`, `20261120-112439-pal`). Keep that integration
+failure open separately; no live-wire pass is claimed for this cornering fix.
+
+Offline A500 scene 5 and its pixel oracle passed (`20261120-112521-pal`);
+the dedicated host regression covers the actual corner-input sequence.
