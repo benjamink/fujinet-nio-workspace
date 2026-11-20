@@ -234,7 +234,7 @@ stream immediately; the protocol silence threshold is already 900 polls.
 - [x] Back off empty reads and add bounded RAM logging in the normal binary:
   broker/native error details, retry/recovery/EOF/queue/idle reasons and counters.
 - [x] Run focused failure-injection tests with sanitizers (nine groups).
-- [ ] Collect a physical-machine log to identify the remaining drop cause.
+- [x] Collect a physical-machine log to identify the remaining drop cause.
 
 The new log identified the emulator's preceding persistence failure as broker
 backend-open failure (cause 1). Explicitly preloading serial drivers did not
@@ -264,3 +264,31 @@ The logging-enabled stalled-network run (`20261120-114638-pal`) retained the
 connection, applied 120/120 movement ticks, predicted the keyboard bomb and
 ran 73 foreground passes. It failed the strict input-gap assertion at 140 ms
 (target 100 ms); do not record it as a full responsiveness pass.
+
+### Physical serial request ownership regression (2026-11-20)
+
+The fetched `fujiblast-net.log` reports `cause=7 serial=250` on the read of a
+15-byte write acknowledgement, after about 49 seconds. This means native
+`IOERR_UNITBUSY`, not a game silence threshold or a reported UART overrun.
+User confirmed custom serial driver 0.11. The source failed to mark reused
+requests pending to Exec; a deterministic real-driver guest regression fails
+64/64 checks before the correction and passes afterward.
+
+- [x] Correct BeginIO request state in the owning driver repository.
+- [x] Handle stale reply-port wake-ups in the broker without false timeouts.
+- [x] Pass Amiga native tests, guest request reuse checks and 100 warm exchanges.
+- [x] Build identifiable serial 0.12 and broker 0.10 artifacts for physical use.
+- [ ] User installs both devices, reboots, verifies loaded versions and retests
+  physical gameplay at the existing baud. Preserve a fresh log if it drops.
+
+Implementation and evidence: driver repository
+`docs/amiga/serial-request-reuse-regression.md`. These are confirmed software
+defects consistent with the physical error; physical resolution remains unproven.
+No game, library API or firmware wire changes are required. Do not update the
+workspace submodule pin until the driver fix is merged upstream.
+
+Final guest evidence: WB3.2/030 `amiberry-20261120-120704` (19.80 s),
+WB1.3/68000 `amiberry-20261120-120914` (99.68 s). Both include 64 request-state
+checks and 100 measured warm exchange trials. The WB1.3 test's activity budget
+was extended from the former one-trial budget to cover the longer test;
+game and transport timeout settings are unchanged.

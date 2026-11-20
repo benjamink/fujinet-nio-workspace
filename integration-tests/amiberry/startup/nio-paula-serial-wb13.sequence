@@ -3,6 +3,7 @@ C:FailAt 100
 C:fujinet-load-resident >DH0:serial-load.result DEVS:fujinet-serial.device fujinet-serial.device
 If NOT WARN
 C:Echo >>DH0:serial-load.result "SERIAL LOAD RC=0"
+C:fujinet-nio-exchange >DH0:serial-request.result --serial-request-test
 C:fujinet-load-resident >DH0:nio-load.result DEVS:fujinet-nio.device fujinet-nio.device
 If NOT WARN
 C:Echo >>DH0:nio-load.result "LOAD RC=0"
@@ -12,6 +13,7 @@ C:Echo >DH0:nio-tool-rc.result "TOOL RC=0"
 Else
 C:Echo >DH0:nio-tool-rc.result "TOOL RC=20"
 EndIf
+C:fujinet-nio-exchange >DH0:serial-repeat.result --type clock --backend warm --baud 19200 --trials 100 --serial-device fujinet-serial.device
 C:fujinet-nio-exchange >NIL: --type file-list --backend cold --baud 19200 --trials 1 --size 256 --uri host:/amiga-e2e-complete/nio-paula-serial --serial-device fujinet-serial.device
 EndIf
 EndIf

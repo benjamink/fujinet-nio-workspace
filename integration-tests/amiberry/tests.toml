@@ -1404,6 +1404,8 @@ startup = "startup/nio-paula-serial.sequence"
 completion_mode = "nio_marker"
 completion_log = "host:/amiga-e2e-complete/nio-paula-serial"
 results = [
+  "serial-request.result",
+  "serial-repeat.result",
   "serial-load.result",
   "nio-load.result",
   "nio-exchange.result",
@@ -1411,6 +1413,9 @@ results = [
 ]
 
 [test.environment_variants.wb13]
+# 100 real-speed 68000 exchanges plus startup exceed the old one-trial budget.
+timeout = 150
+activity_timeout = 120
 startup = "startup/nio-paula-serial-wb13.sequence"
 startup_target = "S/StartupII"
 amiga_artifact_profile = "wb13"
