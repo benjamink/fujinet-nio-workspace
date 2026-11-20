@@ -326,3 +326,24 @@ Completed with twelve host groups, stock A500 WB1.3 audio acceptance
 `20261120-132751-pal` (including captured PCM), and networked WB1.3/030
 acceptance `20261120-132926-pal`. Detailed playback and lifecycle contracts
 are in the game's `docs/amiga-playing.md`.
+
+### Cross-platform review and merge gates (2026-11-20)
+
+- [x] Audit shared changes against base `53f41889`; substantive unconditional
+  behavior changes are in `src/appkey.c`.
+- [x] Compare base/head builds: Atari and DOS package successfully; Apple II
+  links, but packaging lacks `ac`. Measure AppKey growth and available space.
+- [x] Attempt remaining C targets on both revisions; record missing pinned
+  OG-library variants and CMOC toolchain rather than claiming passes.
+- [x] Exercise the OG AppKey API with sanitizers, confirming the old oversized
+  URL overflow is prevented and normal round-trips still work.
+- [ ] Resolve the rejected-default regression: `DEFAULT_SERVER=host:65536`
+  leaves partial port 6553 because the parser failure is ignored.
+- [ ] Decide whether shared hardening belongs in this port or a separate
+  change; keep Amiga-specific save/result needs conditional.
+- [ ] Before cross-platform sign-off, supply missing dependencies and run ROM,
+  bank and memory checks for the blocked targets (or eliminate their diff).
+
+Full review, measured deltas and exact blockers:
+`external/fujinet-fujiblast/docs/amiga-shared-code-review.md`. No shared-code
+fix was made during the review; the recorded source baseline is `518d2a9a`.
