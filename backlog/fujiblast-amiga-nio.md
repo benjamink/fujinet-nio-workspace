@@ -337,9 +337,9 @@ are in the game's `docs/amiga-playing.md`.
   OG-library variants and CMOC toolchain rather than claiming passes.
 - [x] Exercise the OG AppKey API with sanitizers, confirming the old oversized
   URL overflow is prevented and normal round-trips still work.
-- [ ] Resolve the rejected-default regression: `DEFAULT_SERVER=host:65536`
+- [x] Resolve the rejected-default regression: `DEFAULT_SERVER=host:65536`
   leaves partial port 6553 because the parser failure is ignored.
-- [ ] Decide whether shared hardening belongs in this port or a separate
+- [x] Decide whether shared hardening belongs in this port or a separate
   change; keep Amiga-specific save/result needs conditional.
 - [ ] Before cross-platform sign-off, supply missing dependencies and run ROM,
   bank and memory checks for the blocked targets (or eliminate their diff).
@@ -357,3 +357,14 @@ low-memory room is 2,330 bytes (CoCo 1/2) and 5,075 bytes (CoCo 3), excluding
 the reserved 1 KB stack. No new warnings. Full disk packaging still needs
 Toolshed `decb`; no CoCo runtime acceptance is claimed. The review document
 and `scratch/fujiblast/review-checks/coco-comparison.json` record the evidence.
+
+
+Post-review resolution: AppKey changes are now Amiga-only. Amiga invalid-default
+handling is transactional with a valid public fallback; 13 host test groups and
+the production build pass. Rebuilt Atari, Apple II, DOS CGA/VGA, CoCo 1/2 and
+CoCo 3 program binaries match base byte-for-byte (zero size delta). The portable
+overflow is documented for the upstream author, not fixed on other targets.
+Thom will be asked by the user to validate remaining blocked targets. Production
+network logging is opt-in; acceptance logs and optional probes remain available.
+See the resolution section of the repository review for current results; earlier
+size-growth figures above record the pre-isolation audit.
