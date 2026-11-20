@@ -186,3 +186,16 @@ is not represented by these emulator measurements.
   Keep the 320×200 bitmap and existing chip-RAM budget.
 - [x] Select the four-player animated scene for visual verification with
   BOT1/BOT2/BOT3/PLAYER and distinct scores; retain the pixel-oracle check.
+
+### Physical Amiga setup and audio follow-up (2026-11-20)
+
+- [x] Inspect existing lobby server/name appkeys and compile-time fallback.
+- [x] Add title-screen F1 setup for player name and server, validation,
+  persistence, cancellation, and a route back after connection failure.
+- [x] Retain the server when leaving a room; verify appkey boundaries and
+  invalid inputs with host tests, plus real keyboard setup in Amiberry.
+- [ ] Port the actual background music and improve the basic sound substitutes.
+  Work on this separately after server setup; the current audio is not a full port.
+
+Setup implementation and evidence are documented in the game's
+`docs/amiga-playing.md`. The physical binary remains `r2r/amiga/fujiblast-nio`.
