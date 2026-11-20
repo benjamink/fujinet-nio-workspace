@@ -194,7 +194,7 @@ is not represented by these emulator measurements.
   persistence, cancellation, and a route back after connection failure.
 - [x] Retain the server when leaving a room; verify appkey boundaries and
   invalid inputs with host tests, plus real keyboard setup in Amiberry.
-- [ ] Port the actual background music and improve the basic sound substitutes.
+- [x] Port the actual background music and improve the basic sound substitutes.
   Work on this separately after server setup; the current audio is not a full port.
 
 Setup implementation and evidence are documented in the game's
@@ -312,3 +312,17 @@ Lobby is a bundled preset verified via `/viewFull`, not runtime HTTP discovery.
 The DOS `ec.tnfs.io` host serves the lobby disk image. Custom history and the
 public preset use the game's existing room-list flow. Implementation details
 and controls are in the game's `docs/amiga-playing.md`.
+
+### Amiga music and effects
+
+- [x] Replace placeholder jingles/effects with the shared tune definitions.
+- [x] Generate both gameplay voices from `music/play.txt` and enable round music.
+- [x] Keep audio timing independent of rendering/network waits, with PAL/NTSC
+  cadence, concurrent effects, mute/resume, and orderly device cleanup.
+- [x] Verify sequencing on the host and audible playback in Amiberry; rebuild
+  the physical 68000 executable and document evidence in the game repository.
+
+Completed with twelve host groups, stock A500 WB1.3 audio acceptance
+`20261120-132751-pal` (including captured PCM), and networked WB1.3/030
+acceptance `20261120-132926-pal`. Detailed playback and lifecycle contracts
+are in the game's `docs/amiga-playing.md`.
