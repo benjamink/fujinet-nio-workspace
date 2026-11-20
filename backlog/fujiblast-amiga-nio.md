@@ -368,3 +368,18 @@ Thom will be asked by the user to validate remaining blocked targets. Production
 network logging is opt-in; acceptance logs and optional probes remain available.
 See the resolution section of the repository review for current results; earlier
 size-growth figures above record the pre-isolation audit.
+
+
+### Native NIO configuration storage
+
+- [x] Replace Amiga legacy AppKey calls with native AppStore settings, with no
+  migration of development-only keys (user decision).
+- [x] Share bounded chunked storage and endpoint validation under `src/nio/`
+  for a future BBC NIO port, keeping OG target behavior conditional.
+- [x] Increase address/history buffers and verify settings above 64/255 bytes,
+  five-entry history, short/error transfers, and bounded UI rendering.
+- [x] Validate native persistence through Amiberry and refresh production build.
+
+Acceptance: fourteen host groups, including non-Amiga `FB_NIO`, and live guest
+`20261120-142209-pal` pass. Guest checks include a >255-byte URL and chunked
+1,240-byte history. Non-NIO build products remain byte-identical to base.
