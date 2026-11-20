@@ -292,3 +292,23 @@ WB1.3/68000 `amiberry-20261120-120914` (99.68 s). Both include 64 request-state
 checks and 100 measured warm exchange trials. The WB1.3 test's activity budget
 was extended from the former one-trial budget to cover the longer test;
 game and transport timeout settings are unchanged.
+
+### NIO host history and Lobby/Custom setup
+
+- [x] Add/select/delete up to five custom endpoints on the Amiga setup screen.
+- [x] Store the list in one NIO AppStore value, separate from lobby appkeys.
+- [x] Preserve the old selected host on first use, reject malformed history,
+  deduplicate canonical endpoints, and retain errors for retry.
+- [x] Add a Lobby/Custom selector with a separate build-time Lobby preset.
+- [x] Pass sanitizer host tests and build using released library 0.2.0.
+- [x] Resolve the public endpoint using the lobby registry supplied by the user:
+  appkey 16 / FujiBlast advertises `fujinet.online:9910` with four rooms.
+- [x] Finish live public-preset verification and rebuild the physical executable.
+  WB1.3/030 evidence `20261120-130024-pal` shows five saved custom entries,
+  wrapped addresses, save/reload, and the four live public rooms. Eleven host
+  groups pass; the production 68000 artifact uses `fujinet.online:9910`.
+
+Lobby is a bundled preset verified via `/viewFull`, not runtime HTTP discovery.
+The DOS `ec.tnfs.io` host serves the lobby disk image. Custom history and the
+public preset use the game's existing room-list flow. Implementation details
+and controls are in the game's `docs/amiga-playing.md`.
