@@ -26,11 +26,15 @@ Copy NIO:fujinet-nio-baud TO C:
 
 ; Default boot settings; an existing S:FujiNet-Config is never replaced.
 If NOT EXISTS S:FujiNet-Config
-  Copy NIO:FujiNet-Config TO S:
+  Copy NIO:FujiNet-Config.default TO S:FujiNet-Config
 EndIf
 
 If EXISTS S:FujiNet-WB13-Static-Installed
   Echo "FujiNet WB1.3 files refreshed; static MountList retained."
+  Echo "If S:StartupII lacks it, add this line after the fujinet-load-resident lines:"
+  Echo "C:fujinet-nio-baud FROM=S:FujiNet-Config"
+  Echo "It applies the rate in S:FujiNet-Config (38400 by default) at boot;"
+  Echo "the FujiNet must be set to match (uart.baud and uart.save on its console)."
 Else
   If EXISTS S:FujiNet-WB13-Installed
     Echo "Legacy FujiNet WB1.3 MountList detected. Restore a clean DEVS:MountList"

@@ -119,9 +119,12 @@ if [[ "$PROFILE" == wb13 ]]; then
 fi
 
 # Default boot settings, installed to S:FujiNet-Config only if none exists.
+# Staged as FujiNet-Config.default: a plain FujiNet-Config here would sit
+# beside FujiNet-Config.info (Config's WBStartup project icon) as its project.
+rm -f "$STAGE/FujiNet-Config"
 printf '; FujiNet boot settings, written by Config\nBAUD=38400\n' \
-  >"$STAGE/FujiNet-Config"
-chmod 0644 "$STAGE/FujiNet-Config"
+  >"$STAGE/FujiNet-Config.default"
+chmod 0644 "$STAGE/FujiNet-Config.default"
 
 printf 'Amiga %s artifacts: %s\n' "$PROFILE" "$STAGE"
 # Staging doesn't touch the FujiNet's default disk; say what does.
