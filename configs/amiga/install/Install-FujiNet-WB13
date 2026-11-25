@@ -22,6 +22,12 @@ Copy NIO:fls TO C:
 Copy NIO:fmount TO C:
 Copy NIO:fumount TO C:
 Copy NIO:fout TO C:
+Copy NIO:fujinet-nio-baud TO C:
+
+; Default boot settings; an existing S:FujiNet-Config is never replaced.
+If NOT EXISTS S:FujiNet-Config
+  Copy NIO:FujiNet-Config TO S:
+EndIf
 
 If EXISTS S:FujiNet-WB13-Static-Installed
   Echo "FujiNet WB1.3 files refreshed; static MountList retained."
@@ -41,6 +47,7 @@ Else
     Echo "Installed. Add these lines before Break 1 C in S:StartupII:"
     Echo "C:fujinet-load-resident DEVS:fujinet-nio.device fujinet-nio.device"
     Echo "C:fujinet-load-resident DEVS:fujinet-disk.device fujinet-disk.device"
+    Echo "C:fujinet-nio-baud FROM=S:FujiNet-Config"
     Echo "Do not add ordinary C:Mount lines: FMOUNT starts the matching handler."
     Echo "If FujiNet has a configured default disk, add C:FBOOT after these"
     Echo "resident-load lines. It activates the FFS/DD default ADF as DN0:."
