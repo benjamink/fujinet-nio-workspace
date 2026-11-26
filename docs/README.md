@@ -6,6 +6,10 @@ Platform-agnostic references:
   target layers, and ownership.
 - [`disk-image-builds.md`](disk-image-builds.md) — current disk-image targets,
   manifests, and repository boundaries.
+- [`agent-test-policy.md`](agent-test-policy.md) — which tests each change
+  needs, per repository.
+- [`pr-pre-review.md`](pr-pre-review.md) — the checks a pull request gets
+  before it goes to review.
 
 Platform-specific references:
 

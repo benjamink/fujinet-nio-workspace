@@ -173,3 +173,11 @@ When changing `repos/fujinet-nio-lib`, run complete `make check`. Amiga guest
 procedure: `docs/amiga/amiberry-testing.md`. Amiga CLI tools: default Shell
 STACK is 4096; do not `WaitIO` an OpenDevice-only IORequest
 (`docs/amiga/cli-stack-and-iorequest.md`).
+
+## Pull request pre-review
+
+Before a pull request is opened for review or moved out of draft, run the
+pass in `docs/pr-pre-review.md`: read the governing architecture docs, build
+from a clean checkout, run the tests, check every claim in the description,
+and read the code for bugs. Give the author the report; do not post it to the
+pull request unless asked.
